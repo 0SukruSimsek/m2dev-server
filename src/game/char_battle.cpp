@@ -23,6 +23,9 @@
 #include "arena.h"
 #include "regen.h"
 #include "exchange.h"
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+#include "anti_multi_farm.h"
+#endif
 #include "shop_manager.h"
 #include "castle.h"
 #include "ani.h"
@@ -824,13 +827,32 @@ void CHARACTER::Reward(bool bItemDrop)
 	if (!SECTREE_MANAGER::instance().GetMovablePosition(GetMapIndex(), pos.x, pos.y, pos))
 		return;
 
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+	// Anti Multi-Farm: aynı IP'den giren attacker'ın slot tier'ına göre
+	// yang/drop kazançlarını kısıtla. Boss/metin/king kill'ler muaf.
+	const bool fAmfExempt = AntiMultiFarm::IsExemptKillTarget(this);
+	const bool fAmfCanYang = fAmfExempt || AntiMultiFarm::CanReceiveYang(pkAttacker);
+	const bool fAmfCanDrop = fAmfExempt || AntiMultiFarm::CanReceiveDrop(pkAttacker);
+	if (!fAmfCanYang && !fAmfCanDrop)
+	{
+		// Tier SHOP/REJECT: tüm reward bloğunu atla.
+		m_map_kDamage.clear();
+		return;
+	}
+#endif
+
 	//
 	// 돈 드롭
 	//
 	//PROF_UNIT pu2("r2");
 	if (test_server)
 		sys_log(0, "Drop money : Attacker %s", pkAttacker->GetName());
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+	if (fAmfCanYang)
+		RewardGold(pkAttacker);
+#else
 	RewardGold(pkAttacker);
+#endif
 	//pu2.Pop();
 
 	//
@@ -842,7 +864,11 @@ void CHARACTER::Reward(bool bItemDrop)
 	static std::vector<LPITEM> s_vec_item;
 	s_vec_item.clear();
 
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+	if (fAmfCanDrop && ITEM_MANAGER::instance().CreateDropItem(this, pkAttacker, s_vec_item))
+#else
 	if (ITEM_MANAGER::instance().CreateDropItem(this, pkAttacker, s_vec_item))
+#endif
 	{
 		if (s_vec_item.size() == 0);
 		else if (s_vec_item.size() == 1)
@@ -2472,6 +2498,14 @@ void CHARACTER::DistributeHP(LPCHARACTER pkKiller)
 
 static void GiveExp(LPCHARACTER from, LPCHARACTER to, int iExp)
 {
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+	// Anti Multi-Farm: tier NO_EXP/SHOP/REJECT karakterler EXP almaz.
+	// Boss/metin/king kill'lerde muafiyet uygulanır.
+	if (!AntiMultiFarm::IsExemptKillTarget(from) &&
+	    !AntiMultiFarm::CanReceiveExp(to))
+		return;
+#endif
+
 	// 레벨차 경험치 가감비율
 	iExp = CALCULATE_VALUE_LVDELTA(to->GetLevel(), from->GetLevel(), iExp);
 

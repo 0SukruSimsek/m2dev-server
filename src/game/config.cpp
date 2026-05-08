@@ -110,6 +110,15 @@ bool            g_noticeBattleZone      = false;        // 중립지대에 입�
 int gPlayerMaxLevel = 99;
 bool g_BlockCharCreation = false;
 
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+// Anti Multi-Farm config (CONFIG dosyasından override edilebilir)
+bool g_bAntiMultiFarmEnabled    = true;
+int  g_iAntiMultiFarmMaxFull    = 2;   // ilk 2 slot: EXP+drop+yang
+int  g_iAntiMultiFarmMaxNoExp   = 2;   // sonraki 2 slot: drop+yang only
+int  g_iAntiMultiFarmMaxShop    = 1;   // 5. slot: shop only, kazanç yok
+bool g_bAntiMultiFarmExemptBoss = true;
+#endif
+
 bool is_string_true(const char * string)
 {
 	int	result = 0;
@@ -579,6 +588,36 @@ void config_init(const string& st_localeServiceName)
 			str_to_number(test_server, value_string);
 			continue;
 		}
+
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+		TOKEN("anti_multi_farm_enabled")
+		{
+			int v = 0; str_to_number(v, value_string);
+			g_bAntiMultiFarmEnabled = (v != 0);
+			continue;
+		}
+		TOKEN("anti_multi_farm_max_full")
+		{
+			str_to_number(g_iAntiMultiFarmMaxFull, value_string);
+			continue;
+		}
+		TOKEN("anti_multi_farm_max_noexp")
+		{
+			str_to_number(g_iAntiMultiFarmMaxNoExp, value_string);
+			continue;
+		}
+		TOKEN("anti_multi_farm_max_shop")
+		{
+			str_to_number(g_iAntiMultiFarmMaxShop, value_string);
+			continue;
+		}
+		TOKEN("anti_multi_farm_exempt_boss")
+		{
+			int v = 1; str_to_number(v, value_string);
+			g_bAntiMultiFarmExemptBoss = (v != 0);
+			continue;
+		}
+#endif
 
 		TOKEN("china_event_server")
 		{

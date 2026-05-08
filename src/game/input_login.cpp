@@ -18,6 +18,9 @@
 #include "dungeon.h"
 #include "war_map.h"
 #include "questmanager.h"
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+#include "anti_multi_farm.h"
+#endif
 #include "building.h"
 #include "wedding.h"
 #include "affect.h"
@@ -507,6 +510,15 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 		d->SetPhase(PHASE_CLOSE);
 		return;
 	}
+
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+	// IP başına izin verilen toplam slot aşıldıysa kick.
+	if (!AntiMultiFarm::CheckLoginAllowed(d))
+	{
+		d->SetPhase(PHASE_CLOSE);
+		return;
+	}
+#endif
 
 	PIXEL_POSITION pos = ch->GetXYZ();
 

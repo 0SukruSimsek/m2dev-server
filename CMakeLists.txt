@@ -8,6 +8,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # ASan support
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
 
+# Anti Multi-Farm: aynı IP'den giren karakterlerin kazançlarını kademeli
+# olarak kısıtlar (slot 0-1 FULL, 2-3 drop+yang, 4 shop only, 5+ kick).
+# Bkz: src/game/anti_multi_farm.h
+option(ENABLE_ANTI_MULTIPLE_FARM "Enable IP-based anti multi-farm tiering" ON)
+if(ENABLE_ANTI_MULTIPLE_FARM)
+	add_compile_definitions(ENABLE_ANTI_MULTIPLE_FARM)
+endif()
+
 set(CMAKE_MODULE_PATH
 	${CMAKE_MODULE_PATH}
 	"${CMAKE_CURRENT_SOURCE_DIR}/buildtool"
