@@ -179,7 +179,10 @@ CPacketInfoCG::CPacketInfoCG()
 
 	Set(CG::DRAGON_SOUL_REFINE, sizeof(TPacketCGDragonSoulRefine), "DragonSoulRefine");
 	Set(CG::STATE_CHECKER, sizeof(TPacketCGStateCheck), "ServerStateCheck");
-	
+
+	// switchbot dev framework
+	Set(CG::SWITCHBOT_TOGGLE, sizeof(TPacketCGSwitchbotToggle), "SwitchbotToggle");
+
 }
 
 CPacketInfoCG::~CPacketInfoCG()

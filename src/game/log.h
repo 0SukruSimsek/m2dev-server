@@ -51,6 +51,16 @@ class LogManager : public singleton<LogManager>
 		void		DetailLoginLog(bool isLogin, LPCHARACTER ch);
 		void		DragonSlayLog(DWORD dwGuildID, DWORD dwDragonVnum, DWORD dwStartTime, DWORD dwEndTime);
 
+		// switchbot dev log (db: log, table: log_switchbot_dev)
+		void		SwitchbotLog(DWORD dwPID, const char* name,
+		                         BYTE channel, int map_index,
+		                         const char* scenario, const char* event_type,
+		                         const char* error_detail,
+		                         int last_x, int last_y,
+		                         uint32_t duration_sec,
+		                         uint32_t kills, uint32_t encounters,
+		                         uint32_t stuck_cnt, uint32_t err_cnt);
+
 	private:
 		void		Query(const char * c_pszFormat, ...);
 

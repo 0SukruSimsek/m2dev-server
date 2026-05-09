@@ -56,6 +56,9 @@ extern void SendLog(const char * c_pszBuf);		// 운영자에게만 공지
 extern void BroadcastNotice(const char * c_pszBuf);	// 전 서버에 공지
 extern void SendNoticeMap(const char* c_pszBuf, int nMapIndex, bool bBigFont); // 지정 맵에만 공지
 
+// switchbot dev framework
+ACMD(do_switchbot);
+
 // LUA_ADD_BGM_INFO
 void CHARACTER_SetBGMVolumeEnable();
 void CHARACTER_AddBGMInfo(unsigned mapIndex, const char* name, float vol);

@@ -302,3 +302,28 @@ void LogManager::DragonSlayLog(DWORD dwGuildID, DWORD dwDragonVnum, DWORD dwStar
 			dwGuildID, dwDragonVnum, dwStartTime, dwEndTime);
 }
 
+// switchbot dev log ─ pattern mirrors FishLog above.
+// Inserts into log.log_switchbot_dev; dogrulayici SQL-imports the table first.
+void LogManager::SwitchbotLog(DWORD dwPID, const char* name,
+	BYTE channel, int map_index,
+	const char* scenario, const char* event_type,
+	const char* error_detail,
+	int last_x, int last_y,
+	uint32_t duration_sec,
+	uint32_t kills, uint32_t encounters,
+	uint32_t stuck_cnt, uint32_t err_cnt)
+{
+	Query("INSERT INTO log_switchbot_dev "
+		"(pid,name,channel,map_index,scenario,event_type,error_detail,"
+		"last_x,last_y,duration_sec,"
+		"summary_kills,summary_enc,summary_stuck,summary_err,flushed_at) "
+		"VALUES(%u,'%s',%d,%d,'%s','%s','%s',%d,%d,%u,%u,%u,%u,%u,NOW())",
+		dwPID, name ? name : "",
+		(int)channel, map_index,
+		scenario     ? scenario     : "",
+		event_type   ? event_type   : "",
+		error_detail ? error_detail : "",
+		last_x, last_y, duration_sec,
+		kills, encounters, stuck_cnt, err_cnt);
+}
+

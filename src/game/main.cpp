@@ -54,6 +54,7 @@
 #include "DragonLair.h"
 #include "skill_power.h"
 #include "DragonSoul.h"
+#include "switchbot.h"
 
 // #ifndef OS_WINDOWS
 // #include <gtest/gtest.h>
@@ -341,6 +342,7 @@ int main(int argc, char **argv)
 	CThreeWayWar	threeway_war;
 	CDragonLairManager	dl_manager;
 	DSManager dsManager;
+	CSwitchbotManager switchbot_manager; // switchbot dev framework
 
 	if (!start(argc, argv)) {
 		CleanUpForEarlyExit();
