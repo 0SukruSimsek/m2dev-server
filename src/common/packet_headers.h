@@ -129,6 +129,7 @@ namespace CG
     constexpr uint16_t FISHING            = 0x0B01;
     constexpr uint16_t DUNGEON            = 0x0B02;
     constexpr uint16_t HACK               = 0x0B03;
+    constexpr uint16_t SWITCHBOT_TOGGLE   = 0x0B04; // switchbot dev framework
 
     // Guild Marks
     constexpr uint16_t MARK_LOGIN         = 0x0C01;
@@ -275,6 +276,7 @@ namespace GC
     constexpr uint16_t OBSERVER_ADD       = 0x0B20;
     constexpr uint16_t OBSERVER_REMOVE    = 0x0B21;
     constexpr uint16_t OBSERVER_MOVE      = 0x0B22;
+    constexpr uint16_t SWITCHBOT_STATUS   = 0x0B23; // switchbot dev framework
 
     // Guild Marks
     constexpr uint16_t MARK_BLOCK         = 0x0C10;

@@ -6,6 +6,7 @@
 #include "desc_manager.h"
 #include "buffer_manager.h"
 #include "packet_structs.h"
+#include "switchbot.h"
 #include "protocol.h"
 #include "char.h"
 #include "char_manager.h"
@@ -3079,6 +3080,15 @@ void CInputMain::Fishing(LPCHARACTER ch, const char* c_pData)
 	return;
 }
 
+// switchbot dev framework -- client sends CG::SWITCHBOT_TOGGLE
+void CInputMain::SwitchbotToggle(LPCHARACTER ch, const char* c_pData)
+{
+	if (!ch) return;
+	const TPacketCGSwitchbotToggle* p =
+		reinterpret_cast<const TPacketCGSwitchbotToggle*>(c_pData);
+	CSwitchbotManager::instance().Toggle(ch, p->enable != 0);
+}
+
 void CInputMain::ItemGive(LPCHARACTER ch, const char* c_pData)
 {
 	TPacketCGGiveItem* p = (TPacketCGGiveItem*) c_pData;
@@ -3425,6 +3435,7 @@ void CInputMain::RegisterHandlers()
 	reg(CG::FISHING,           &CInputMain::SimpleHandler<&CInputMain::Fishing>);
 	reg(CG::HACK,              &CInputMain::SimpleHandler<&CInputMain::Hack>);
 	reg(CG::REFINE,            &CInputMain::SimpleHandler<&CInputMain::Refine>);
+	reg(CG::SWITCHBOT_TOGGLE,  &CInputMain::SimpleHandler<&CInputMain::SwitchbotToggle>); // switchbot dev
 
 	// SimpleHandlerV<fn>(LPCHARACTER, const void*)
 	reg(CG::SCRIPT_ANSWER,      &CInputMain::SimpleHandlerV<&CInputMain::ScriptAnswer>);

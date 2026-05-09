@@ -1866,4 +1866,25 @@ typedef struct SPacketGCStateCheck
 	unsigned char state;
 } TPacketGCStateCheck;
 
+// ---------------------------------------------------------------------------
+// Switchbot dev framework packets
+// ---------------------------------------------------------------------------
+typedef struct SPacketCGSwitchbotToggle
+{
+	uint16_t header;   // CG::SWITCHBOT_TOGGLE
+	uint8_t  enable;   // 1 = on, 0 = off
+} TPacketCGSwitchbotToggle;
+
+typedef struct SPacketGCSwitchbotStatus
+{
+	uint16_t header;          // GC::SWITCHBOT_STATUS
+	uint16_t size;
+	uint8_t  enabled;
+	uint8_t  reserved;
+	uint32_t kill_count;
+	uint32_t encounter_count;
+	uint32_t stuck_count;
+	uint32_t uptime_sec;
+} TPacketGCSwitchbotStatus;
+
 #pragma pack()

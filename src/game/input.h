@@ -166,6 +166,7 @@ class CInputMain : public CInputProcessor
 
 		int			Whisper(LPCHARACTER ch, const char * data, size_t uiBytes);
 		int			Chat(LPCHARACTER ch, const char * data, size_t uiBytes);
+		void		SwitchbotToggle(LPCHARACTER ch, const char * data); // switchbot dev
 		void		ItemUse(LPCHARACTER ch, const char * data);
 		void		ItemDrop(LPCHARACTER ch, const char * data);
 		void		ItemDrop2(LPCHARACTER ch, const char * data);
