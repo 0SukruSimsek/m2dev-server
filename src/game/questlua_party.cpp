@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include <sstream>
 
 #include "desc.h"
@@ -68,7 +68,7 @@ namespace quest
             {
                 sys_log(0, "CINEMASEND %s", ch->GetName());
                 ch->GetDesc()->BufferedPacket(&pack, sizeof(struct packet_script));
-                ch->GetDesc()->Packet(data.c_str(),data.size());
+                CHARACTER::SafeSendPacketTo(ch, data.c_str(),data.size());
             }
         }
     };
@@ -117,7 +117,7 @@ namespace quest
 			{
 				sys_log(0, "CINEMASEND %s", ch->GetName());
 				ch->GetDesc()->BufferedPacket(&packet_script, sizeof(struct packet_script));
-				ch->GetDesc()->Packet(str,len);
+				CHARACTER::SafeSendPacketTo(ch, str,len);
 			}
 		}
 	};
@@ -326,8 +326,8 @@ namespace quest
 		}
 	};
 	
-	// 파티 단위로 버프 주는 함수.
-	// 같은 맵에 있는 파티원만 영향을 받는다.
+	// íŒŒí‹° ë‹¨ìœ„ë¡œ ë²„í”„ ì£¼ëŠ” í•¨ìˆ˜.
+	// ê°™ì€ ë§µì— ìˆëŠ” íŒŒí‹°ì›ë§Œ ì˜í–¥ì„ ë°›ëŠ”ë‹¤.
 	int party_give_buff (lua_State* L)
 	{
 		CQuestManager & q = CQuestManager::instance();
@@ -472,7 +472,7 @@ namespace quest
 			{ "is_in_dungeon",	party_is_in_dungeon	},
 			{ "give_buff",		party_give_buff		},
 			{ "is_map_member_flag_lt",	party_is_map_member_flag_lt	},
-			{ "get_member_pids",		party_get_member_pids	}, // 파티원들의 pid를 return
+			{ "get_member_pids",		party_get_member_pids	}, // íŒŒí‹°ì›ë“¤ì˜ pidë¥¼ return
 			{ "check_item",		party_check_item	},
 			{ "remove_item",	party_remove_item	},
 			{ NULL,				NULL				}
@@ -481,6 +481,7 @@ namespace quest
 		CQuestManager::instance().AddLuaFunctionTable("party", party_functions);
 	}
 }
+
 
 
 

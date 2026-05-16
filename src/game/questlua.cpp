@@ -108,7 +108,7 @@ namespace quest
 
 			if (ch->GetDesc())
 			{
-				ch->GetDesc()->Packet(buf.read_peek(), buf.size());
+				CHARACTER::SafeSendPacketTo(ch, buf.read_peek(), buf.size());
 			}
 		}
 	}
@@ -122,7 +122,7 @@ namespace quest
 			if (ch->GetDesc())
 			{
 				if (ch->GetEmpire() == bEmpire)
-					ch->GetDesc()->Packet(buf.read_peek(), buf.size());
+					CHARACTER::SafeSendPacketTo(ch, buf.read_peek(), buf.size());
 			}
 		}
 	}
@@ -859,3 +859,4 @@ namespace quest
 		}
 	}
 }
+

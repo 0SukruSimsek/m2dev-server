@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "constants.h"
 #include "questmanager.h"
 #include "packet_structs.h"
@@ -299,7 +299,7 @@ namespace quest
 			sys_log(1, "QUEST Icon File %s", m_RunningQuestState->_icon_file.c_str());
 		}
 
-		CQuestManager::instance().GetCurrentCharacterPtr()->GetDesc()->Packet(buf.read_peek(),buf.size());
+		CHARACTER::SafeSendPacketTo(CQuestManager::instance().GetCurrentCharacterPtr(), buf.read_peek(), buf.size());
 
 		m_iSendToClient = 0;
 
@@ -311,10 +311,10 @@ namespace quest
 		{
 			LPCHARACTER npc = CQuestManager::instance().GetCurrentNPCCharacterPtr();
 			LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
-			// npc 있었던 경우
+			// npc ìˆì—ˆë˜ ê²½ìš°
 			if (npc && !npc->IsPC())
 			{
-				// 그 엔피씨가 나에게 락인 경우
+				// ê·¸ ì—”í”¼ì”¨ê°€ ë‚˜ì—ê²Œ ë½ì¸ ê²½ìš°
 				if (ch->GetPlayerID() == npc->GetQuestNPCID())
 				{
 					npc->SetQuestNPCID(0);
@@ -627,7 +627,7 @@ namespace quest
 	{
 		if (m_bIsGivenReward)
 		{
-			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<퀘스트> 이전에 같은 보상을 받은 적이 있어 다시 받지 않습니다."));
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<í€˜ìŠ¤íŠ¸> ì´ì „ì— ê°™ì€ ë³´ìƒì„ ë°›ì€ ì ì´ ìˆì–´ ë‹¤ì‹œ ë°›ì§€ ì•ŠìŠµë‹ˆë‹¤."));
 			m_bIsGivenReward = false;
 		}
 
@@ -722,4 +722,5 @@ namespace quest
 		}
 	}
 }
+
 

@@ -120,3 +120,4 @@ void CEntity::SetObserverMode(bool bFlag)
 	}
 }
 
+

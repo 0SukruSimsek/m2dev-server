@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "war_map.h"
 #include "sectree_manager.h"
 #include "char.h"
@@ -304,7 +304,7 @@ void CWarMap::STeamData::AppendMember(LPCHARACTER ch)
 
 void CWarMap::STeamData::RemoveMember(LPCHARACTER ch)
 {
-	// set_pidJoiner 는 누적 인원을 계산하기 때문에 제거하지 않는다
+	// set_pidJoiner ëŠ” ëˆ„ì  ì¸ì›ì„ ê³„ì‚°í•˜ê¸° ë•Œë¬¸ì— ì œê±°í•˜ì§€ ì•ŠëŠ”ë‹¤
 	--iMemberCount;
 }
 
@@ -382,8 +382,8 @@ void CWarMap::IncMember(LPCHARACTER ch)
 		++m_iObserverCount; 
 		sys_log(0, "WarMap +o %d", m_iObserverCount);
 		ch->SetObserverMode(true);
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("관전 모드로 길드전에 참가하셨습니다."));
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("자신을 선택하시면 밖으로 나갈 수 있는 <관람 종료> 버튼이 나옵니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê´€ì „ ëª¨ë“œë¡œ ê¸¸ë“œì „ì— ì°¸ê°€í•˜ì…¨ìŠµë‹ˆë‹¤."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìì‹ ì„ ì„ íƒí•˜ì‹œë©´ ë°–ìœ¼ë¡œ ë‚˜ê°ˆ ìˆ˜ ìˆëŠ” <ê´€ëŒ ì¢…ë£Œ> ë²„íŠ¼ì´ ë‚˜ì˜µë‹ˆë‹¤."));
 	}
 
 	UpdateUserCount();
@@ -480,8 +480,8 @@ void CWarMap::CheckWarEnd()
 		if (m_pkTimeoutEvent)
 			return;
 
-		Notice(LC_TEXT("길드전에 참가한 상대방 길드원이 아무도 없습니다."));
-		Notice(LC_TEXT("1분 이내에 아무도 접속하지 않으면 길드전이 자동 종료됩니다."));
+		Notice(LC_TEXT("ê¸¸ë“œì „ì— ì°¸ê°€í•œ ìƒëŒ€ë°© ê¸¸ë“œì›ì´ ì•„ë¬´ë„ ì—†ìŠµë‹ˆë‹¤."));
+		Notice(LC_TEXT("1ë¶„ ì´ë‚´ì— ì•„ë¬´ë„ ì ‘ì†í•˜ì§€ ì•Šìœ¼ë©´ ê¸¸ë“œì „ì´ ìë™ ì¢…ë£Œë©ë‹ˆë‹¤."));
 
 		sys_log(0, "CheckWarEnd: Timeout begin %u vs %u", m_TeamData[0].dwID, m_TeamData[1].dwID);
 
@@ -523,7 +523,7 @@ void CWarMap::Timeout()
 
 	if (get_dword_time() - m_dwStartTime < 60000 * 5)
 	{
-		Notice(LC_TEXT("길드전이 일찍 종료되어 무승부로 판정 되었습니다. (5분이 지나지 않음)"));
+		Notice(LC_TEXT("ê¸¸ë“œì „ì´ ì¼ì° ì¢…ë£Œë˜ì–´ ë¬´ìŠ¹ë¶€ë¡œ íŒì • ë˜ì—ˆìŠµë‹ˆë‹¤. (5ë¶„ì´ ì§€ë‚˜ì§€ ì•ŠìŒ)"));
 		dwWinner = 0;
 		dwLoser = 0;
 	}
@@ -586,7 +586,7 @@ namespace
 
 		void operator () (LPCHARACTER ch)
 		{
-			ch->GetDesc()->Packet(m_pvData, m_iSize);
+			CHARACTER::SafeSendPacketTo(ch, m_pvData, m_iSize);
 		}
 
 		const void * m_pvData;
@@ -688,11 +688,11 @@ bool CWarMap::CheckScore()
 	if (m_bEnded)
 		return true;
 
-	// 30초 이후 부터 확인한다.
+	// 30ì´ˆ ì´í›„ ë¶€í„° í™•ì¸í•œë‹¤.
 	if (get_dword_time() - m_dwStartTime < 30000)
 		return false;
 
-	// 점수가 같으면 체크하지 않는다.
+	// ì ìˆ˜ê°€ ê°™ìœ¼ë©´ ì²´í¬í•˜ì§€ ì•ŠëŠ”ë‹¤.
 	if (m_TeamData[0].iScore == m_TeamData[1].iScore)
 		return false;
 
@@ -1099,4 +1099,5 @@ void CWarMapManager::OnShutdown()
 	while (it != m_mapWarMap.end())
 		(it++)->second->Draw();
 }
+
 

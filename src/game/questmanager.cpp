@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include <fstream>
 #include "constants.h"
 #include "buffer_manager.h"
@@ -61,29 +61,29 @@ namespace quest
 
 		m_pSelectedDungeon = NULL;
 
-		m_mapEventName.insert(TEventNameMap::value_type("click", QUEST_CLICK_EVENT));		// NPC를 클릭
-		m_mapEventName.insert(TEventNameMap::value_type("kill", QUEST_KILL_EVENT));		// Mob을 사냥
-		m_mapEventName.insert(TEventNameMap::value_type("timer", QUEST_TIMER_EVENT));		// 미리 지정해둔 시간이 지남
-		m_mapEventName.insert(TEventNameMap::value_type("levelup", QUEST_LEVELUP_EVENT));	// 레벨업을 함
-		m_mapEventName.insert(TEventNameMap::value_type("login", QUEST_LOGIN_EVENT));		// 로그인 시
-		m_mapEventName.insert(TEventNameMap::value_type("logout", QUEST_LOGOUT_EVENT));		// 로그아웃 시
-		m_mapEventName.insert(TEventNameMap::value_type("button", QUEST_BUTTON_EVENT));		// 퀘스트 버튼을 누름
-		m_mapEventName.insert(TEventNameMap::value_type("info", QUEST_INFO_EVENT));		// 퀘스트 정보창을 염
-		m_mapEventName.insert(TEventNameMap::value_type("chat", QUEST_CHAT_EVENT));		// 특정 키워드로 대화를 함
-		m_mapEventName.insert(TEventNameMap::value_type("in", QUEST_ATTR_IN_EVENT));		// 맵의 특정 속성에 들어감
-		m_mapEventName.insert(TEventNameMap::value_type("out", QUEST_ATTR_OUT_EVENT));		// 맵의 특정 속성에서 나옴
-		m_mapEventName.insert(TEventNameMap::value_type("use", QUEST_ITEM_USE_EVENT));		// 퀘스트 아이템을 사용
-		m_mapEventName.insert(TEventNameMap::value_type("server_timer", QUEST_SERVER_TIMER_EVENT));	// 서버 타이머 (아직 테스트 안됐음)
-		m_mapEventName.insert(TEventNameMap::value_type("enter", QUEST_ENTER_STATE_EVENT));	// 현재 스테이트가 됨
-		m_mapEventName.insert(TEventNameMap::value_type("leave", QUEST_LEAVE_STATE_EVENT));	// 현재 스테이트에서 다른 스테이트로 바뀜
-		m_mapEventName.insert(TEventNameMap::value_type("letter", QUEST_LETTER_EVENT));		// 로긴 하거나 스테이트가 바껴 새로 정보를 세팅해줘야함
-		m_mapEventName.insert(TEventNameMap::value_type("take", QUEST_ITEM_TAKE_EVENT));	// 아이템을 받음
-		m_mapEventName.insert(TEventNameMap::value_type("target", QUEST_TARGET_EVENT));		// 타겟
-		m_mapEventName.insert(TEventNameMap::value_type("party_kill", QUEST_PARTY_KILL_EVENT));	// 파티 멤버가 몬스터를 사냥 (리더에게 옴)
+		m_mapEventName.insert(TEventNameMap::value_type("click", QUEST_CLICK_EVENT));		// NPCë¥¼ í´ë¦­
+		m_mapEventName.insert(TEventNameMap::value_type("kill", QUEST_KILL_EVENT));		// Mobì„ ì‚¬ëƒ¥
+		m_mapEventName.insert(TEventNameMap::value_type("timer", QUEST_TIMER_EVENT));		// ë¯¸ë¦¬ ì§€ì •í•´ë‘” ì‹œê°„ì´ ì§€ë‚¨
+		m_mapEventName.insert(TEventNameMap::value_type("levelup", QUEST_LEVELUP_EVENT));	// ë ˆë²¨ì—…ì„ í•¨
+		m_mapEventName.insert(TEventNameMap::value_type("login", QUEST_LOGIN_EVENT));		// ë¡œê·¸ì¸ ì‹œ
+		m_mapEventName.insert(TEventNameMap::value_type("logout", QUEST_LOGOUT_EVENT));		// ë¡œê·¸ì•„ì›ƒ ì‹œ
+		m_mapEventName.insert(TEventNameMap::value_type("button", QUEST_BUTTON_EVENT));		// í€˜ìŠ¤íŠ¸ ë²„íŠ¼ì„ ëˆ„ë¦„
+		m_mapEventName.insert(TEventNameMap::value_type("info", QUEST_INFO_EVENT));		// í€˜ìŠ¤íŠ¸ ì •ë³´ì°½ì„ ì—¼
+		m_mapEventName.insert(TEventNameMap::value_type("chat", QUEST_CHAT_EVENT));		// íŠ¹ì • í‚¤ì›Œë“œë¡œ ëŒ€í™”ë¥¼ í•¨
+		m_mapEventName.insert(TEventNameMap::value_type("in", QUEST_ATTR_IN_EVENT));		// ë§µì˜ íŠ¹ì • ì†ì„±ì— ë“¤ì–´ê°
+		m_mapEventName.insert(TEventNameMap::value_type("out", QUEST_ATTR_OUT_EVENT));		// ë§µì˜ íŠ¹ì • ì†ì„±ì—ì„œ ë‚˜ì˜´
+		m_mapEventName.insert(TEventNameMap::value_type("use", QUEST_ITEM_USE_EVENT));		// í€˜ìŠ¤íŠ¸ ì•„ì´í…œì„ ì‚¬ìš©
+		m_mapEventName.insert(TEventNameMap::value_type("server_timer", QUEST_SERVER_TIMER_EVENT));	// ì„œë²„ íƒ€ì´ë¨¸ (ì•„ì§ í…ŒìŠ¤íŠ¸ ì•ˆëìŒ)
+		m_mapEventName.insert(TEventNameMap::value_type("enter", QUEST_ENTER_STATE_EVENT));	// í˜„ì¬ ìŠ¤í…Œì´íŠ¸ê°€ ë¨
+		m_mapEventName.insert(TEventNameMap::value_type("leave", QUEST_LEAVE_STATE_EVENT));	// í˜„ì¬ ìŠ¤í…Œì´íŠ¸ì—ì„œ ë‹¤ë¥¸ ìŠ¤í…Œì´íŠ¸ë¡œ ë°”ë€œ
+		m_mapEventName.insert(TEventNameMap::value_type("letter", QUEST_LETTER_EVENT));		// ë¡œê¸´ í•˜ê±°ë‚˜ ìŠ¤í…Œì´íŠ¸ê°€ ë°”ê»´ ìƒˆë¡œ ì •ë³´ë¥¼ ì„¸íŒ…í•´ì¤˜ì•¼í•¨
+		m_mapEventName.insert(TEventNameMap::value_type("take", QUEST_ITEM_TAKE_EVENT));	// ì•„ì´í…œì„ ë°›ìŒ
+		m_mapEventName.insert(TEventNameMap::value_type("target", QUEST_TARGET_EVENT));		// íƒ€ê²Ÿ
+		m_mapEventName.insert(TEventNameMap::value_type("party_kill", QUEST_PARTY_KILL_EVENT));	// íŒŒí‹° ë©¤ë²„ê°€ ëª¬ìŠ¤í„°ë¥¼ ì‚¬ëƒ¥ (ë¦¬ë”ì—ê²Œ ì˜´)
 		m_mapEventName.insert(TEventNameMap::value_type("unmount", QUEST_UNMOUNT_EVENT));
-		m_mapEventName.insert(TEventNameMap::value_type("pick", QUEST_ITEM_PICK_EVENT));	// 떨어져있는 아이템을 습득함.
-		m_mapEventName.insert(TEventNameMap::value_type("sig_use", QUEST_SIG_USE_EVENT));		// Special item group에 속한 아이템을 사용함.
-		m_mapEventName.insert(TEventNameMap::value_type("item_informer", QUEST_ITEM_INFORMER_EVENT));	// 독일선물기능테스트
+		m_mapEventName.insert(TEventNameMap::value_type("pick", QUEST_ITEM_PICK_EVENT));	// ë–¨ì–´ì ¸ìˆëŠ” ì•„ì´í…œì„ ìŠµë“í•¨.
+		m_mapEventName.insert(TEventNameMap::value_type("sig_use", QUEST_SIG_USE_EVENT));		// Special item groupì— ì†í•œ ì•„ì´í…œì„ ì‚¬ìš©í•¨.
+		m_mapEventName.insert(TEventNameMap::value_type("item_informer", QUEST_ITEM_INFORMER_EVENT));	// ë…ì¼ì„ ë¬¼ê¸°ëŠ¥í…ŒìŠ¤íŠ¸
 
 		m_bNoSend = false;
 
@@ -259,9 +259,9 @@ namespace quest
 
 			if (!pPC->GetRunningQuestState()->chat_scripts.empty())
 			{
-				// 채팅 이벤트인 경우
-				// 현재 퀘스트는 어느 퀘스트를 실행할 것인가를 고르는 퀘스트 이므로
-				// 끝내고 선택된 퀘스트를 실행한다.
+				// ì±„íŒ… ì´ë²¤íŠ¸ì¸ ê²½ìš°
+				// í˜„ì¬ í€˜ìŠ¤íŠ¸ëŠ” ì–´ëŠ í€˜ìŠ¤íŠ¸ë¥¼ ì‹¤í–‰í•  ê²ƒì¸ê°€ë¥¼ ê³ ë¥´ëŠ” í€˜ìŠ¤íŠ¸ ì´ë¯€ë¡œ
+				// ëë‚´ê³  ì„ íƒëœ í€˜ìŠ¤íŠ¸ë¥¼ ì‹¤í–‰í•œë‹¤.
 				QuestState& old_qs = *pPC->GetRunningQuestState();
 				CloseState(old_qs);
 
@@ -374,7 +374,7 @@ namespace quest
 			pPC->CancelRunning();
 		}
 
-		// 지우기 전에 로그아웃 한다.
+		// ì§€ìš°ê¸° ì „ì— ë¡œê·¸ì•„ì›ƒ í•œë‹¤.
 		Logout(ch->GetPlayerID());
 
 		if (ch == m_pCurrentCharacter)
@@ -403,7 +403,7 @@ namespace quest
 
 	///////////////////////////////////////////////////////////////////////////////////////////
 	//
-	// Quest Event 관련
+	// Quest Event ê´€ë ¨
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////
 	void CQuestManager::Login(unsigned int pc, const char * c_pszQuest)
@@ -450,9 +450,9 @@ namespace quest
 			if (!CheckQuestLoaded(pPC))
 				return;
 
-			/* [hyo] 몹 kill시 중복 카운팅 이슈 관련한 수정사항
-			   quest script에 when 171.kill begin ... 등의 코드로 인하여 스크립트가 처리되었더라도
-			   바로 return하지 않고 다른 검사도 수행하도록 변경함. (2011/07/21)
+			/* [hyo] ëª¹ killì‹œ ì¤‘ë³µ ì¹´ìš´íŒ… ì´ìŠˆ ê´€ë ¨í•œ ìˆ˜ì •ì‚¬í•­
+			   quest scriptì— when 171.kill begin ... ë“±ì˜ ì½”ë“œë¡œ ì¸í•˜ì—¬ ìŠ¤í¬ë¦½íŠ¸ê°€ ì²˜ë¦¬ë˜ì—ˆë”ë¼ë„
+			   ë°”ë¡œ returní•˜ì§€ ì•Šê³  ë‹¤ë¥¸ ê²€ì‚¬ë„ ìˆ˜í–‰í•˜ë„ë¡ ë³€ê²½í•¨. (2011/07/21)
 			*/   
 			// call script
 			
@@ -606,7 +606,7 @@ namespace quest
 				LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(pc);
 
 				if (ch)
-					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("퀘스트를 로드하는 중입니다. 잠시만 기다려 주십시오."));
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("í€˜ìŠ¤íŠ¸ë¥¼ ë¡œë“œí•˜ëŠ” ì¤‘ì…ë‹ˆë‹¤. ì ì‹œë§Œ ê¸°ë‹¤ë ¤ ì£¼ì‹­ì‹œì˜¤."));
 
 				return;
 			}
@@ -631,7 +631,7 @@ namespace quest
 				LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(pc);
 				if (ch)
 				{
-					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("퀘스트를 로드하는 중입니다. 잠시만 기다려 주십시오."));
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("í€˜ìŠ¤íŠ¸ë¥¼ ë¡œë“œí•˜ëŠ” ì¤‘ì…ë‹ˆë‹¤. ì ì‹œë§Œ ê¸°ë‹¤ë ¤ ì£¼ì‹­ì‹œì˜¤."));
 				}
 				return;
 			}
@@ -656,7 +656,7 @@ namespace quest
 				LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(pc);
 				if (ch)
 				{
-					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("퀘스트를 로드하는 중입니다. 잠시만 기다려 주십시오."));
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("í€˜ìŠ¤íŠ¸ë¥¼ ë¡œë“œí•˜ëŠ” ì¤‘ì…ë‹ˆë‹¤. ì ì‹œë§Œ ê¸°ë‹¤ë ¤ ì£¼ì‹­ì‹œì˜¤."));
 				}
 				return false;
 			}
@@ -684,7 +684,7 @@ namespace quest
 				LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(pc);
 				if (ch)
 				{
-					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("퀘스트를 로드하는 중입니다. 잠시만 기다려 주십시오."));
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("í€˜ìŠ¤íŠ¸ë¥¼ ë¡œë“œí•˜ëŠ” ì¤‘ì…ë‹ˆë‹¤. ì ì‹œë§Œ ê¸°ë‹¤ë ¤ ì£¼ì‹­ì‹œì˜¤."));
 				}
 				return false;
 			}
@@ -715,7 +715,7 @@ namespace quest
 		}
 	}
 
-	// Speical Item Group에 정의된 Group Use
+	// Speical Item Groupì— ì •ì˜ëœ Group Use
 	bool CQuestManager::SIGUse(unsigned int pc, DWORD sig_vnum, LPITEM item, bool bReceiveAll)
 	{
 		if (test_server)
@@ -728,7 +728,7 @@ namespace quest
 				LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(pc);
 				if (ch)
 				{
-					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("퀘스트를 로드하는 중입니다. 잠시만 기다려 주십시오."));
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("í€˜ìŠ¤íŠ¸ë¥¼ ë¡œë“œí•˜ëŠ” ì¤‘ì…ë‹ˆë‹¤. ì ì‹œë§Œ ê¸°ë‹¤ë ¤ ì£¼ì‹­ì‹œì˜¤."));
 				}
 				return false;
 			}
@@ -782,7 +782,7 @@ namespace quest
 				LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(pc);
 
 				if (ch)
-					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("퀘스트를 로드하는 중입니다. 잠시만 기다려 주십시오."));
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("í€˜ìŠ¤íŠ¸ë¥¼ ë¡œë“œí•˜ëŠ” ì¤‘ì…ë‹ˆë‹¤. ì ì‹œë§Œ ê¸°ë‹¤ë ¤ ì£¼ì‹­ì‹œì˜¤."));
 
 				return false;
 			}
@@ -863,7 +863,7 @@ namespace quest
 		else
 			sys_err("QUEST no such pc id : %d", pc);
 	}
-	//독일 선물 기능 테스트
+	//ë…ì¼ ì„ ë¬¼ ê¸°ëŠ¥ í…ŒìŠ¤íŠ¸
 	void CQuestManager::ItemInformer(unsigned int pc,unsigned int vnum)
 	{
 		
@@ -873,7 +873,7 @@ namespace quest
 		m_mapNPC[QUEST_NO_NPC].OnItemInformer(*pPC,vnum);
 	}
 	///////////////////////////////////////////////////////////////////////////////////////////
-	// END OF 퀘스트 이벤트 처리
+	// END OF í€˜ìŠ¤íŠ¸ ì´ë²¤íŠ¸ ì²˜ë¦¬
 	///////////////////////////////////////////////////////////////////////////////////////////
 
 	///////////////////////////////////////////////////////////////////////////////////////////
@@ -998,7 +998,7 @@ namespace quest
 		buf.write(&packet_script, sizeof(struct packet_script));
 		buf.write(&m_strScript[0], m_strScript.size());
 
-		GetCurrentCharacterPtr()->GetDesc()->Packet(buf.read_peek(), buf.size());
+		CHARACTER::SafeSendPacketTo(GetCurrentCharacterPtr(), buf.read_peek(), buf.size());
 
 		if (test_server)
 			sys_log(0, "m_strScript %s size %d", m_strScript.c_str(), buf.size());
@@ -1296,19 +1296,19 @@ namespace quest
 					continue;
 				if (value)
 				{
-					// 밤
+					// ë°¤
 					ch->ChatPacket(CHAT_TYPE_COMMAND, "DayMode dark");
 				}
 				else
 				{
-					// 낮
+					// ë‚®
 					ch->ChatPacket(CHAT_TYPE_COMMAND, "DayMode light");
 				}
 			}
 
 			if (value && !prev_value)
 			{
-				// 없으면 만들어준다
+				// ì—†ìœ¼ë©´ ë§Œë“¤ì–´ì¤€ë‹¤
 				struct SNPCSellFireworkPosition
 				{
 					long lMapIndex;
@@ -1344,7 +1344,7 @@ namespace quest
 			}
 			else if (!value && prev_value)
 			{
-				// 있으면 지워준다
+				// ìˆìœ¼ë©´ ì§€ì›Œì¤€ë‹¤
 				CharacterVectorInteractor i;
 
 				if (CHARACTER_MANAGER::instance().GetCharactersByRaceNum(xmas::MOB_XMAS_FIRWORK_SELLER_VNUM, i))
@@ -1443,7 +1443,7 @@ namespace quest
 #endif
 		else if (name == "new_xmas_event")
 		{
-			// 20126 new산타.
+			// 20126 newì‚°íƒ€.
 			static DWORD new_santa = 20126;
 			if (value != 0)
 			{
@@ -1608,12 +1608,12 @@ namespace quest
 			return false;
 		}
 
-		// 실행공간을 생성
+		// ì‹¤í–‰ê³µê°„ì„ ìƒì„±
 		QuestState qs = CQuestManager::instance().OpenState(quest_name, state);
 		if (pChatScripts)
 			qs.chat_scripts.swap(*pChatScripts);
 
-		// 코드를 읽어들임
+		// ì½”ë“œë¥¼ ì½ì–´ë“¤ì„
 		if (bUseCache)
 		{
 			lua_getglobal(qs.co, "__codecache");
@@ -1652,10 +1652,10 @@ namespace quest
 		else
 			luaL_loadbuffer(qs.co, code, code_size, quest_name.c_str());
 
-		// 플레이어와 연결
+		// í”Œë ˆì´ì–´ì™€ ì—°ê²°
 		pc.SetQuest(quest_name, qs);
 
-		// 실행
+		// ì‹¤í–‰
 		QuestState& rqs = *pc.GetRunningQuestState();
 		if (!CQuestManager::instance().RunState(rqs))
 		{
@@ -1814,7 +1814,7 @@ namespace quest
 				LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(pc);
 				if (ch)
 				{
-					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("퀘스트를 로드하는 중입니다. 잠시만 기다려 주십시오."));
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("í€˜ìŠ¤íŠ¸ë¥¼ ë¡œë“œí•˜ëŠ” ì¤‘ì…ë‹ˆë‹¤. ì ì‹œë§Œ ê¸°ë‹¤ë ¤ ì£¼ì‹­ì‹œì˜¤."));
 				}
 				return false;
 			}
@@ -1882,4 +1882,5 @@ namespace quest
 		return m_pOtherPCBlockRootPC;
 	}
 }
+
 

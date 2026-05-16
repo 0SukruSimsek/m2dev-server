@@ -1,4 +1,4 @@
-//#define __FISHING_MAIN__
+﻿//#define __FISHING_MAIN__
 #include "stdafx.h"
 #include "constants.h"
 #include "fishing.h"
@@ -108,79 +108,79 @@ namespace fishing
 	int g_fish_count = 0;  // Actual number of loaded fish
 	/*
 	   {
-	   { "꽝",		00000, 00000, 00000, {  750, 1750, 2750 },   10, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_NORMAL, { 0,           }, 
+	   { "ê½",		00000, 00000, 00000, {  750, 1750, 2750 },   10, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_NORMAL, { 0,           }, 
 	   {0, } },
-	   { "금반지",	50002, 00000, 00000, {   50,   50,    0 },  200, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_NORMAL, { 0,           }, 
+	   { "ê¸ˆë°˜ì§€",	50002, 00000, 00000, {   50,   50,    0 },  200, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_NORMAL, { 0,           }, 
 	   {0, } },
-	   { "피라미",	27802, 00000, 00000, { 2100, 1500,   50 },   10, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_EASY,   {500, 550, 600}, 
+	   { "í”¼ë¼ë¯¸",	27802, 00000, 00000, { 2100, 1500,   50 },   10, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_EASY,   {500, 550, 600}, 
 	   {0, } },
-	   { "붕어",	27803, 27833, 27863, { 2100, 1500,  100 },   13, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_EASY,   {1000,2500,2800},
+	   { "ë¶•ì–´",	27803, 27833, 27863, { 2100, 1500,  100 },   13, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_EASY,   {1000,2500,2800},
 	   {USED_NONE, USED_SHELLFISH, USED_NONE, USED_NONE, USED_WATER_STONE, USED_TREASURE_MAP, USED_EARTHWARM, USED_NONE,USED_NONE,  USED_NONE } },
-	   { "쏘가리",	27804, 27834, 27864, { 1100, 1300,  150 },   16, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_NORMAL, {2000,3500,3800},
+	   { "ì˜ê°€ë¦¬",	27804, 27834, 27864, { 1100, 1300,  150 },   16, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_NORMAL, {2000,3500,3800},
 	   {USED_NONE, USED_SHELLFISH, USED_NONE, USED_NONE, USED_WATER_STONE, USED_TREASURE_MAP, USED_EARTHWARM, USED_NONE,USED_NONE,  USED_NONE } },
-	   { "월척붕어",	27805, 27835, 27865, { 1100, 1100,  200 },   20, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_SLOW, {3030,3500,4300},
+	   { "ì›”ì²™ë¶•ì–´",	27805, 27835, 27865, { 1100, 1100,  200 },   20, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_SLOW, {3030,3500,4300},
 	   {USED_NONE, USED_SHELLFISH, USED_NONE, USED_NONE, USED_WATER_STONE, USED_TREASURE_MAP, USED_EARTHWARM, USED_NONE,USED_NONE,  USED_NONE } },
-	   { "잉어",	27806, 27836, 27866, { 1100,  500,  300 },   26, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_NORMAL, {4000,6000,10000},
+	   { "ì‰ì–´",	27806, 27836, 27866, { 1100,  500,  300 },   26, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_NORMAL, {4000,6000,10000},
 	   {USED_NONE, USED_SHELLFISH, USED_NONE, USED_NONE, USED_WATER_STONE, USED_TREASURE_MAP, USED_EARTHWARM, USED_NONE,USED_NONE,  USED_NONE } },
-	   { "연어",	27807, 27837, 27867, { 1100,  450,  400 },   33, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_NORMAL,{6000,8000,10000},
+	   { "ì—°ì–´",	27807, 27837, 27867, { 1100,  450,  400 },   33, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_NORMAL,{6000,8000,10000},
 	   {USED_NONE, USED_SHELLFISH, USED_NONE, USED_NONE, USED_WATER_STONE, USED_TREASURE_MAP, USED_EARTHWARM, USED_NONE,USED_NONE,  USED_NONE } },
-	   { "향어",	27808, 27838, 27868, {  200,  400,  500 },   42, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_NORMAL,{1500,3000,3800},
+	   { "í–¥ì–´",	27808, 27838, 27868, {  200,  400,  500 },   42, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_NORMAL,{1500,3000,3800},
 	   {USED_NONE, USED_SHELLFISH, USED_NONE, USED_NONE, USED_WATER_STONE, USED_TREASURE_MAP, USED_EARTHWARM, USED_NONE,USED_NONE,  USED_NONE } },
-	   { "송어",	27809, 27839, 27869, {  200,  300,  700 },   54, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_NORMAL,{5000,7000,8000},
+	   { "ì†¡ì–´",	27809, 27839, 27869, {  200,  300,  700 },   54, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_NORMAL,{5000,7000,8000},
 	   {USED_NONE, USED_SHELLFISH, USED_NONE, USED_NONE, USED_WATER_STONE, USED_TREASURE_MAP, USED_EARTHWARM, USED_NONE,USED_NONE,  USED_NONE } },
-	   { "민물장어",	27810, 27840, 27870, {    0,  270, 1000 },   70, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_NORMAL,{4000,5000,6000},
+	   { "ë¯¼ë¬¼ì¥ì–´",	27810, 27840, 27870, {    0,  270, 1000 },   70, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_NORMAL,{4000,5000,6000},
 	   {USED_SHELLFISH, USED_NONE, USED_NONE, USED_WATER_STONE, USED_TREASURE_MAP, USED_NONE, USED_EARTHWARM, USED_NONE,USED_NONE,  USED_NONE } },
-	   { "무지개송어",	27811, 27841, 27871, {    0,  200, 1000 },   91, FISHING_LIMIT_APPEAR,	{  0,   0,   0}, FISHING_TIME_NORMAL,{5000,7000,8000},
+	   { "ë¬´ì§€ê°œì†¡ì–´",	27811, 27841, 27871, {    0,  200, 1000 },   91, FISHING_LIMIT_APPEAR,	{  0,   0,   0}, FISHING_TIME_NORMAL,{5000,7000,8000},
 	   {USED_SHELLFISH, USED_NONE, USED_NONE, USED_WATER_STONE, USED_TREASURE_MAP, USED_NONE, USED_EARTHWARM, USED_NONE,USED_NONE,  USED_NONE } },
-	   { "강송어",	27812, 27842, 27872, {    0,  160, 1000 },  118, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_QUICK,{4000,6000,7000},
+	   { "ê°•ì†¡ì–´",	27812, 27842, 27872, {    0,  160, 1000 },  118, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_QUICK,{4000,6000,7000},
 	   {USED_SHELLFISH, USED_NONE, USED_NONE, USED_WATER_STONE, USED_TREASURE_MAP, USED_NONE, USED_EARTHWARM, USED_NONE,USED_NONE,  USED_NONE } },
-	   { "러드",	27813, 27843, 27873, {    0,  130,  700 },  153, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_NORMAL,{4000,6000,10000},
+	   { "ëŸ¬ë“œ",	27813, 27843, 27873, {    0,  130,  700 },  153, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_NORMAL,{4000,6000,10000},
 	   {USED_SHELLFISH, USED_NONE, USED_NONE, USED_WATER_STONE, USED_TREASURE_MAP, USED_NONE, USED_EARTHWARM, USED_NONE,USED_NONE,  USED_NONE } },
-	   { "퍼치",	27814, 27844, 27874, {    0,  100,  400 },  198, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_NORMAL,{3000,4000,5000},
+	   { "í¼ì¹˜",	27814, 27844, 27874, {    0,  100,  400 },  198, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_NORMAL,{3000,4000,5000},
 	   {USED_SHELLFISH, USED_NONE, USED_NONE, USED_WATER_STONE, USED_TREASURE_MAP, USED_NONE, USED_EARTHWARM, USED_NONE,USED_NONE,  USED_NONE } },
-	   { "텐치",	27815, 27845, 27875, {    0,   50,  300 },  257, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_NORMAL,{3500,5500,8000},
+	   { "í…ì¹˜",	27815, 27845, 27875, {    0,   50,  300 },  257, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_NORMAL,{3500,5500,8000},
 	   {USED_SHELLFISH, USED_NONE, USED_NONE, USED_WATER_STONE, USED_TREASURE_MAP, USED_NONE, USED_EARTHWARM, USED_NONE,USED_NONE,  USED_NONE } },
-	   { "메기",	27816, 27846, 27876, {    0,   30,  100 },  334, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_NORMAL,{3000,5000,10000},
+	   { "ë©”ê¸°",	27816, 27846, 27876, {    0,   30,  100 },  334, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_NORMAL,{3000,5000,10000},
 	   {USED_SHELLFISH, USED_NONE, USED_NONE, USED_WATER_STONE, USED_TREASURE_MAP, USED_NONE, USED_EARTHWARM, USED_NONE,USED_NONE,  USED_NONE } },
-	   { "미꾸라지",	27817, 27847, 27877, {    0,   10,   64 },  434, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_QUICK,{1800,2200,3000},
+	   { "ë¯¸ê¾¸ë¼ì§€",	27817, 27847, 27877, {    0,   10,   64 },  434, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_QUICK,{1800,2200,3000},
 	   {USED_SHELLFISH, USED_NONE, USED_NONE, USED_WATER_STONE, USED_TREASURE_MAP, USED_NONE, USED_EARTHWARM, USED_NONE,USED_NONE,  USED_NONE } },
-	   { "백련",	27818, 27848, 27878, {    0,    0,   15 },  564, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_NORMAL,{5000,8000,10000},
+	   { "ë°±ë ¨",	27818, 27848, 27878, {    0,    0,   15 },  564, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_NORMAL,{5000,8000,10000},
 	   {USED_SHELLFISH, USED_NONE, USED_WATER_STONE, USED_TREASURE_MAP, USED_NONE, USED_NONE, USED_EARTHWARM, USED_NONE,USED_NONE,  USED_NONE } },
-	   { "은어",	27819, 27849, 27879, {    0,    0,    9 },  733, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_NORMAL,{1500,3000,3800},
+	   { "ì€ì–´",	27819, 27849, 27879, {    0,    0,    9 },  733, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_NORMAL,{1500,3000,3800},
 	   {USED_SHELLFISH, USED_NONE, USED_WATER_STONE, USED_TREASURE_MAP, USED_NONE, USED_NONE, USED_EARTHWARM, USED_NONE,USED_NONE,  USED_NONE } },
-	   { "빙어",	27820, 27850, 27880, {    0,    0,    6 },  952, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_QUICK,{1500,3000,3800},
+	   { "ë¹™ì–´",	27820, 27850, 27880, {    0,    0,    6 },  952, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_QUICK,{1500,3000,3800},
 	   {USED_SHELLFISH, USED_NONE, USED_WATER_STONE, USED_TREASURE_MAP, USED_NONE, USED_NONE, USED_EARTHWARM, USED_NONE,USED_NONE,  USED_NONE } },
-	   { "쉬리",	27821, 27851, 27881, {    0,    0,    3 }, 1237, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_NORMAL,{1000,1500,2000},
+	   { "ì‰¬ë¦¬",	27821, 27851, 27881, {    0,    0,    3 }, 1237, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_NORMAL,{1000,1500,2000},
 	   {USED_SHELLFISH, USED_NONE, USED_WATER_STONE, USED_TREASURE_MAP, USED_NONE, USED_NONE, USED_EARTHWARM, USED_NONE,USED_NONE,  USED_NONE } },
-	   { "비늘잉어",	27822, 27852, 27882, {    0,    0,    2 }, 1608, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_SLOW,{4000,6000,10000},
+	   { "ë¹„ëŠ˜ì‰ì–´",	27822, 27852, 27882, {    0,    0,    2 }, 1608, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_SLOW,{4000,6000,10000},
 	   {USED_SHELLFISH, USED_NONE, USED_WATER_STONE, USED_TREASURE_MAP, USED_NONE, USED_NONE, USED_EARTHWARM, USED_NONE,USED_NONE,  USED_NONE } },
-	   { "황금붕어",	27823, 27853, 27883, {    0,    0,    1 }, 2090, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_SLOW,{1000,3000,3500},
+	   { "í™©ê¸ˆë¶•ì–´",	27823, 27853, 27883, {    0,    0,    1 }, 2090, FISHING_LIMIT_NONE,	{  0,   0,   0}, FISHING_TIME_SLOW,{1000,3000,3500},
 	   {USED_SHELLFISH, USED_NONE, USED_WATER_STONE, USED_TREASURE_MAP, USED_NONE, USED_NONE, USED_EARTHWARM, USED_NONE,USED_NONE,  USED_NONE } },
-	   { "탈색약",     70201, 00000, 00000, { 5,    5,  0 },   60, FISHING_LIMIT_NONE,    {  0,   0,   0}, FISHING_TIME_NORMAL, {0,           },
+	   { "íƒˆìƒ‰ì•½",     70201, 00000, 00000, { 5,    5,  0 },   60, FISHING_LIMIT_NONE,    {  0,   0,   0}, FISHING_TIME_NORMAL, {0,           },
 	   {0,	}},
-	   { "염색약(흰색)",  70202, 00000, 00000, { 15,  15,  0 },   60, FISHING_LIMIT_NONE,    {  0,   0,   0}, FISHING_TIME_NORMAL, {0,           },
+	   { "ì—¼ìƒ‰ì•½(í°ìƒ‰)",  70202, 00000, 00000, { 15,  15,  0 },   60, FISHING_LIMIT_NONE,    {  0,   0,   0}, FISHING_TIME_NORMAL, {0,           },
 	   {0,	}},
-	   { "염색약(금색)",  70203, 00000, 00000, { 15,  15,  0 },   60, FISHING_LIMIT_NONE,    {  0,   0,   0}, FISHING_TIME_NORMAL, {0,           },
+	   { "ì—¼ìƒ‰ì•½(ê¸ˆìƒ‰)",  70203, 00000, 00000, { 15,  15,  0 },   60, FISHING_LIMIT_NONE,    {  0,   0,   0}, FISHING_TIME_NORMAL, {0,           },
 	   {0,	}},
-	   { "염색약(빨간색)",70204, 00000, 00000, { 15,  15,  0 },   60, FISHING_LIMIT_NONE,    {  0,   0,   0}, FISHING_TIME_NORMAL, {0,           },
+	   { "ì—¼ìƒ‰ì•½(ë¹¨ê°„ìƒ‰)",70204, 00000, 00000, { 15,  15,  0 },   60, FISHING_LIMIT_NONE,    {  0,   0,   0}, FISHING_TIME_NORMAL, {0,           },
 	   {0,	}},
-	   { "염색약(갈색)",  70205, 00000, 00000, { 15,  15,  0 },   60, FISHING_LIMIT_NONE,    {  0,   0,   0}, FISHING_TIME_NORMAL, {0,           },
+	   { "ì—¼ìƒ‰ì•½(ê°ˆìƒ‰)",  70205, 00000, 00000, { 15,  15,  0 },   60, FISHING_LIMIT_NONE,    {  0,   0,   0}, FISHING_TIME_NORMAL, {0,           },
 	   {0,	}},
-	   { "염색약(검은색)",70206, 00000, 00000, { 15,  15,  0 },   60, FISHING_LIMIT_NONE,    {  0,   0,   0}, FISHING_TIME_NORMAL, {0,           },
+	   { "ì—¼ìƒ‰ì•½(ê²€ì€ìƒ‰)",70206, 00000, 00000, { 15,  15,  0 },   60, FISHING_LIMIT_NONE,    {  0,   0,   0}, FISHING_TIME_NORMAL, {0,           },
 	   {0,	}},
-	   { "은둔자의 망토", 70048, 00000, 00000, {  8,   8,  0 },   60, FISHING_LIMIT_NONE,    {  0,   0,   0}, FISHING_TIME_NORMAL, {0,           },
+	   { "ì€ë‘”ìì˜ ë§í† ", 70048, 00000, 00000, {  8,   8,  0 },   60, FISHING_LIMIT_NONE,    {  0,   0,   0}, FISHING_TIME_NORMAL, {0,           },
 	   {0,	}},
-	   { "행운의 반지",   70049, 00000, 00000, {  8,   8,  0 },   60, FISHING_LIMIT_NONE,    {  0,   0,   0}, FISHING_TIME_NORMAL, {0,           },
+	   { "í–‰ìš´ì˜ ë°˜ì§€",   70049, 00000, 00000, {  8,   8,  0 },   60, FISHING_LIMIT_NONE,    {  0,   0,   0}, FISHING_TIME_NORMAL, {0,           },
 	   {0,	}},
-	   { "선왕의 증표",   70050, 00000, 00000, {  8,   8,  0 },   60, FISHING_LIMIT_NONE,    {  0,   0,   0}, FISHING_TIME_NORMAL, {0,           },
+	   { "ì„ ì™•ì˜ ì¦í‘œ",   70050, 00000, 00000, {  8,   8,  0 },   60, FISHING_LIMIT_NONE,    {  0,   0,   0}, FISHING_TIME_NORMAL, {0,           },
 	   {0,	}},
-	   { "선왕의 장갑",   70051, 00000, 00000, {  8,   8,  0 },   60, FISHING_LIMIT_NONE,    {  0,   0,   0}, FISHING_TIME_NORMAL, {0,           },
+	   { "ì„ ì™•ì˜ ì¥ê°‘",   70051, 00000, 00000, {  8,   8,  0 },   60, FISHING_LIMIT_NONE,    {  0,   0,   0}, FISHING_TIME_NORMAL, {0,           },
 	   {0,	}},
-	   { "금덩어리",	   80008, 00000, 00000, { 20,  20,  0 },  250, FISHING_LIMIT_NONE,    {  0,   0,   0}, FISHING_TIME_SLOW,    {0,           },
+	   { "ê¸ˆë©ì–´ë¦¬",	   80008, 00000, 00000, { 20,  20,  0 },  250, FISHING_LIMIT_NONE,    {  0,   0,   0}, FISHING_TIME_SLOW,    {0,           },
 	   {0, } },
-	{ "은열쇠",	   50009, 00000, 00000, {300, 300, 0, },   70, FISHING_LIMIT_NONE,    { 0, 0, 0}, FISHING_TIME_NORMAL, {0,	}, {0, } },
+	{ "ì€ì—´ì‡ ",	   50009, 00000, 00000, {300, 300, 0, },   70, FISHING_LIMIT_NONE,    { 0, 0, 0}, FISHING_TIME_NORMAL, {0,	}, {0, } },
 
-	{ "금열쇠",	   50008, 00000, 00000, {110, 110, 0, },  100, FISHING_LIMIT_NONE,    { 0, 0, 0}, FISHING_TIME_NORMAL, {0,	}, {0, } },
+	{ "ê¸ˆì—´ì‡ ",	   50008, 00000, 00000, {110, 110, 0, },  100, FISHING_LIMIT_NONE,    { 0, 0, 0}, FISHING_TIME_NORMAL, {0,	}, {0, } },
 };
 	*/
 void Initialize()
@@ -206,7 +206,7 @@ void Initialize()
 	{
 		SendLog("error! cannot open fishing.txt");
 
-		// 백업에 이름이 있으면 리스토어 한다.
+		// ë°±ì—…ì— ì´ë¦„ì´ ìˆìœ¼ë©´ ë¦¬ìŠ¤í† ì–´ í•œë‹¤.
 		if (*fish_info_bak[0].name)
 		{
 			thecore_memcpy(fish_info, fish_info_bak, sizeof(fish_info));
@@ -321,7 +321,7 @@ void Initialize()
 	}
 	sys_log(0, "FISH: DEBUG - Finished printing all fish");
 
-	// 확률 계산
+	// í™•ë¥  ê³„ì‚°
 	for (int j = 0; j < MAX_PROB; ++j)
 	{
 		g_prob_accumulate[j][0] = fish_info[0].prob[j];
@@ -374,7 +374,7 @@ int DetermineFish(LPCHARACTER ch)
 
 	// ADD_PREMIUM
 	if (ch->GetPremiumRemainSeconds(PREMIUM_FISH_MIND) > 0 ||
-			ch->IsEquipUniqueGroup(UNIQUE_GROUP_FISH_MIND)) // 월간어심 착용시 고급 물고기 확률 상승
+			ch->IsEquipUniqueGroup(UNIQUE_GROUP_FISH_MIND)) // ì›”ê°„ì–´ì‹¬ ì°©ìš©ì‹œ ê³ ê¸‰ ë¬¼ê³ ê¸° í™•ë¥  ìƒìŠ¹
 	{
 		if (quest::CQuestManager::instance().GetEventFlag("manwoo") != 0)
 			prob_idx = 3;
@@ -402,7 +402,7 @@ int DetermineFish(LPCHARACTER ch)
 			return 0;
 	}
 
-	if (g_iUseLocale) // 중국에서는 금덩어리, 금열쇠, 은열쇠 나오지 않게 함
+	if (g_iUseLocale) // ì¤‘êµ­ì—ì„œëŠ” ê¸ˆë©ì–´ë¦¬, ê¸ˆì—´ì‡ , ì€ì—´ì‡  ë‚˜ì˜¤ì§€ ì•Šê²Œ í•¨
 	{
 		DWORD vnum = fish_info[fish_idx].vnum;
 
@@ -448,26 +448,26 @@ void FishingPractice(LPCHARACTER ch)
 	LPITEM rod = ch->GetWear(WEAR_WEAPON);
 	if (rod && rod->GetType() == ITEM_ROD)
 	{
-		// 최대 수련도가 아닌 경우 낚시대 수련
+		// ìµœëŒ€ ìˆ˜ë ¨ë„ê°€ ì•„ë‹Œ ê²½ìš° ë‚šì‹œëŒ€ ìˆ˜ë ¨
 		if ( rod->GetRefinedVnum()>0 && rod->GetSocket(0) < rod->GetValue(2) && number(1,rod->GetValue(1))==1 )
 		{
 			rod->SetSocket(0, rod->GetSocket(0) + 1);
-			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("낚시대의 수련도가 증가하였습니다! (%d/%d)"),rod->GetSocket(0), rod->GetValue(2));
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë‚šì‹œëŒ€ì˜ ìˆ˜ë ¨ë„ê°€ ì¦ê°€í•˜ì˜€ìŠµë‹ˆë‹¤! (%d/%d)"),rod->GetSocket(0), rod->GetValue(2));
 			if (rod->GetSocket(0) == rod->GetValue(2))
 			{
-				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("낚시대가 최대 수련도에 도달하였습니다."));
-				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("어부를 통해 다음 레벨의 낚시대로 업그레이드 할 수 있습니다."));
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë‚šì‹œëŒ€ê°€ ìµœëŒ€ ìˆ˜ë ¨ë„ì— ë„ë‹¬í•˜ì˜€ìŠµë‹ˆë‹¤."));
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì–´ë¶€ë¥¼ í†µí•´ ë‹¤ìŒ ë ˆë²¨ì˜ ë‚šì‹œëŒ€ë¡œ ì—…ê·¸ë ˆì´ë“œ í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤."));
 			}
 		}
 	}
-	// 미끼를 뺀다
+	// ë¯¸ë¼ë¥¼ ëº€ë‹¤
 	rod->SetSocket(2, 0);
 }
 
 bool PredictFish(LPCHARACTER ch)
 {
 	// ADD_PREMIUM
-	// 어심환
+	// ì–´ì‹¬í™˜
 	if (ch->FindAffect(AFFECT_FISH_MIND_PILL) || 
 			ch->GetPremiumRemainSeconds(PREMIUM_FISH_MIND) > 0 ||
 			ch->IsEquipUniqueGroup(UNIQUE_GROUP_FISH_MIND))
@@ -502,7 +502,7 @@ EVENTFUNC(fishing_event)
 
 	switch (info->step)
 	{
-		case 0:	// 흔들리기 또는 떡밥만 날아감
+		case 0:	// í”ë“¤ë¦¬ê¸° ë˜ëŠ” ë–¡ë°¥ë§Œ ë‚ ì•„ê°
 			++info->step;
 
 			//info->ch->Motion(MOTION_FISHING_SIGN);
@@ -517,7 +517,7 @@ EVENTFUNC(fishing_event)
 				p.length = sizeof(p);
 				p.subheader	= FishingSub::GC::FISH;
 				p.info	= fish_info[info->fish_id].vnum;
-				ch->GetDesc()->Packet(&p, sizeof(TPacketGCFishing));
+				CHARACTER::SafeSendPacketTo(ch, &p, sizeof(TPacketGCFishing));
 			}
 			return (PASSES_PER_SEC(6));
 
@@ -613,7 +613,7 @@ int GetFishLength(int fish_id)
 
 void Take(fishing_event_info* info, LPCHARACTER ch)
 {
-	if (info->step == 1)	// 고기가 걸린 상태면..
+	if (info->step == 1)	// ê³ ê¸°ê°€ ê±¸ë¦° ìƒíƒœë©´..
 	{
 		long ms = (long) ((get_dword_time() - info->hang_time));
 		DWORD item_vnum = 0;
@@ -624,10 +624,10 @@ void Take(fishing_event_info* info, LPCHARACTER ch)
 
 		switch (ret)
 		{
-			case -2: // 잡히지 않은 경우
-			case -3: // 난이도 때문에 실패
-			case -1: // 시간 확률 때문에 실패
-				//ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("고기가 미끼만 빼먹고 잽싸게 도망칩니다."));
+			case -2: // ì¡íˆì§€ ì•Šì€ ê²½ìš°
+			case -3: // ë‚œì´ë„ ë•Œë¬¸ì— ì‹¤íŒ¨
+			case -1: // ì‹œê°„ í™•ë¥  ë•Œë¬¸ì— ì‹¤íŒ¨
+				//ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê³ ê¸°ê°€ ë¯¸ë¼ë§Œ ë¹¼ë¨¹ê³  ì½ì‹¸ê²Œ ë„ë§ì¹©ë‹ˆë‹¤."));
 				{
 					int map_idx = ch->GetMapIndex();
 					int prob_idx = GetProbIndexByMapIndex(map_idx);
@@ -643,7 +643,7 @@ void Take(fishing_event_info* info, LPCHARACTER ch)
 				break;
 
 			case 0:
-				//ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("고기가 잡혔습니다! (%s)"), fish_info[info->fish_id].name);
+				//ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê³ ê¸°ê°€ ì¡í˜”ìŠµë‹ˆë‹¤! (%s)"), fish_info[info->fish_id].name);
 				if (item_vnum)
 				{
 					FishingSuccess(ch);
@@ -653,7 +653,7 @@ void Take(fishing_event_info* info, LPCHARACTER ch)
 					p.length = sizeof(p);
 					p.subheader = FishingSub::GC::FISH;
 					p.info = item_vnum;
-					ch->GetDesc()->Packet(&p, sizeof(TPacketGCFishing));
+					CHARACTER::SafeSendPacketTo(ch, &p, sizeof(TPacketGCFishing));
 
 					LPITEM item = ch->AutoGiveItem(item_vnum, 1, -1, false);
 					if (item)
@@ -661,12 +661,12 @@ void Take(fishing_event_info* info, LPCHARACTER ch)
 						item->SetSocket(0,GetFishLength(info->fish_id));
 						if (test_server)
 						{
-							ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이번에 잡은 물고기의 길이는 %.2fcm"), item->GetSocket(0)/100.f);
+							ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ë²ˆì— ì¡ì€ ë¬¼ê³ ê¸°ì˜ ê¸¸ì´ëŠ” %.2fcm"), item->GetSocket(0)/100.f);
 						}
 
 						if (quest::CQuestManager::instance().GetEventFlag("fishevent") > 0 && (info->fish_id == 5 || info->fish_id == 6))
 						{
-							// 이벤트 중이므로 기록한다.
+							// ì´ë²¤íŠ¸ ì¤‘ì´ë¯€ë¡œ ê¸°ë¡í•œë‹¤.
 
 							TPacketGDHighscore p;
 							p.dwPID = ch->GetPlayerID();
@@ -674,11 +674,11 @@ void Take(fishing_event_info* info, LPCHARACTER ch)
 
 							if (info->fish_id == 5)
 							{
-								strlcpy(p.szBoard, LC_TEXT("낚시이벤트월척붕어"), sizeof(p.szBoard));
+								strlcpy(p.szBoard, LC_TEXT("ë‚šì‹œì´ë²¤íŠ¸ì›”ì²™ë¶•ì–´"), sizeof(p.szBoard));
 							}
 							else if (info->fish_id == 6)
 							{
-								strlcpy(p.szBoard, LC_TEXT("낚시이벤트잉어"), sizeof(p.szBoard));
+								strlcpy(p.szBoard, LC_TEXT("ë‚šì‹œì´ë²¤íŠ¸ì‰ì–´"), sizeof(p.szBoard));
 							}
 
 							db_clientdesc->DBPacket(GD::HIGHSCORE_REGISTER, 0, &p, sizeof(TPacketGDHighscore));
@@ -725,7 +725,7 @@ void Take(fishing_event_info* info, LPCHARACTER ch)
 				info->fish_id,
 				GetFishingLevel(ch),
 				7000);
-		//ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("고기가 미끼만 빼먹고 잽싸게 도망칩니다."));
+		//ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê³ ê¸°ê°€ ë¯¸ë¼ë§Œ ë¹¼ë¨¹ê³  ì½ì‹¸ê²Œ ë„ë§ì¹©ë‹ˆë‹¤."));
 		FishingFail(ch);
 	}
 	else
@@ -764,16 +764,16 @@ void Simulation(int level, int count, int prob_idx, LPCHARACTER ch)
 	}
 
 	for (std::map<std::string,int>::iterator it = fished.begin(); it != fished.end(); ++it)
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s : %d 마리"), it->first.c_str(), it->second);
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s : %d ë§ˆë¦¬"), it->first.c_str(), it->second);
 
-	ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%d 종류 %d 마리 낚음"), fished.size(), total_count);
+	ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%d ì¢…ë¥˜ %d ë§ˆë¦¬ ë‚šìŒ"), fished.size(), total_count);
 }
 
 void UseFish(LPCHARACTER ch, LPITEM item)
 {
 	int idx = item->GetVnum() - fish_info[2].vnum+2;
 
-	// 피라미 사용불가, 살아있는게 아닌건 사용불가
+	// í”¼ë¼ë¯¸ ì‚¬ìš©ë¶ˆê°€, ì‚´ì•„ìˆëŠ”ê²Œ ì•„ë‹Œê±´ ì‚¬ìš©ë¶ˆê°€
 
 	if (idx<=1 || idx >= g_fish_count)
 		return;
@@ -784,12 +784,12 @@ void UseFish(LPCHARACTER ch, LPITEM item)
 
 	if (r >= 4001)
 	{
-		// 죽은 물고기
+		// ì£½ì€ ë¬¼ê³ ê¸°
 		ch->AutoGiveItem(fish_info[idx].dead_vnum);
 	}
 	else if (r >= 2001)
 	{
-		// 생선뼈
+		// ìƒì„ ë¼ˆ
 		ch->AutoGiveItem(FISH_BONE_VNUM);
 	}
 	else
@@ -803,7 +803,7 @@ void UseFish(LPCHARACTER ch, LPITEM item)
 			case USED_TREASURE_MAP:	// 3
 			case USED_NONE:		// 0
 			case USED_WATER_STONE:	// 2
-				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("고기가 흔적도 없이 사라집니다."));
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê³ ê¸°ê°€ í”ì ë„ ì—†ì´ ì‚¬ë¼ì§‘ë‹ˆë‹¤."));
 				break;
 
 			case USED_SHELLFISH:	// 1
@@ -812,12 +812,12 @@ void UseFish(LPCHARACTER ch, LPITEM item)
 					if ( number(0, 2) != 2 ) return;
 				}
 
-				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("배 속에서 조개가 나왔습니다."));
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë°° ì†ì—ì„œ ì¡°ê°œê°€ ë‚˜ì™”ìŠµë‹ˆë‹¤."));
 				ch->AutoGiveItem(SHELLFISH_VNUM);
 				break;
 
 			case USED_EARTHWARM:	// 4
-				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("배 속에서 지렁이가 나왔습니다."));
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë°° ì†ì—ì„œ ì§€ë ì´ê°€ ë‚˜ì™”ìŠµë‹ˆë‹¤."));
 				ch->AutoGiveItem(EARTHWORM_VNUM);
 				break;
 
@@ -848,7 +848,7 @@ void Grill(LPCHARACTER ch, LPITEM item)
 
 	int count = item->GetCount();
 
-	ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s를 구웠습니다."), item->GetName());
+	ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%së¥¼ êµ¬ì› ìŠµë‹ˆë‹¤."), item->GetName());
 	item->SetCount(0);
 	ch->AutoGiveItem(fish_info[idx].grill_vnum, count);
 }
@@ -893,14 +893,14 @@ int RealRefineRod(LPCHARACTER ch, LPITEM item)
 		if (pkNewItem)
 		{
 			BYTE bCell = rod->GetCell();
-			// 낚시대 개량 성공
+			// ë‚šì‹œëŒ€ ê°œëŸ‰ ì„±ê³µ
 			ITEM_MANAGER::instance().RemoveItem(rod, "REMOVE (REFINE FISH_ROD)");
 			pkNewItem->AddToCharacter(ch, TItemPos (INVENTORY, bCell)); 
 			LogManager::instance().ItemLog(ch, pkNewItem, "REFINE FISH_ROD SUCCESS", pkNewItem->GetName());
 			return 1;
 		}
 
-		// 낚시대 개량 실패
+		// ë‚šì‹œëŒ€ ê°œëŸ‰ ì‹¤íŒ¨
 		return 2;
 	}
 	else
@@ -911,14 +911,14 @@ int RealRefineRod(LPCHARACTER ch, LPITEM item)
 		if (pkNewItem)
 		{
 			BYTE bCell = rod->GetCell();
-			// 낚시대 개량에 성공
+			// ë‚šì‹œëŒ€ ê°œëŸ‰ì— ì„±ê³µ
 			ITEM_MANAGER::instance().RemoveItem(rod, "REMOVE (REFINE FISH_ROD)");
 			pkNewItem->AddToCharacter(ch, TItemPos(INVENTORY, bCell)); 
 			LogManager::instance().ItemLog(ch, pkNewItem, "REFINE FISH_ROD FAIL", pkNewItem->GetName());
 			return 0;
 		}
 
-		// 낚시대 개량 실패
+		// ë‚šì‹œëŒ€ ê°œëŸ‰ ì‹¤íŒ¨
 		return 2;
 	}
 }
@@ -982,3 +982,4 @@ int main(int argc, char **argv)
 }
 
 #endif
+

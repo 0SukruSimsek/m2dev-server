@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "dungeon.h"
 #include "char.h"
 #include "char_manager.h"
@@ -98,7 +98,7 @@ struct FSendDestPosition
 	void operator()(LPCHARACTER ch)
 	{
 		ch->GetDesc()->BufferedPacket(&p1, sizeof(TPacketGCDungeon));
-		ch->GetDesc()->Packet(&p2, sizeof(TPacketGCDungeonDestPosition));
+		CHARACTER::SafeSendPacketTo(ch, &p2, sizeof(TPacketGCDungeonDestPosition));
 	}
 
 	TPacketGCDungeon p1;
@@ -1269,7 +1269,7 @@ struct FExitDungeonToStartPosition
 			{
 				PIXEL_POSITION posWarp;
 
-				// 현재 맵 인덱스를 넣는 것이 아니라 시작하는 맵 인덱스를 넣는다.
+				// í˜„ì¬ ë§µ ì¸ë±ìŠ¤ë¥¼ ë„£ëŠ” ê²ƒì´ ì•„ë‹ˆë¼ ì‹œì‘í•˜ëŠ” ë§µ ì¸ë±ìŠ¤ë¥¼ ë„£ëŠ”ë‹¤.
 				if (SECTREE_MANAGER::instance().GetRecallPositionByEmpire(g_start_map[ch->GetEmpire()], ch->GetEmpire(), posWarp))
 					ch->WarpSet(posWarp.x, posWarp.y);
 				else
@@ -1419,7 +1419,7 @@ void CDungeon::JumpToEliminateLocation()
 	}
 	else
 	{
-		// 일반 맵으로 워프
+		// ì¼ë°˜ ë§µìœ¼ë¡œ ì›Œí”„
 		LPSECTREE_MAP pMap = SECTREE_MANAGER::instance().GetMap(m_lMapIndex);
 
 		if (!pMap)
@@ -1496,3 +1496,4 @@ const CDungeon::ItemGroup* CDungeon::GetItemGroup (std::string& group_name)
 	else
 		return NULL;
 }
+

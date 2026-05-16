@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "constants.h"
 #include "questmanager.h"
 #include "questlua.h"
@@ -1229,7 +1229,7 @@ namespace quest
 		return 0;
 	}
 
-	int dungeon_exit(lua_State* L) // 던전에 들어오기 전 위치로 보냄
+	int dungeon_exit(lua_State* L) // ë˜ì „ì— ë“¤ì–´ì˜¤ê¸° ì „ ìœ„ì¹˜ë¡œ ë³´ëƒ„
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 
@@ -1237,7 +1237,7 @@ namespace quest
 		return 0;
 	}
 
-	int dungeon_exit_all(lua_State* L) // 던전에 있는 모든 사람을 던전에 들어오기 전 위치로 보냄
+	int dungeon_exit_all(lua_State* L) // ë˜ì „ì— ìˆëŠ” ëª¨ë“  ì‚¬ëŒì„ ë˜ì „ì— ë“¤ì–´ì˜¤ê¸° ì „ ìœ„ì¹˜ë¡œ ë³´ëƒ„
 	{
 		CQuestManager& q = CQuestManager::instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
@@ -1275,7 +1275,7 @@ namespace quest
 
 							buf.write(&packet_script, sizeof(struct packet_script));
 							buf.write(&can_enter_ment[0], can_enter_ment.size());
-							ch->GetDesc()->Packet(buf.read_peek(), buf.size());
+							CHARACTER::SafeSendPacketTo(ch, buf.read_peek(), buf.size());
 							return;
 						}
 					}
@@ -1287,7 +1287,7 @@ namespace quest
 
 					buf.write(&packet_script, sizeof(struct packet_script));
 					buf.write(&cant_enter_ment[0], cant_enter_ment.size());
-					ch->GetDesc()->Packet(buf.read_peek(), buf.size());
+					CHARACTER::SafeSendPacketTo(ch, buf.read_peek(), buf.size());
 				}
 			}
 		}
@@ -1365,7 +1365,7 @@ namespace quest
 		}
 	};
 	
-	int dungeon_exit_all_by_item_group (lua_State* L) // 특정 아이템 그룹에 속한 아이템이 없는사람은 강퇴
+	int dungeon_exit_all_by_item_group (lua_State* L) // íŠ¹ì • ì•„ì´í…œ ê·¸ë£¹ì— ì†í•œ ì•„ì´í…œì´ ì—†ëŠ”ì‚¬ëŒì€ ê°•í‡´
 	{
 		if (!lua_isstring(L, 1))
 		{
@@ -1430,7 +1430,7 @@ namespace quest
 		}
 	};
 	
-	int dungeon_delete_item_in_item_group_from_all(lua_State* L) // 특정 아이템을 던전 내 pc에게서 삭제.
+	int dungeon_delete_item_in_item_group_from_all(lua_State* L) // íŠ¹ì • ì•„ì´í…œì„ ë˜ì „ ë‚´ pcì—ê²Œì„œ ì‚­ì œ.
 	{
 		if (!lua_isstring(L, 1))
 		{
@@ -1735,3 +1735,4 @@ namespace quest
 		CQuestManager::instance().AddLuaFunctionTable("d", dungeon_functions);
 	}
 }
+

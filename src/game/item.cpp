@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "utils.h"
 #include "config.h"
 #include "char.h"
@@ -222,7 +222,7 @@ void CItem::UpdatePacket()
 	thecore_memcpy(pack.aAttr, GetAttributes(), sizeof(pack.aAttr));
 
 	sys_log(2, "UpdatePacket %s -> %s", GetName(), m_pOwner->GetName());
-	m_pOwner->GetDesc()->Packet(&pack, sizeof(pack));
+	CHARACTER::SafeSendPacketTo(m_pOwner, &pack, sizeof(pack));
 }
 
 DWORD CItem::GetCount()
@@ -298,7 +298,7 @@ LPITEM CItem::RemoveFromCharacter()
 
 	LPCHARACTER pOwner = m_pOwner;
 
-	if (m_bEquipped) // 장착되었는가?
+	if (m_bEquipped) // ì¥ì°©ë˜ì—ˆëŠ”ê°€?
 	{
 		Unequip();
 		//pOwner->UpdatePacket();
@@ -322,7 +322,7 @@ LPITEM CItem::RemoveFromCharacter()
 			{
 				TItemPos cell(INVENTORY, m_wCell);
 
-				if (false == cell.IsDefaultInventoryPosition() && false == cell.IsBeltInventoryPosition()) // 아니면 소지품에?
+				if (false == cell.IsDefaultInventoryPosition() && false == cell.IsBeltInventoryPosition()) // ì•„ë‹ˆë©´ ì†Œì§€í’ˆì—?
 					sys_err("CItem::RemoveFromCharacter: Invalid Item Position");
 				else
 				{
@@ -489,16 +489,16 @@ bool CItem::CanUsedBy(LPCHARACTER ch)
 
 int CItem::FindEquipCell(LPCHARACTER ch, int iCandidateCell)
 {
-	// 코스츔 아이템(ITEM_COSTUME)은 WearFlag 없어도 됨. (sub type으로 착용위치 구분. 귀찮게 또 wear flag 줄 필요가 있나..)
-	// 용혼석(ITEM_DS, ITEM_SPECIAL_DS)도  SUB_TYPE으로 구분. 신규 반지, 벨트는 ITEM_TYPE으로 구분 -_-
+	// ì½”ìŠ¤ì¸” ì•„ì´í…œ(ITEM_COSTUME)ì€ WearFlag ì—†ì–´ë„ ë¨. (sub typeìœ¼ë¡œ ì°©ìš©ìœ„ì¹˜ êµ¬ë¶„. ê·€ì°®ê²Œ ë˜ wear flag ì¤„ í•„ìš”ê°€ ìˆë‚˜..)
+	// ìš©í˜¼ì„(ITEM_DS, ITEM_SPECIAL_DS)ë„  SUB_TYPEìœ¼ë¡œ êµ¬ë¶„. ì‹ ê·œ ë°˜ì§€, ë²¨íŠ¸ëŠ” ITEM_TYPEìœ¼ë¡œ êµ¬ë¶„ -_-
 	if ((0 == GetWearFlag() || ITEM_TOTEM == GetType()) && ITEM_COSTUME != GetType() && ITEM_DS != GetType() && ITEM_SPECIAL_DS != GetType() && ITEM_RING != GetType() && ITEM_BELT != GetType())
 		return -1;
 
-	// 용혼석 슬롯을 WEAR로 처리할 수가 없어서(WEAR는 최대 32개까지 가능한데 용혼석을 추가하면 32가 넘는다.)
-	// 인벤토리의 특정 위치((INVENTORY_MAX_NUM + WEAR_MAX_NUM)부터 (INVENTORY_MAX_NUM + WEAR_MAX_NUM + DRAGON_SOUL_DECK_MAX_NUM * DS_SLOT_MAX - 1)까지)를
-	// 용혼석 슬롯으로 정함.
-	// return 할 때에, INVENTORY_MAX_NUM을 뺀 이유는,
-	// 본래 WearCell이 INVENTORY_MAX_NUM를 빼고 return 하기 때문.
+	// ìš©í˜¼ì„ ìŠ¬ë¡¯ì„ WEARë¡œ ì²˜ë¦¬í•  ìˆ˜ê°€ ì—†ì–´ì„œ(WEARëŠ” ìµœëŒ€ 32ê°œê¹Œì§€ ê°€ëŠ¥í•œë° ìš©í˜¼ì„ì„ ì¶”ê°€í•˜ë©´ 32ê°€ ë„˜ëŠ”ë‹¤.)
+	// ì¸ë²¤í† ë¦¬ì˜ íŠ¹ì • ìœ„ì¹˜((INVENTORY_MAX_NUM + WEAR_MAX_NUM)ë¶€í„° (INVENTORY_MAX_NUM + WEAR_MAX_NUM + DRAGON_SOUL_DECK_MAX_NUM * DS_SLOT_MAX - 1)ê¹Œì§€)ë¥¼
+	// ìš©í˜¼ì„ ìŠ¬ë¡¯ìœ¼ë¡œ ì •í•¨.
+	// return í•  ë•Œì—, INVENTORY_MAX_NUMì„ ëº€ ì´ìœ ëŠ”,
+	// ë³¸ë˜ WearCellì´ INVENTORY_MAX_NUMë¥¼ ë¹¼ê³  return í•˜ê¸° ë•Œë¬¸.
 	if (GetType() == ITEM_DS || GetType() == ITEM_SPECIAL_DS)
 	{
 		if (iCandidateCell < 0)
@@ -559,7 +559,7 @@ int CItem::FindEquipCell(LPCHARACTER ch, int iCandidateCell)
 			return WEAR_UNIQUE1;		
 	}
 
-	// 수집 퀘스트를 위한 아이템이 박히는곳으로 한번 박히면 절대 뺼수 없다.
+	// ìˆ˜ì§‘ í€˜ìŠ¤íŠ¸ë¥¼ ìœ„í•œ ì•„ì´í…œì´ ë°•íˆëŠ”ê³³ìœ¼ë¡œ í•œë²ˆ ë°•íˆë©´ ì ˆëŒ€ ëº¼ìˆ˜ ì—†ë‹¤.
 	else if (GetWearFlag() & WEARABLE_ABILITY)
 	{
 		if (!ch->GetWear(WEAR_ABILITY1))
@@ -606,12 +606,12 @@ void CItem::ModifyPoints(bool bAdd)
 {
 	int accessoryGrade;
 
-	// 무기와 갑옷만 소켓을 적용시킨다.
+	// ë¬´ê¸°ì™€ ê°‘ì˜·ë§Œ ì†Œì¼“ì„ ì ìš©ì‹œí‚¨ë‹¤.
 	if (false == IsAccessoryForSocket())
 	{
 		if (m_pProto->bType == ITEM_WEAPON || m_pProto->bType == ITEM_ARMOR)
 		{
-			// 소켓이 속성강화에 사용되는 경우 적용하지 않는다 (ARMOR_WRIST ARMOR_NECK ARMOR_EAR)
+			// ì†Œì¼“ì´ ì†ì„±ê°•í™”ì— ì‚¬ìš©ë˜ëŠ” ê²½ìš° ì ìš©í•˜ì§€ ì•ŠëŠ”ë‹¤ (ARMOR_WRIST ARMOR_NECK ARMOR_EAR)
 			for (int i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
 			{
 				DWORD dwVnum;
@@ -670,12 +670,12 @@ void CItem::ModifyPoints(bool bAdd)
 			m_pOwner->ApplyPoint(m_pProto->aApplies[i].bType, bAdd ? value : -value);
 		}
 	}
-	// 초승달의 반지, 할로윈 사탕, 행복의 반지, 영원한 사랑의 펜던트의 경우
-	// 기존의 하드 코딩으로 강제로 속성을 부여했지만,
-	// 그 부분을 제거하고 special item group 테이블에서 속성을 부여하도록 변경하였다.
-	// 하지만 하드 코딩되어있을 때 생성된 아이템이 남아있을 수도 있어서 특수처리 해놓는다.
-	// 이 아이템들의 경우, 밑에 ITEM_UNIQUE일 때의 처리로 속성이 부여되기 때문에,
-	// 아이템에 박혀있는 attribute는 적용하지 않고 넘어간다.
+	// ì´ˆìŠ¹ë‹¬ì˜ ë°˜ì§€, í• ë¡œìœˆ ì‚¬íƒ•, í–‰ë³µì˜ ë°˜ì§€, ì˜ì›í•œ ì‚¬ë‘ì˜ íœë˜íŠ¸ì˜ ê²½ìš°
+	// ê¸°ì¡´ì˜ í•˜ë“œ ì½”ë”©ìœ¼ë¡œ ê°•ì œë¡œ ì†ì„±ì„ ë¶€ì—¬í–ˆì§€ë§Œ,
+	// ê·¸ ë¶€ë¶„ì„ ì œê±°í•˜ê³  special item group í…Œì´ë¸”ì—ì„œ ì†ì„±ì„ ë¶€ì—¬í•˜ë„ë¡ ë³€ê²½í•˜ì˜€ë‹¤.
+	// í•˜ì§€ë§Œ í•˜ë“œ ì½”ë”©ë˜ì–´ìˆì„ ë•Œ ìƒì„±ëœ ì•„ì´í…œì´ ë‚¨ì•„ìˆì„ ìˆ˜ë„ ìˆì–´ì„œ íŠ¹ìˆ˜ì²˜ë¦¬ í•´ë†“ëŠ”ë‹¤.
+	// ì´ ì•„ì´í…œë“¤ì˜ ê²½ìš°, ë°‘ì— ITEM_UNIQUEì¼ ë•Œì˜ ì²˜ë¦¬ë¡œ ì†ì„±ì´ ë¶€ì—¬ë˜ê¸° ë•Œë¬¸ì—,
+	// ì•„ì´í…œì— ë°•í˜€ìˆëŠ” attributeëŠ” ì ìš©í•˜ì§€ ì•Šê³  ë„˜ì–´ê°„ë‹¤.
 	if (true == CItemVnumHelper::IsRamadanMoonRing(GetVnum()) || true == CItemVnumHelper::IsHalloweenCandy(GetVnum())
 		|| true == CItemVnumHelper::IsHappinessRing(GetVnum()) || true == CItemVnumHelper::IsLovePendant(GetVnum()))
 	{
@@ -732,7 +732,7 @@ void CItem::ModifyPoints(bool bAdd)
 
 		case ITEM_ARMOR:
 			{
-				// 코스츔 body를 입고있다면 armor는 벗던 입던 상관 없이 비주얼에 영향을 주면 안 됨.
+				// ì½”ìŠ¤ì¸” bodyë¥¼ ì…ê³ ìˆë‹¤ë©´ armorëŠ” ë²—ë˜ ì…ë˜ ìƒê´€ ì—†ì´ ë¹„ì£¼ì–¼ì— ì˜í–¥ì„ ì£¼ë©´ ì•ˆ ë¨.
 				if (0 != m_pOwner->GetWear(WEAR_COSTUME_BODY))
 					break;
 
@@ -752,33 +752,33 @@ void CItem::ModifyPoints(bool bAdd)
 			}
 			break;
 
-		// 코스츔 아이템 입었을 때 캐릭터 parts 정보 세팅. 기존 스타일대로 추가함..
+		// ì½”ìŠ¤ì¸” ì•„ì´í…œ ì…ì—ˆì„ ë•Œ ìºë¦­í„° parts ì •ë³´ ì„¸íŒ…. ê¸°ì¡´ ìŠ¤íƒ€ì¼ëŒ€ë¡œ ì¶”ê°€í•¨..
 		case ITEM_COSTUME:
 			{
 				DWORD toSetValue = this->GetVnum();
 				EParts toSetPart = PART_MAX_NUM;
 
-				// 갑옷 코스츔
+				// ê°‘ì˜· ì½”ìŠ¤ì¸”
 				if (GetSubType() == COSTUME_BODY)
 				{
 					toSetPart = PART_MAIN;
 
 					if (false == bAdd)
 					{
-						// 코스츔 갑옷을 벗었을 때 원래 갑옷을 입고 있었다면 그 갑옷으로 look 세팅, 입지 않았다면 default look
+						// ì½”ìŠ¤ì¸” ê°‘ì˜·ì„ ë²—ì—ˆì„ ë•Œ ì›ë˜ ê°‘ì˜·ì„ ì…ê³  ìˆì—ˆë‹¤ë©´ ê·¸ ê°‘ì˜·ìœ¼ë¡œ look ì„¸íŒ…, ì…ì§€ ì•Šì•˜ë‹¤ë©´ default look
 						const CItem* pArmor = m_pOwner->GetWear(WEAR_BODY);
 						toSetValue = (NULL != pArmor) ? pArmor->GetVnum() : m_pOwner->GetOriginalPart(PART_MAIN);						
 					}
 					
 				}
 
-				// 헤어 코스츔
+				// í—¤ì–´ ì½”ìŠ¤ì¸”
 				else if (GetSubType() == COSTUME_HAIR)
 				{
 					toSetPart = PART_HAIR;
 
-					// 코스츔 헤어는 shape값을 item proto의 value3에 세팅하도록 함. 특별한 이유는 없고 기존 갑옷(ARMOR_BODY)의 shape값이 프로토의 value3에 있어서 헤어도 같이 value3으로 함.
-					// [NOTE] 갑옷은 아이템 vnum을 보내고 헤어는 shape(value3)값을 보내는 이유는.. 기존 시스템이 그렇게 되어있음...
+					// ì½”ìŠ¤ì¸” í—¤ì–´ëŠ” shapeê°’ì„ item protoì˜ value3ì— ì„¸íŒ…í•˜ë„ë¡ í•¨. íŠ¹ë³„í•œ ì´ìœ ëŠ” ì—†ê³  ê¸°ì¡´ ê°‘ì˜·(ARMOR_BODY)ì˜ shapeê°’ì´ í”„ë¡œí† ì˜ value3ì— ìˆì–´ì„œ í—¤ì–´ë„ ê°™ì´ value3ìœ¼ë¡œ í•¨.
+					// [NOTE] ê°‘ì˜·ì€ ì•„ì´í…œ vnumì„ ë³´ë‚´ê³  í—¤ì–´ëŠ” shape(value3)ê°’ì„ ë³´ë‚´ëŠ” ì´ìœ ëŠ”.. ê¸°ì¡´ ì‹œìŠ¤í…œì´ ê·¸ë ‡ê²Œ ë˜ì–´ìˆìŒ...
 					toSetValue = (true == bAdd) ? this->GetValue(3) : 0;
 				}
 
@@ -839,7 +839,7 @@ bool CItem::EquipTo(LPCHARACTER ch, BYTE bWearCell)
 		return false;
 	}
 
-	// 용혼석 슬롯 index는 WEAR_MAX_NUM 보다 큼.
+	// ìš©í˜¼ì„ ìŠ¬ë¡¯ indexëŠ” WEAR_MAX_NUM ë³´ë‹¤ í¼.
 	if (IsDragonSoul())
 	{
 		if (bWearCell < WEAR_MAX_NUM || bWearCell >= WEAR_MAX_NUM + (DWORD)DRAGON_SOUL_DECK_MAX_NUM * (DWORD)DS_SLOT_MAX)
@@ -866,7 +866,7 @@ bool CItem::EquipTo(LPCHARACTER ch, BYTE bWearCell)
 	if (GetOwner())
 		RemoveFromCharacter();
 
-	ch->SetWear(bWearCell, this); // 여기서 패킷 나감
+	ch->SetWear(bWearCell, this); // ì—¬ê¸°ì„œ íŒ¨í‚· ë‚˜ê°
 
 	m_pOwner = ch;
 	m_bEquipped = true;
@@ -951,7 +951,7 @@ bool CItem::Unequip()
 		return false;
 	}
 
-	//신규 말 아이템 제거시 처리
+	//ì‹ ê·œ ë§ ì•„ì´í…œ ì œê±°ì‹œ ì²˜ë¦¬
 	if (IsRideItem())
 		ClearMountAttributeAndAffect();
 
@@ -1284,7 +1284,7 @@ void CItem::AlterToMagicItem()
 		}
 	}
 
-	// 100% 확률로 좋은 속성 하나
+	// 100% í™•ë¥ ë¡œ ì¢‹ì€ ì†ì„± í•˜ë‚˜
 	PutAttribute(aiItemMagicAttributePercentHigh);
 
 	if (number(1, 100) <= iSecondPct)
@@ -1370,8 +1370,8 @@ EVENTFUNC(unique_expire_event)
 		}
 		else
 		{
-			// 게임 내에 시간제 아이템들이 빠릿빠릿하게 사라지지 않는 버그가 있어
-			// 수정
+			// ê²Œì„ ë‚´ì— ì‹œê°„ì œ ì•„ì´í…œë“¤ì´ ë¹ ë¦¿ë¹ ë¦¿í•˜ê²Œ ì‚¬ë¼ì§€ì§€ ì•ŠëŠ” ë²„ê·¸ê°€ ìˆì–´
+			// ìˆ˜ì •
 			// by rtsummit
 			if (pkItem->GetSocket(ITEM_SOCKET_UNIQUE_REMAIN_TIME) - cur < 600)
 				return PASSES_PER_SEC(pkItem->GetSocket(ITEM_SOCKET_UNIQUE_REMAIN_TIME) - cur);
@@ -1381,9 +1381,9 @@ EVENTFUNC(unique_expire_event)
 	}
 }
 
-// 시간 후불제
-// timer를 시작할 때에 시간 차감하는 것이 아니라, 
-// timer가 발화할 때에 timer가 동작한 시간 만큼 시간 차감을 한다.
+// ì‹œê°„ í›„ë¶ˆì œ
+// timerë¥¼ ì‹œì‘í•  ë•Œì— ì‹œê°„ ì°¨ê°í•˜ëŠ” ê²ƒì´ ì•„ë‹ˆë¼, 
+// timerê°€ ë°œí™”í•  ë•Œì— timerê°€ ë™ì‘í•œ ì‹œê°„ ë§Œí¼ ì‹œê°„ ì°¨ê°ì„ í•œë‹¤.
 EVENTFUNC(timer_based_on_wear_expire_event)
 {
 	item_event_info* info = dynamic_cast<item_event_info*>( event->info );
@@ -1402,7 +1402,7 @@ EVENTFUNC(timer_based_on_wear_expire_event)
 		pkItem->SetTimerBasedOnWearExpireEvent(NULL);
 		pkItem->SetSocket(ITEM_SOCKET_REMAIN_SEC, 0);
 	
-		// 일단 timer based on wear 용혼석은 시간 다 되었다고 없애지 않는다.
+		// ì¼ë‹¨ timer based on wear ìš©í˜¼ì„ì€ ì‹œê°„ ë‹¤ ë˜ì—ˆë‹¤ê³  ì—†ì• ì§€ ì•ŠëŠ”ë‹¤.
 		if (pkItem->IsDragonSoul())
 		{
 			DSManager::instance().DeactivateDragonSoul(pkItem);
@@ -1513,7 +1513,7 @@ void CItem::StartUniqueExpireEvent()
 	if (m_pkUniqueExpireEvent)
 		return;
 
-	//기간제 아이템일 경우 시간제 아이템은 동작하지 않는다
+	//ê¸°ê°„ì œ ì•„ì´í…œì¼ ê²½ìš° ì‹œê°„ì œ ì•„ì´í…œì€ ë™ì‘í•˜ì§€ ì•ŠëŠ”ë‹¤
 	if (IsRealTimeItem())
 		return;
 
@@ -1536,14 +1536,14 @@ void CItem::StartUniqueExpireEvent()
 	SetUniqueExpireEvent(event_create(unique_expire_event, info, PASSES_PER_SEC(iSec)));
 }
 
-// 시간 후불제
-// timer_based_on_wear_expire_event 설명 참조
+// ì‹œê°„ í›„ë¶ˆì œ
+// timer_based_on_wear_expire_event ì„¤ëª… ì°¸ì¡°
 void CItem::StartTimerBasedOnWearExpireEvent()
 {
 	if (m_pkTimerBasedOnWearExpireEvent)
 		return;
 
-	//기간제 아이템일 경우 시간제 아이템은 동작하지 않는다
+	//ê¸°ê°„ì œ ì•„ì´í…œì¼ ê²½ìš° ì‹œê°„ì œ ì•„ì´í…œì€ ë™ì‘í•˜ì§€ ì•ŠëŠ”ë‹¤
 	if (IsRealTimeItem())
 		return;
 
@@ -1552,7 +1552,7 @@ void CItem::StartTimerBasedOnWearExpireEvent()
 
 	int iSec = GetSocket(0);
 	
-	// 남은 시간을 분단위로 끊기 위해...
+	// ë‚¨ì€ ì‹œê°„ì„ ë¶„ë‹¨ìœ„ë¡œ ëŠê¸° ìœ„í•´...
 	if (0 != iSec)
 	{
 		iSec %= 60;
@@ -1571,7 +1571,7 @@ void CItem::StopUniqueExpireEvent()
 	if (!m_pkUniqueExpireEvent)
 		return;
 
-	if (GetValue(2) != 0) // 게임시간제 이외의 아이템은 UniqueExpireEvent를 중단할 수 없다.
+	if (GetValue(2) != 0) // ê²Œì„ì‹œê°„ì œ ì´ì™¸ì˜ ì•„ì´í…œì€ UniqueExpireEventë¥¼ ì¤‘ë‹¨í•  ìˆ˜ ì—†ë‹¤.
 		return;
 
 	// HARD CODING
@@ -1608,12 +1608,12 @@ int CItem::GetSpecialGroup() const
 }
 
 //
-// 악세서리 소켓 처리.
+// ì•…ì„¸ì„œë¦¬ ì†Œì¼“ ì²˜ë¦¬.
 //
 bool CItem::IsAccessoryForSocket()
 {
 	return (m_pProto->bType == ITEM_ARMOR && (m_pProto->bSubType == ARMOR_WRIST || m_pProto->bSubType == ARMOR_NECK || m_pProto->bSubType == ARMOR_EAR)) ||
-		(m_pProto->bType == ITEM_BELT);				// 2013년 2월 새로 추가된 '벨트' 아이템의 경우 기획팀에서 악세서리 소켓 시스템을 그대로 이용하자고 함.
+		(m_pProto->bType == ITEM_BELT);				// 2013ë…„ 2ì›” ìƒˆë¡œ ì¶”ê°€ëœ 'ë²¨íŠ¸' ì•„ì´í…œì˜ ê²½ìš° ê¸°íšíŒ€ì—ì„œ ì•…ì„¸ì„œë¦¬ ì†Œì¼“ ì‹œìŠ¤í…œì„ ê·¸ëŒ€ë¡œ ì´ìš©í•˜ìê³  í•¨.
 }
 
 void CItem::SetAccessorySocketGrade(int iGrade) 
@@ -1638,7 +1638,7 @@ void CItem::SetAccessorySocketDownGradeTime(DWORD time)
 	SetSocket(2, time); 
 
 	if (test_server && GetOwner())
-		GetOwner()->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s에서 소켓 빠질때까지 남은 시간 %d"), GetName(), time);
+		GetOwner()->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%sì—ì„œ ì†Œì¼“ ë¹ ì§ˆë•Œê¹Œì§€ ë‚¨ì€ ì‹œê°„ %d"), GetName(), time);
 }
 
 EVENTFUNC(accessory_socket_expire_event)
@@ -1758,7 +1758,7 @@ void CItem::ClearMountAttributeAndAffect()
 }
 
 // fixme
-// 이거 지금은 안쓴데... 근데 혹시나 싶어서 남겨둠.
+// ì´ê±° ì§€ê¸ˆì€ ì•ˆì“´ë°... ê·¼ë° í˜¹ì‹œë‚˜ ì‹¶ì–´ì„œ ë‚¨ê²¨ë‘ .
 // by rtsummit
 bool CItem::IsNewMountItem()
 {
@@ -1786,7 +1786,7 @@ void CItem::AccessorySocketDegrade()
 
 		if (ch)
 		{
-			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s에 박혀있던 보석이 사라집니다."), GetName());
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%sì— ë°•í˜€ìˆë˜ ë³´ì„ì´ ì‚¬ë¼ì§‘ë‹ˆë‹¤."), GetName());
 		}
 
 		ModifyPoints(false);
@@ -1805,7 +1805,7 @@ void CItem::AccessorySocketDegrade()
 	}
 }
 
-// ring에 item을 박을 수 있는지 여부를 체크해서 리턴
+// ringì— itemì„ ë°•ì„ ìˆ˜ ìˆëŠ”ì§€ ì—¬ë¶€ë¥¼ ì²´í¬í•´ì„œ ë¦¬í„´
 static const bool CanPutIntoRing(LPITEM ring, LPITEM item)
 {
 	const DWORD vnum = item->GetVnum();
@@ -2014,10 +2014,10 @@ int CItem::GetLevelLimit()
 
 bool CItem::OnAfterCreatedItem()
 {
-	// 아이템을 한 번이라도 사용했다면, 그 이후엔 사용 중이지 않아도 시간이 차감되는 방식
+	// ì•„ì´í…œì„ í•œ ë²ˆì´ë¼ë„ ì‚¬ìš©í–ˆë‹¤ë©´, ê·¸ ì´í›„ì—” ì‚¬ìš© ì¤‘ì´ì§€ ì•Šì•„ë„ ì‹œê°„ì´ ì°¨ê°ë˜ëŠ” ë°©ì‹
 	if (-1 != this->GetProto()->cLimitRealTimeFirstUseIndex)
 	{
-		// Socket1에 아이템의 사용 횟수가 기록되어 있으니, 한 번이라도 사용한 아이템은 타이머를 시작한다.
+		// Socket1ì— ì•„ì´í…œì˜ ì‚¬ìš© íšŸìˆ˜ê°€ ê¸°ë¡ë˜ì–´ ìˆìœ¼ë‹ˆ, í•œ ë²ˆì´ë¼ë„ ì‚¬ìš©í•œ ì•„ì´í…œì€ íƒ€ì´ë¨¸ë¥¼ ì‹œì‘í•œë‹¤.
 		if (0 != GetSocket(1))
 		{
 			StartRealTimeExpireEvent();
@@ -2052,7 +2052,7 @@ int CItem::GiveMoreTime_Per(float fPercent)
 			return given_time;
 		}
 	}
-	// 우선 용혼석에 관해서만 하도록 한다.
+	// ìš°ì„  ìš©í˜¼ì„ì— ê´€í•´ì„œë§Œ í•˜ë„ë¡ í•œë‹¤.
 	else
 		return 0;
 }
@@ -2076,7 +2076,7 @@ int CItem::GiveMoreTime_Fix(DWORD dwTime)
 			return dwTime;
 		}
 	}
-	// 우선 용혼석에 관해서만 하도록 한다.
+	// ìš°ì„  ìš©í˜¼ì„ì— ê´€í•´ì„œë§Œ í•˜ë„ë¡ í•œë‹¤.
 	else
 		return 0;
 }
@@ -2101,7 +2101,7 @@ int	CItem::GetDuration()
 
 bool CItem::IsSameSpecialGroup(const LPITEM item) const
 {
-	// 서로 VNUM이 같다면 같은 그룹인 것으로 간주
+	// ì„œë¡œ VNUMì´ ê°™ë‹¤ë©´ ê°™ì€ ê·¸ë£¹ì¸ ê²ƒìœ¼ë¡œ ê°„ì£¼
 	if (this->GetVnum() == item->GetVnum())
 		return true;
 
@@ -2110,3 +2110,4 @@ bool CItem::IsSameSpecialGroup(const LPITEM item) const
 
 	return false;
 }
+

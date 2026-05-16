@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "libgame/grid.h"
 #include "constants.h"
 #include "utils.h"
@@ -95,10 +95,10 @@ LPSHOP CShopManager::GetByNPCVnum(DWORD dwVnum)
 }
 
 /*
- * 인터페이스 함수들
+ * ì¸í„°í˜ì´ìŠ¤ í•¨ìˆ˜ë“¤
  */
 
-// 상점 거래를 시작
+// ìƒì  ê±°ë˜ë¥¼ ì‹œì‘
 bool CShopManager::StartShopping(LPCHARACTER pkChr, LPCHARACTER pkChrShopKeeper, int iShopVnum)
 {
 	if (pkChr->GetShopOwner() == pkChrShopKeeper)
@@ -110,7 +110,7 @@ bool CShopManager::StartShopping(LPCHARACTER pkChr, LPCHARACTER pkChrShopKeeper,
 	//PREVENT_TRADE_WINDOW
 	if (pkChr->IsOpenSafebox() || pkChr->GetExchange() || pkChr->GetMyShop() || pkChr->IsCubeOpen())
 	{
-		pkChr->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("다른 거래창이 열린상태에서는 상점거래를 할수 가 없습니다."));
+		pkChr->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë‹¤ë¥¸ ê±°ë˜ì°½ì´ ì—´ë¦°ìƒíƒœì—ì„œëŠ” ìƒì ê±°ë˜ë¥¼ í• ìˆ˜ ê°€ ì—†ìŠµë‹ˆë‹¤."));
 		return false;
 	}
 	//END_PREVENT_TRADE_WINDOW
@@ -185,7 +185,7 @@ void CShopManager::DestroyPCShop(LPCHARACTER ch)
 	M2_DELETE(pkShop);
 }
 
-// 상점 거래를 종료
+// ìƒì  ê±°ë˜ë¥¼ ì¢…ë£Œ
 void CShopManager::StopShopping(LPCHARACTER ch)
 {
 	LPSHOP shop;
@@ -201,7 +201,7 @@ void CShopManager::StopShopping(LPCHARACTER ch)
 	sys_log(0, "SHOP: END: %s", ch->GetName());
 }
 
-// 아이템 구입
+// ì•„ì´í…œ êµ¬ì…
 void CShopManager::Buy(LPCHARACTER ch, BYTE pos)
 {
 	if (!ch->GetShop())
@@ -212,7 +212,7 @@ void CShopManager::Buy(LPCHARACTER ch, BYTE pos)
 
 	if (DISTANCE_APPROX(ch->GetX() - ch->GetShopOwner()->GetX(), ch->GetY() - ch->GetShopOwner()->GetY()) > 2000)
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상점과의 거리가 너무 멀어 물건을 살 수 없습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒì ê³¼ì˜ ê±°ë¦¬ê°€ ë„ˆë¬´ ë©€ì–´ ë¬¼ê±´ì„ ì‚´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		return;
 	}
 
@@ -241,7 +241,7 @@ void CShopManager::Buy(LPCHARACTER ch, BYTE pos)
 
 	int ret = pkShop->Buy(ch, pos);
 
-	if (ShopSub::GC::OK != ret) // 문제가 있었으면 보낸다.
+	if (ShopSub::GC::OK != ret) // ë¬¸ì œê°€ ìˆì—ˆìœ¼ë©´ ë³´ë‚¸ë‹¤.
 	{
 		TPacketGCShop pack;
 
@@ -249,7 +249,7 @@ void CShopManager::Buy(LPCHARACTER ch, BYTE pos)
 		pack.subheader	= ret;
 		pack.length	= sizeof(TPacketGCShop);
 
-		ch->GetDesc()->Packet(&pack, sizeof(pack));
+		CHARACTER::SafeSendPacketTo(ch, &pack, sizeof(pack));
 	}
 }
 
@@ -269,7 +269,7 @@ void CShopManager::Sell(LPCHARACTER ch, BYTE bCell, BYTE bCount)
 
 	if (DISTANCE_APPROX(ch->GetX()-ch->GetShopOwner()->GetX(), ch->GetY()-ch->GetShopOwner()->GetY())>2000)
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상점과의 거리가 너무 멀어 물건을 팔 수 없습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒì ê³¼ì˜ ê±°ë¦¬ê°€ ë„ˆë¬´ ë©€ì–´ ë¬¼ê±´ì„ íŒ” ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		return;
 	}
 	
@@ -280,7 +280,7 @@ void CShopManager::Sell(LPCHARACTER ch, BYTE bCell, BYTE bCount)
 
 	if (item->IsEquipped() == true)
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("장비중인 아이템은 개인상점에서 판매할 수 없습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì¥ë¹„ì¤‘ì¸ ì•„ì´í…œì€ ê°œì¸ìƒì ì—ì„œ íŒë§¤í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		return;
 	}
 
@@ -311,7 +311,7 @@ void CShopManager::Sell(LPCHARACTER ch, BYTE bCell, BYTE bCount)
 
 	dwPrice /= 5;
 	
-	//세금 계산
+	//ì„¸ê¸ˆ ê³„ì‚°
 	DWORD dwTax = 0;
 	int iVal = 3;
 	
@@ -334,22 +334,22 @@ void CShopManager::Sell(LPCHARACTER ch, BYTE bCell, BYTE bCount)
 	if (GOLD_MAX <= nTotalMoney)
 	{
 		sys_err("[OVERFLOW_GOLD] id %u name %s gold %u", ch->GetPlayerID(), ch->GetName(), ch->GetGold());
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("20억냥이 초과하여 물품을 팔수 없습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("20ì–µëƒ¥ì´ ì´ˆê³¼í•˜ì—¬ ë¬¼í’ˆì„ íŒ”ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		return;
 	}
 
-	// 20050802.myevan.상점 판매 로그에 아이템 ID 추가
+	// 20050802.myevan.ìƒì  íŒë§¤ ë¡œê·¸ì— ì•„ì´í…œ ID ì¶”ê°€
 	sys_log(0, "SHOP: SELL: %s item name: %s(x%d):%u price: %u", ch->GetName(), item->GetName(), bCount, item->GetID(), dwPrice);
 
 	if (iVal > 0)
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("판매금액의 %d %% 가 세금으로 나가게됩니다"), iVal);
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("íŒë§¤ê¸ˆì•¡ì˜ %d %% ê°€ ì„¸ê¸ˆìœ¼ë¡œ ë‚˜ê°€ê²Œë©ë‹ˆë‹¤"), iVal);
 
 	DBManager::instance().SendMoneyLog(MONEY_LOG_SHOP, item->GetVnum(), dwPrice);
 
 	if (bCount == item->GetCount())
 	{
-		// 한국에는 아이템을 버리고 복구해달라는 진상유저들이 많아서
-		// 상점 판매시 속성로그를 남긴다.
+		// í•œêµ­ì—ëŠ” ì•„ì´í…œì„ ë²„ë¦¬ê³  ë³µêµ¬í•´ë‹¬ë¼ëŠ” ì§„ìƒìœ ì €ë“¤ì´ ë§ì•„ì„œ
+		// ìƒì  íŒë§¤ì‹œ ì†ì„±ë¡œê·¸ë¥¼ ë‚¨ê¸´ë‹¤.
 		if (LC_IsYMIR())
 			item->AttrLog();
 
@@ -486,8 +486,8 @@ bool ConvertToShopItemTable(IN CGroupNode* pNode, OUT TShopTableEx& shopTable)
 
 bool CShopManager::ReadShopTableEx(const char* stFileName)
 {
-	// file 유무 체크.
-	// 없는 경우는 에러로 처리하지 않는다.
+	// file ìœ ë¬´ ì²´í¬.
+	// ì—†ëŠ” ê²½ìš°ëŠ” ì—ëŸ¬ë¡œ ì²˜ë¦¬í•˜ì§€ ì•ŠëŠ”ë‹¤.
 	FILE* fp = fopen(stFileName, "rb");
 	if (NULL == fp)
 		return true;
@@ -585,3 +585,4 @@ bool CShopManager::ReadShopTableEx(const char* stFileName)
 
 	return true;
 }
+

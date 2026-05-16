@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "libgame/grid.h"
 #include "constants.h"
 #include "utils.h"
@@ -158,8 +158,8 @@ void CShop::SetShopItems(TShopItemTable * pTable, BYTE bItemCount)
 		if (item.pkItem)
 		{
 			item.vnum = pkItem->GetVnum();
-			item.count = pkItem->GetCount(); // PC 샵의 경우 아이템 개수는 진짜 아이템의 개수여야 한다.
-			item.price = pTable->price; // 가격도 사용자가 정한대로..
+			item.count = pkItem->GetCount(); // PC ìƒµì˜ ê²½ìš° ì•„ì´í…œ ê°œìˆ˜ëŠ” ì§„ì§œ ì•„ì´í…œì˜ ê°œìˆ˜ì—¬ì•¼ í•œë‹¤.
+			item.price = pTable->price; // ê°€ê²©ë„ ì‚¬ìš©ìê°€ ì •í•œëŒ€ë¡œ..
 			item.itemid	= pkItem->GetID();
 		}
 		else
@@ -246,7 +246,7 @@ int CShop::Buy(LPCHARACTER ch, BYTE pos)
 
 	LPITEM item;
 
-	if (m_pkPC) // 피씨가 운영하는 샵은 피씨가 실제 아이템을 가지고있어야 한다.
+	if (m_pkPC) // í”¼ì”¨ê°€ ìš´ì˜í•˜ëŠ” ìƒµì€ í”¼ì”¨ê°€ ì‹¤ì œ ì•„ì´í…œì„ ê°€ì§€ê³ ìˆì–´ì•¼ í•œë‹¤.
 		item = r_item.pkItem;
 	else
 		item = ITEM_MANAGER::instance().CreateItem(r_item.vnum, r_item.count);
@@ -258,7 +258,7 @@ int CShop::Buy(LPCHARACTER ch, BYTE pos)
 	{
 		if (quest::CQuestManager::instance().GetEventFlag("hivalue_item_sell") == 0)
 		{
-			//축복의 구슬 && 만년한철 이벤트 
+			//ì¶•ë³µì˜ êµ¬ìŠ¬ && ë§Œë…„í•œì²  ì´ë²¤íŠ¸ 
 			if (item->GetVnum() == 70024 || item->GetVnum() == 70035)
 			{
 				return ShopSub::GC::END;
@@ -293,7 +293,7 @@ int CShop::Buy(LPCHARACTER ch, BYTE pos)
 
 	ch->PointChange(POINT_GOLD, -dwPrice, false);
 
-	//세금 계산
+	//ì„¸ê¸ˆ ê³„ì‚°
 	DWORD dwTax = 0;
 	int iVal = 0;
 
@@ -366,7 +366,7 @@ int CShop::Buy(LPCHARACTER ch, BYTE pos)
 		m_pkPC->PointChange(POINT_GOLD, dwPrice, false);
 
 		if (iVal > 0)
-			m_pkPC->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("판매금액의 %d %% 가 세금으로 나가게됩니다"), iVal);
+			m_pkPC->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("íŒë§¤ê¸ˆì•¡ì˜ %d %% ê°€ ì„¸ê¸ˆìœ¼ë¡œ ë‚˜ê°€ê²Œë©ë‹ˆë‹¤"), iVal);
 
 	}
 	else
@@ -427,7 +427,7 @@ bool CShop::AddGuest(LPCHARACTER ch, DWORD owner_vid, bool bOtherEmpire)
 		//HIVALUE_ITEM_EVENT
 		if (quest::CQuestManager::instance().GetEventFlag("hivalue_item_sell") == 0)
 		{
-			//축복의 구슬 && 만년한철 이벤트 
+			//ì¶•ë³µì˜ êµ¬ìŠ¬ && ë§Œë…„í•œì²  ì´ë²¤íŠ¸ 
 			if (item.vnum == 70024 || item.vnum == 70035)
 			{				
 				continue;
@@ -456,7 +456,7 @@ bool CShop::AddGuest(LPCHARACTER ch, DWORD owner_vid, bool bOtherEmpire)
 	pack.length = sizeof(pack) + sizeof(pack2);
 
 	ch->GetDesc()->BufferedPacket(&pack, sizeof(TPacketGCShop));
-	ch->GetDesc()->Packet(&pack2, sizeof(TPacketGCShopStart));
+	CHARACTER::SafeSendPacketTo(ch, &pack2, sizeof(TPacketGCShopStart));
 	return true;
 }
 
@@ -474,7 +474,7 @@ void CShop::RemoveGuest(LPCHARACTER ch)
 	pack.subheader	= ShopSub::GC::END;
 	pack.length		= sizeof(TPacketGCShop);
 
-	ch->GetDesc()->Packet(&pack, sizeof(pack));
+	CHARACTER::SafeSendPacketTo(ch, &pack, sizeof(pack));
 }
 
 void CShop::Broadcast(const void * data, int bytes)
@@ -490,7 +490,7 @@ void CShop::Broadcast(const void * data, int bytes)
 		LPCHARACTER ch = it->first;
 
 		if (ch->GetDesc())
-			ch->GetDesc()->Packet(data, bytes);
+			CHARACTER::SafeSendPacketTo(ch, data, bytes);
 
 		++it;
 	}
@@ -568,3 +568,4 @@ bool CShop::IsSellingItem(DWORD itemID)
 	return isSelling;
 
 }
+

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "libgame/grid.h"
 #include "utils.h"
 #include "desc.h"
@@ -16,7 +16,7 @@
 
 void exchange_packet(LPCHARACTER ch, BYTE sub_header, bool is_me, DWORD arg1, TItemPos arg2, DWORD arg3, void * pvData = NULL);
 
-// 교환 패킷
+// êµí™˜ íŒ¨í‚·
 void exchange_packet(LPCHARACTER ch, BYTE sub_header, bool is_me, DWORD arg1, TItemPos arg2, DWORD arg3, void * pvData)
 {
 	if (!ch->GetDesc())
@@ -43,18 +43,18 @@ void exchange_packet(LPCHARACTER ch, BYTE sub_header, bool is_me, DWORD arg1, TI
 		memset(&pack_exchg.aAttr, 0, sizeof(pack_exchg.aAttr));
 	}
 
-	ch->GetDesc()->Packet(&pack_exchg, sizeof(pack_exchg));
+	CHARACTER::SafeSendPacketTo(ch, &pack_exchg, sizeof(pack_exchg));
 }
 
-// 교환을 시작
+// êµí™˜ì„ ì‹œì‘
 bool CHARACTER::ExchangeStart(LPCHARACTER victim)
 {
-	if (this == victim)	// 자기 자신과는 교환을 못한다.
+	if (this == victim)	// ìê¸° ìì‹ ê³¼ëŠ” êµí™˜ì„ ëª»í•œë‹¤.
 		return false;
 
 	if (IsObserverMode())
 	{
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("관전 상태에서는 교환을 할 수 없습니다."));
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê´€ì „ ìƒíƒœì—ì„œëŠ” êµí™˜ì„ í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		return false;
 	}
 
@@ -64,19 +64,19 @@ bool CHARACTER::ExchangeStart(LPCHARACTER victim)
 	//PREVENT_TRADE_WINDOW
 	if ( IsOpenSafebox() || GetShopOwner() || GetMyShop() || IsCubeOpen())
 	{
-		ChatPacket( CHAT_TYPE_INFO, LC_TEXT("다른 거래창이 열려있을경우 거래를 할수 없습니다." ) );
+		ChatPacket( CHAT_TYPE_INFO, LC_TEXT("ë‹¤ë¥¸ ê±°ë˜ì°½ì´ ì—´ë ¤ìˆì„ê²½ìš° ê±°ë˜ë¥¼ í• ìˆ˜ ì—†ìŠµë‹ˆë‹¤." ) );
 		return false;
 	}
 
 	if ( victim->IsOpenSafebox() || victim->GetShopOwner() || victim->GetMyShop() || victim->IsCubeOpen() )
 	{
-		ChatPacket( CHAT_TYPE_INFO, LC_TEXT("상대방이 다른 거래중이라 거래를 할수 없습니다." ) );
+		ChatPacket( CHAT_TYPE_INFO, LC_TEXT("ìƒëŒ€ë°©ì´ ë‹¤ë¥¸ ê±°ë˜ì¤‘ì´ë¼ ê±°ë˜ë¥¼ í• ìˆ˜ ì—†ìŠµë‹ˆë‹¤." ) );
 		return false;
 	}
 	//END_PREVENT_TRADE_WINDOW
 	int iDist = DISTANCE_APPROX(GetX() - victim->GetX(), GetY() - victim->GetY());
 
-	// 거리 체크
+	// ê±°ë¦¬ ì²´í¬
 	if (iDist >= EXCHANGE_MAX_DISTANCE)
 		return false;
 
@@ -91,7 +91,7 @@ bool CHARACTER::ExchangeStart(LPCHARACTER victim)
 
 	if (victim->IsBlockMode(BLOCK_EXCHANGE))
 	{
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상대방이 교환 거부 상태입니다."));
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒëŒ€ë°©ì´ êµí™˜ ê±°ë¶€ ìƒíƒœì…ë‹ˆë‹¤."));
 		return false;
 	}
 
@@ -144,7 +144,7 @@ bool CExchange::AddItem(TItemPos item_pos, BYTE display_pos)
 	if (!item_pos.IsValidItemPosition())
 		return false;
 
-	// 장비는 교환할 수 없음
+	// ì¥ë¹„ëŠ” êµí™˜í•  ìˆ˜ ì—†ìŒ
 	if (item_pos.IsEquipPosition())
 		return false;
 
@@ -155,7 +155,7 @@ bool CExchange::AddItem(TItemPos item_pos, BYTE display_pos)
 
 	if (IS_SET(item->GetAntiFlag(), ITEM_ANTIFLAG_GIVE))
 	{
-		m_pOwner->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("아이템을 건네줄 수 없습니다."));
+		m_pOwner->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì•„ì´í…œì„ ê±´ë„¤ì¤„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		return false;
 	}
 
@@ -164,7 +164,7 @@ bool CExchange::AddItem(TItemPos item_pos, BYTE display_pos)
 		return false;
 	}
 
-	// 이미 교환창에 추가된 아이템인가?
+	// ì´ë¯¸ êµí™˜ì°½ì— ì¶”ê°€ëœ ì•„ì´í…œì¸ê°€?
 	if (item->IsExchanging())
 	{
 		sys_log(0, "EXCHANGE under exchanging");
@@ -213,7 +213,7 @@ bool CExchange::AddItem(TItemPos item_pos, BYTE display_pos)
 		return true;
 	}
 
-	// 추가할 공간이 없음
+	// ì¶”ê°€í•  ê³µê°„ì´ ì—†ìŒ
 	return false;
 }
 
@@ -249,7 +249,7 @@ bool CExchange::AddGold(long gold)
 
 	if (GetOwner()->GetGold() < gold)
 	{
-		// 가지고 있는 돈이 부족.
+		// ê°€ì§€ê³  ìˆëŠ” ëˆì´ ë¶€ì¡±.
 		exchange_packet(GetOwner(), ExchangeSub::GC::LESS_GOLD, 0, 0, NPOS, 0);
 		return false;
 	}
@@ -272,7 +272,7 @@ bool CExchange::AddGold(long gold)
 	return true;
 }
 
-// 돈이 충분히 있는지, 교환하려는 아이템이 실제로 있는지 확인 한다.
+// ëˆì´ ì¶©ë¶„íˆ ìˆëŠ”ì§€, êµí™˜í•˜ë ¤ëŠ” ì•„ì´í…œì´ ì‹¤ì œë¡œ ìˆëŠ”ì§€ í™•ì¸ í•œë‹¤.
 bool CExchange::Check(int * piItemCount)
 {
 	if (GetOwner()->GetGold() < m_lGold)
@@ -326,10 +326,10 @@ bool CExchange::CheckSpace()
 		s_grid2.Put(i - INVENTORY_MAX_NUM / 2, 1, item->GetSize());
 	}
 
-	// 아... 뭔가 개병신 같지만... 용혼석 인벤을 노멀 인벤 보고 따라 만든 내 잘못이다 ㅠㅠ
+	// ì•„... ë­”ê°€ ê°œë³‘ì‹  ê°™ì§€ë§Œ... ìš©í˜¼ì„ ì¸ë²¤ì„ ë…¸ë©€ ì¸ë²¤ ë³´ê³  ë”°ë¼ ë§Œë“  ë‚´ ì˜ëª»ì´ë‹¤ ã… ã… 
 	static std::vector <WORD> s_vDSGrid(DRAGON_SOUL_INVENTORY_MAX_NUM);
 	
-	// 일단 용혼석을 교환하지 않을 가능성이 크므로, 용혼석 인벤 복사는 용혼석이 있을 때 하도록 한다.
+	// ì¼ë‹¨ ìš©í˜¼ì„ì„ êµí™˜í•˜ì§€ ì•Šì„ ê°€ëŠ¥ì„±ì´ í¬ë¯€ë¡œ, ìš©í˜¼ì„ ì¸ë²¤ ë³µì‚¬ëŠ” ìš©í˜¼ì„ì´ ìˆì„ ë•Œ í•˜ë„ë¡ í•œë‹¤.
 	bool bDSInitialized = false;
 	
 	for (i = 0; i < EXCHANGE_ITEM_MAX_NUM; ++i)
@@ -413,7 +413,7 @@ bool CExchange::CheckSpace()
 	return true;
 }
 
-// 교환 끝 (아이템과 돈 등을 실제로 옮긴다)
+// êµí™˜ ë (ì•„ì´í…œê³¼ ëˆ ë“±ì„ ì‹¤ì œë¡œ ì˜®ê¸´ë‹¤)
 bool CExchange::Done()
 {
 	int		empty_pos, i;
@@ -489,7 +489,7 @@ bool CExchange::Done()
 	return true;
 }
 
-// 교환을 동의
+// êµí™˜ì„ ë™ì˜
 bool CExchange::Accept(bool bAccept)
 {
 	if (m_bAccept == bAccept)
@@ -497,7 +497,7 @@ bool CExchange::Accept(bool bAccept)
 
 	m_bAccept = bAccept;
 
-	// 둘 다 동의 했으므로 교환 성립
+	// ë‘˜ ë‹¤ ë™ì˜ í–ˆìœ¼ë¯€ë¡œ êµí™˜ ì„±ë¦½
 	if (m_bAccept && GetCompany()->m_bAccept)
 	{
 		int	iItemCount;
@@ -509,36 +509,36 @@ bool CExchange::Accept(bool bAccept)
 		victim->SetExchangeTime();		
 		//END_PREVENT_PORTAL_AFTER_EXCHANGE
 
-		// exchange_check 에서는 교환할 아이템들이 제자리에 있나 확인하고,
-		// 엘크도 충분히 있나 확인한다, 두번째 인자로 교환할 아이템 개수
-		// 를 리턴한다.
+		// exchange_check ì—ì„œëŠ” êµí™˜í•  ì•„ì´í…œë“¤ì´ ì œìë¦¬ì— ìˆë‚˜ í™•ì¸í•˜ê³ ,
+		// ì—˜í¬ë„ ì¶©ë¶„íˆ ìˆë‚˜ í™•ì¸í•œë‹¤, ë‘ë²ˆì§¸ ì¸ìë¡œ êµí™˜í•  ì•„ì´í…œ ê°œìˆ˜
+		// ë¥¼ ë¦¬í„´í•œë‹¤.
 		if (!Check(&iItemCount))
 		{
-			GetOwner()->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("돈이 부족하거나 아이템이 제자리에 없습니다."));
-			victim->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상대방의 돈이 부족하거나 아이템이 제자리에 없습니다."));
+			GetOwner()->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ëˆì´ ë¶€ì¡±í•˜ê±°ë‚˜ ì•„ì´í…œì´ ì œìë¦¬ì— ì—†ìŠµë‹ˆë‹¤."));
+			victim->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒëŒ€ë°©ì˜ ëˆì´ ë¶€ì¡±í•˜ê±°ë‚˜ ì•„ì´í…œì´ ì œìë¦¬ì— ì—†ìŠµë‹ˆë‹¤."));
 			goto EXCHANGE_END;
 		}
 
-		// 리턴 받은 아이템 개수로 상대방의 소지품에 남은 자리가 있나 확인한다.
+		// ë¦¬í„´ ë°›ì€ ì•„ì´í…œ ê°œìˆ˜ë¡œ ìƒëŒ€ë°©ì˜ ì†Œì§€í’ˆì— ë‚¨ì€ ìë¦¬ê°€ ìˆë‚˜ í™•ì¸í•œë‹¤.
 		if (!CheckSpace())
 		{
-			GetOwner()->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상대방의 소지품에 빈 공간이 없습니다."));
-			victim->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("소지품에 빈 공간이 없습니다."));
+			GetOwner()->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒëŒ€ë°©ì˜ ì†Œì§€í’ˆì— ë¹ˆ ê³µê°„ì´ ì—†ìŠµë‹ˆë‹¤."));
+			victim->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì†Œì§€í’ˆì— ë¹ˆ ê³µê°„ì´ ì—†ìŠµë‹ˆë‹¤."));
 			goto EXCHANGE_END;
 		}
 
-		// 상대방도 마찬가지로..
+		// ìƒëŒ€ë°©ë„ ë§ˆì°¬ê°€ì§€ë¡œ..
 		if (!GetCompany()->Check(&iItemCount))
 		{
-			victim->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("돈이 부족하거나 아이템이 제자리에 없습니다."));
-			GetOwner()->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상대방의 돈이 부족하거나 아이템이 제자리에 없습니다."));
+			victim->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ëˆì´ ë¶€ì¡±í•˜ê±°ë‚˜ ì•„ì´í…œì´ ì œìë¦¬ì— ì—†ìŠµë‹ˆë‹¤."));
+			GetOwner()->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒëŒ€ë°©ì˜ ëˆì´ ë¶€ì¡±í•˜ê±°ë‚˜ ì•„ì´í…œì´ ì œìë¦¬ì— ì—†ìŠµë‹ˆë‹¤."));
 			goto EXCHANGE_END;
 		}
 
 		if (!GetCompany()->CheckSpace())
 		{
-			victim->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상대방의 소지품에 빈 공간이 없습니다."));
-			GetOwner()->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("소지품에 빈 공간이 없습니다."));
+			victim->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒëŒ€ë°©ì˜ ì†Œì§€í’ˆì— ë¹ˆ ê³µê°„ì´ ì—†ìŠµë‹ˆë‹¤."));
+			GetOwner()->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì†Œì§€í’ˆì— ë¹ˆ ê³µê°„ì´ ì—†ìŠµë‹ˆë‹¤."));
 			goto EXCHANGE_END;
 		}
 
@@ -552,17 +552,17 @@ bool CExchange::Accept(bool bAccept)
 
 		if (Done())
 		{
-			if (m_lGold) // 돈이 있을 떄만 저장
+			if (m_lGold) // ëˆì´ ìˆì„ ë–„ë§Œ ì €ì¥
 				GetOwner()->Save();
 
 			if (GetCompany()->Done())
 			{
-				if (GetCompany()->m_lGold) // 돈이 있을 때만 저장
+				if (GetCompany()->m_lGold) // ëˆì´ ìˆì„ ë•Œë§Œ ì €ì¥
 					victim->Save();
 
 				// INTERNATIONAL_VERSION
-				GetOwner()->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s 님과의 교환이 성사 되었습니다."), victim->GetName());
-				victim->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s 님과의 교환이 성사 되었습니다."), GetOwner()->GetName());
+				GetOwner()->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s ë‹˜ê³¼ì˜ êµí™˜ì´ ì„±ì‚¬ ë˜ì—ˆìŠµë‹ˆë‹¤."), victim->GetName());
+				victim->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s ë‹˜ê³¼ì˜ êµí™˜ì´ ì„±ì‚¬ ë˜ì—ˆìŠµë‹ˆë‹¤."), GetOwner()->GetName());
 				// END_OF_INTERNATIONAL_VERSION
 			}
 		}
@@ -573,14 +573,14 @@ EXCHANGE_END:
 	}
 	else
 	{
-		// 아니면 accept에 대한 패킷을 보내자.
+		// ì•„ë‹ˆë©´ acceptì— ëŒ€í•œ íŒ¨í‚·ì„ ë³´ë‚´ì.
 		exchange_packet(GetOwner(), ExchangeSub::GC::ACCEPT, true, m_bAccept, NPOS, 0);
 		exchange_packet(GetCompany()->GetOwner(), ExchangeSub::GC::ACCEPT, false, m_bAccept, NPOS, 0);
 		return true;
 	}
 }
 
-// 교환 취소
+// êµí™˜ ì·¨ì†Œ
 void CExchange::Cancel()
 {
 	exchange_packet(GetOwner(), ExchangeSub::GC::END, 0, 0, NPOS, 0);
@@ -600,4 +600,5 @@ void CExchange::Cancel()
 
 	M2_DELETE(this);
 }
+
 
