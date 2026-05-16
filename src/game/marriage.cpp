@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "char.h"
 #include "char_manager.h"
 #include "sectree_manager.h"
@@ -21,19 +21,19 @@ namespace marriage
 		DWORD dwVnum;
 		int value[MAX_LOVE_GRADE];
 	} g_ItemBonus[MAX_MARRIAGE_UNIQUE_ITEM] = {
-		{ 71069,	{ 4,	5,	6,	8,  } }, // 관통 증가
-		{ 71070,	{ 10,	12,	15,	20, } }, // 경험치 증가
-		{ 71071,	{ 4,	5,	6,	8,  } }, // 크리티컬 증가
-		{ 71072,	{ -4,	-5,	-6,	-8, } }, // 상대방 공격력 감소
-		{ 71073,	{ 20,	25,	30,	40, } }, // 공격력 증가 (절대값)
-		{ 71074,	{ 12,	16,	20,	30, } }, // 방어력 증가 (절대값)
+		{ 71069,	{ 4,	5,	6,	8,  } }, // ê´€í†µ ì¦ê°€
+		{ 71070,	{ 10,	12,	15,	20, } }, // ê²½í—˜ì¹˜ ì¦ê°€
+		{ 71071,	{ 4,	5,	6,	8,  } }, // í¬ë¦¬í‹°ì»¬ ì¦ê°€
+		{ 71072,	{ -4,	-5,	-6,	-8, } }, // ìƒëŒ€ë°© ê³µê²©ë ¥ ê°ì†Œ
+		{ 71073,	{ 20,	25,	30,	40, } }, // ê³µê²©ë ¥ ì¦ê°€ (ì ˆëŒ€ê°’)
+		{ 71074,	{ 12,	16,	20,	30, } }, // ë°©ì–´ë ¥ ì¦ê°€ (ì ˆëŒ€ê°’)
 
-		//{ 71069,	1,	2,	3,	6,	8,  }, // 관통 증가
-		//{ 71070,	5,	7,	10,	15,	20, }, // 경험치 증가
-		//{ 71071,	1,	2,	3,	6,	8,  }, // 크리티컬 증가
-		//{ 71072,	5,	10,	15,	20,	30, }, // 상대방이 입은 데미지를 나에게로
-		//{ 71073,	10,	15,	20,	25,	40, }, // 공격력 증가 (절대값)
-		//{ 71074,	5,	10,	15,	20,	30, }, // 방어력 증가 (절대값)
+		//{ 71069,	1,	2,	3,	6,	8,  }, // ê´€í†µ ì¦ê°€
+		//{ 71070,	5,	7,	10,	15,	20, }, // ê²½í—˜ì¹˜ ì¦ê°€
+		//{ 71071,	1,	2,	3,	6,	8,  }, // í¬ë¦¬í‹°ì»¬ ì¦ê°€
+		//{ 71072,	5,	10,	15,	20,	30, }, // ìƒëŒ€ë°©ì´ ì…ì€ ë°ë¯¸ì§€ë¥¼ ë‚˜ì—ê²Œë¡œ
+		//{ 71073,	10,	15,	20,	25,	40, }, // ê³µê²©ë ¥ ì¦ê°€ (ì ˆëŒ€ê°’)
+		//{ 71074,	5,	10,	15,	20,	30, }, // ë°©ì–´ë ¥ ì¦ê°€ (ì ˆëŒ€ê°’)
 	};
 
 	const int MARRIAGE_POINT_PER_DAY = 1;
@@ -48,7 +48,7 @@ namespace marriage
 		p.length = sizeof(p);
 		strlcpy(p.name, lover_name.c_str(), sizeof(p.name));
 		p.love_point = love_point;
-		ch->GetDesc()->Packet(&p, sizeof(p));
+		CHARACTER::SafeSendPacketTo(ch, &p, sizeof(p));
 	}
 
 	TMarriage::~TMarriage()
@@ -102,17 +102,17 @@ namespace marriage
 		else
 			days /= 86400;
 
-		// 기본 50%
+		// ê¸°ë³¸ 50%
 
-		// 원앙의 깃털 사용중일 때 :
-		// 날짜에 의한 영향 80% 하루당 8%
-		// 전투에 의한 영향 80%
-		// 토탈 100%
+		// ì›ì•™ì˜ ê¹ƒí„¸ ì‚¬ìš©ì¤‘ì¼ ë•Œ :
+		// ë‚ ì§œì— ì˜í•œ ì˜í–¥ 80% í•˜ë£¨ë‹¹ 8%
+		// ì „íˆ¬ì— ì˜í•œ ì˜í–¥ 80%
+		// í† íƒˆ 100%
 
-		// 비사용중일 때 : 
-		// 날짜에 의한 영향 60% 하루당 6%
-		// 전투에 의한 영향 60%
-		// 토탈 100%
+		// ë¹„ì‚¬ìš©ì¤‘ì¼ ë•Œ : 
+		// ë‚ ì§œì— ì˜í•œ ì˜í–¥ 60% í•˜ë£¨ë‹¹ 6%
+		// ì „íˆ¬ì— ì˜í•œ ì˜í–¥ 60%
+		// í† íƒˆ 100%
 		return MIN(50 + MIN(days * point_per_day, max_limit) + MIN(love_point / 1000000, max_limit), 100);
 	}
 
@@ -125,11 +125,11 @@ namespace marriage
 
 		return ch1->GetMapIndex() == ch2->GetMapIndex();
 
-		// 파티 체크가 사라졌음
+		// íŒŒí‹° ì²´í¬ê°€ ì‚¬ë¼ì¡ŒìŒ
 		/*if (!ch1->GetParty() || ch1->GetParty() != ch2->GetParty())
 		  return false;*/
 
-		// 거리 체크가 사라졌음
+		// ê±°ë¦¬ ì²´í¬ê°€ ì‚¬ë¼ì¡ŒìŒ
 		/*const int DISTANCE = 5000;
 
 		  if (labs(ch1->GetX() - ch2->GetX()) > DISTANCE)
@@ -141,15 +141,15 @@ namespace marriage
 		  return (DISTANCE_APPROX(ch1->GetX() - ch2->GetX(), ch1->GetY() - ch2->GetY()) < DISTANCE);*/
 	}
 
-	// 금슬 수치
+	// ê¸ˆìŠ¬ ìˆ˜ì¹˜
 	int TMarriage::GetBonus(DWORD dwItemVnum, bool bShare, LPCHARACTER me)
 	{
 		if (!is_married)
 			return 0;
 
-		// 주변에 없을때는 자기 기능만 적용된다.
+		// ì£¼ë³€ì— ì—†ì„ë•ŒëŠ” ìê¸° ê¸°ëŠ¥ë§Œ ì ìš©ëœë‹¤.
 
-		// 해당 아이템이 어떤 기능을 하는지 찾는다.
+		// í•´ë‹¹ ì•„ì´í…œì´ ì–´ë–¤ ê¸°ëŠ¥ì„ í•˜ëŠ”ì§€ ì°¾ëŠ”ë‹¤.
 		int iFindedBonusIndex=0;
 		{
 			for (iFindedBonusIndex = 0; iFindedBonusIndex < MAX_MARRIAGE_UNIQUE_ITEM; ++iFindedBonusIndex)
@@ -164,7 +164,7 @@ namespace marriage
 
 		if (bShare)
 		{
-			// 두명의 보너스를 합한다.
+			// ë‘ëª…ì˜ ë³´ë„ˆìŠ¤ë¥¼ í•©í•œë‹¤.
 			int count = 0;
 			if (NULL != ch1 && ch1->IsEquipUniqueItem(dwItemVnum))
 				count ++;
@@ -179,7 +179,7 @@ namespace marriage
 		}
 		else
 		{
-			// 상대방 것만 계산
+			// ìƒëŒ€ë°© ê²ƒë§Œ ê³„ì‚°
 			int count = 0;
 			if (me != ch1 && NULL!= ch1 && ch1->IsEquipUniqueItem(dwItemVnum))
 				count ++;
@@ -209,7 +209,7 @@ namespace marriage
 				SendLoverInfo(ch2, name1, GetMarriagePoint());
 		}
 
-		// 둘 다 이 프로세스에 로그인 중이면 포인터를 연결하고 이벤트 발생
+		// ë‘˜ ë‹¤ ì´ í”„ë¡œì„¸ìŠ¤ì— ë¡œê·¸ì¸ ì¤‘ì´ë©´ í¬ì¸í„°ë¥¼ ì—°ê²°í•˜ê³  ì´ë²¤íŠ¸ ë°œìƒ
 		if (IsOnline())
 		{
 			ch1->SetMarryPartner(ch2);
@@ -218,7 +218,7 @@ namespace marriage
 			StartNearCheckEvent();
 		}
 
-		// 둘 다 로그인 되어 있다면 패킷을 보낸다.
+		// ë‘˜ ë‹¤ ë¡œê·¸ì¸ ë˜ì–´ ìˆë‹¤ë©´ íŒ¨í‚·ì„ ë³´ë‚¸ë‹¤.
 		if (is_married)
 		{
 			LPDESC d1, d2;
@@ -353,8 +353,8 @@ namespace marriage
 			p.length = sizeof(p);
 			p.love_point = byLastLovePoint;
 
-			ch1->GetDesc()->Packet(&p, sizeof(p));
-			ch2->GetDesc()->Packet(&p, sizeof(p));
+			CHARACTER::SafeSendPacketTo(ch1, &p, sizeof(p));
+			CHARACTER::SafeSendPacketTo(ch2, &p, sizeof(p));
 		}
 	}
 
@@ -583,7 +583,7 @@ namespace marriage
 
 			if (A && B)
 			{
-				// 웨딩 맵 요청을 보낸다
+				// ì›¨ë”© ë§µ ìš”ì²­ì„ ë³´ë‚¸ë‹¤
 				TPacketWeddingRequest p;
 				p.dwPID1 = dwPID1;
 				p.dwPID2 = dwPID2;
@@ -705,11 +705,11 @@ namespace marriage
 		if (!pwi)
 			return;
 
-		// 결혼자들을 워프시켜야함
+		// ê²°í˜¼ìë“¤ì„ ì›Œí”„ì‹œì¼œì•¼í•¨
 		pMarriage->WarpToWeddingMap(dwPID1);
 		pMarriage->WarpToWeddingMap(dwPID2);
 
-		// 등록해서 메뉴창에서 이름나와야함
+		// ë“±ë¡í•´ì„œ ë©”ë‰´ì°½ì—ì„œ ì´ë¦„ë‚˜ì™€ì•¼í•¨
 		m_setWedding.insert(make_pair(dwPID1, dwPID2));
 	}
 
@@ -728,7 +728,7 @@ namespace marriage
 			return;
 		}
 
-		// 맵에서 빼내야합니다
+		// ë§µì—ì„œ ë¹¼ë‚´ì•¼í•©ë‹ˆë‹¤
 		if (map_allow_find(WEDDING_MAP_INDEX))
 			if (!WeddingManager::instance().End(pMarriage->pWeddingInfo->dwMapIndex))
 			{
@@ -751,3 +751,4 @@ namespace marriage
 		db_clientdesc->DBPacket(GD::WEDDING_END, 0, &p, sizeof(p));
 	}
 }
+

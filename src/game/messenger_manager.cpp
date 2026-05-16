@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "constants.h"
 #include "gm.h"
 #include "messenger_manager.h"
@@ -181,7 +181,7 @@ void MessengerManager::P2PRequestToAdd_Stage1(LPCHARACTER ch, const char* target
 
 		if (quest::CQuestManager::instance().GetPCForce(ch->GetPlayerID())->IsRunning() == true)
 		{
-			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상대방이 친구 추가를 받을 수 없는 상태입니다."));
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒëŒ€ë°©ì´ ì¹œêµ¬ ì¶”ê°€ë¥¼ ë°›ì„ ìˆ˜ ì—†ëŠ” ìƒíƒœì…ë‹ˆë‹¤."));
 			return;
 		}
 
@@ -241,7 +241,7 @@ void MessengerManager::RequestToAdd(LPCHARACTER ch, LPCHARACTER target)
 
 	if (quest::CQuestManager::instance().GetPCForce(ch->GetPlayerID())->IsRunning() == true)
 	{
-	    ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상대방이 친구 추가를 받을 수 없는 상태입니다."));
+	    ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒëŒ€ë°©ì´ ì¹œêµ¬ ì¶”ê°€ë¥¼ ë°›ì„ ìˆ˜ ì—†ëŠ” ìƒíƒœì…ë‹ˆë‹¤."));
 	    return;
 	}
 
@@ -474,7 +474,7 @@ void MessengerManager::__AddToList(MessengerManager::keyA account, MessengerMana
 
 	if (d && isRequester)
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<메신져> %s 님을 친구로 추가하였습니다."), companion.c_str());
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ë©”ì‹ ì ¸> %s ë‹˜ì„ ì¹œêµ¬ë¡œ ì¶”ê°€í•˜ì˜€ìŠµë‹ˆë‹¤."), companion.c_str());
 	}
 
 	LPCHARACTER tch = CHARACTER_MANAGER::instance().FindPC(companion.c_str());
@@ -536,7 +536,7 @@ void MessengerManager::__RemoveFromList(MessengerManager::keyA account, Messenge
 		BYTE bLen		= account.size();
 		tch->GetDesc()->BufferedPacket(&p, sizeof(p));
 		tch->GetDesc()->BufferedPacket(&bLen, sizeof(BYTE));
-		tch->GetDesc()->Packet(account.c_str(), account.size());
+		CHARACTER::SafeSendPacketTo(tch, account.c_str(), account.size());
 	}
 }
 // MR-3: -- END OF -- Remove from messenger Fix
@@ -577,7 +577,7 @@ void MessengerManager::RemoveFromList(MessengerManager::keyA account, MessengerM
 	LPDESC d = ch ? ch->GetDesc() : NULL;
 
 	if (d && isRequester)
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<메신져> %s 님을 메신저에서 삭제하였습니다."), companion.c_str());
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ë©”ì‹ ì ¸> %s ë‹˜ì„ ë©”ì‹ ì €ì—ì„œ ì‚­ì œí•˜ì˜€ìŠµë‹ˆë‹¤."), companion.c_str());
 	// MR-3: -- END OF -- Remove from messenger Fix
 
 	__RemoveFromList(account, companion);
@@ -600,11 +600,11 @@ void MessengerManager::RemoveAllList(keyA account)
 	if (account.compare(__account))
         	return;
 
-	/* SQL Data 삭제 */
+	/* SQL Data ì‚­ì œ */
 	DBManager::instance().Query("DELETE FROM messenger_list%s WHERE account='%s' OR companion='%s'",
 			get_table_postfix(), account.c_str(), account.c_str());
 
-	/* 내가 가지고있는 리스트 삭제 */
+	/* ë‚´ê°€ ê°€ì§€ê³ ìˆëŠ” ë¦¬ìŠ¤íŠ¸ ì‚­ì œ */
 	for (std::set<keyT>::iterator iter = company.begin();
 			iter != company.end();
 			iter++ )
@@ -615,7 +615,7 @@ void MessengerManager::RemoveAllList(keyA account)
 		// MR-3: -- END OF -- Remove from messenger Fix
 	}
 
-	/* 복사한 데이타 삭제 */
+	/* ë³µì‚¬í•œ ë°ì´íƒ€ ì‚­ì œ */
 	for (std::set<keyT>::iterator iter = company.begin();
 			iter != company.end();
 			)
@@ -739,4 +739,5 @@ void MessengerManager::SendLogout(MessengerManager::keyA account, MessengerManag
 	d->BufferedPacket(&bLen, sizeof(BYTE));
 	d->Packet(companion.c_str(), companion.size());
 }
+
 

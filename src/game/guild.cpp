@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "utils.h"
 #include "config.h"
 #include "char.h"
@@ -65,12 +65,12 @@ CGuild::CGuild(TGuildCreateParameter & cp)
 
 	strlcpy(m_data.name, cp.name, sizeof(m_data.name));
 	m_data.master_pid = cp.master->GetPlayerID();
-	strlcpy(m_data.grade_array[0].grade_name, LC_TEXT("길드장"), sizeof(m_data.grade_array[0].grade_name));
+	strlcpy(m_data.grade_array[0].grade_name, LC_TEXT("ê¸¸ë“œì¥"), sizeof(m_data.grade_array[0].grade_name));
 	m_data.grade_array[0].auth_flag = GUILD_AUTH_ADD_MEMBER | GUILD_AUTH_REMOVE_MEMBER | GUILD_AUTH_NOTICE | GUILD_AUTH_USE_SKILL;
 
 	for (int i = 1; i < GUILD_GRADE_COUNT; ++i)
 	{
-		strlcpy(m_data.grade_array[i].grade_name, LC_TEXT("길드원"), sizeof(m_data.grade_array[i].grade_name));
+		strlcpy(m_data.grade_array[i].grade_name, LC_TEXT("ê¸¸ë“œì›"), sizeof(m_data.grade_array[i].grade_name));
 		m_data.grade_array[i].auth_flag = 0;
 	}
 
@@ -434,7 +434,7 @@ void CGuild::SendListPacket(LPCHARACTER ch)
 	   Count (byte)
 	   [
 	   ...
-	   name_flag 1 - 이름을 보내느냐 안보내느냐
+	   name_flag 1 - ì´ë¦„ì„ ë³´ë‚´ëŠëƒ ì•ˆë³´ë‚´ëŠëƒ
 	   name CHARACTER_NAME_MAX_LEN+1 (only if name_flag is 1)
 	   ] * Count
 
@@ -515,7 +515,7 @@ void CGuild::SendLoginPacket(LPCHARACTER ch, uint32_t pid)
 
 	buf.write(&pid, 4);
 
-	ch->GetDesc()->Packet(buf.read_peek(), buf.size());
+	CHARACTER::SafeSendPacketTo(ch, buf.read_peek(), buf.size());
 }
 
 void CGuild::SendLogoutPacket(LPCHARACTER ch, LPCHARACTER chLogout)
@@ -543,7 +543,7 @@ void CGuild::SendLogoutPacket(LPCHARACTER ch, uint32_t pid)
 	buf.write(&pack, sizeof(pack));
 	buf.write(&pid, 4);
 
-	ch->GetDesc()->Packet(buf.read_peek(), buf.size());
+	CHARACTER::SafeSendPacketTo(ch, buf.read_peek(), buf.size());
 }
 
 void CGuild::LoadGuildMemberData(SQLMsg* pmsg)
@@ -582,7 +582,7 @@ void CGuild::LoadGuildMemberData(SQLMsg* pmsg)
 void CGuild::LoadGuildGradeData(SQLMsg* pmsg)
 {
 	/*
-    // 15개 아닐 가능성 존재
+    // 15ê°œ ì•„ë‹ ê°€ëŠ¥ì„± ì¡´ì¬
 	if (pmsg->Get()->iNumRows != 15)
 	{
 		sys_err("Query failed: getting guild grade data. GuildID(%d)", GetID());
@@ -721,7 +721,7 @@ void CGuild::__P2PUpdateGrade(SQLMsg* pmsg)
 
 		grade--;
 
-		// 등급 명칭이 현재와 다르다면 업데이트
+		// ë“±ê¸‰ ëª…ì¹­ì´ í˜„ì¬ì™€ ë‹¤ë¥´ë‹¤ë©´ ì—…ë°ì´íŠ¸
 		if (0 != strcmp(m_data.grade_array[grade].grade_name, name))
 		{
 			strlcpy(m_data.grade_array[grade].grade_name, name, sizeof(m_data.grade_array[grade].grade_name));
@@ -943,7 +943,7 @@ bool CGuild::OfferExp(LPCHARACTER ch, int amount)
 
 	if (ch->GetExp() < (DWORD) amount)
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 제공하고자 하는 경험치가 남은 경험치보다 많습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ì œê³µí•˜ê³ ì í•˜ëŠ” ê²½í—˜ì¹˜ê°€ ë‚¨ì€ ê²½í—˜ì¹˜ë³´ë‹¤ ë§ìŠµë‹ˆë‹¤."));
 		return false;
 	}
 
@@ -1038,7 +1038,7 @@ void CGuild::AddComment(LPCHARACTER ch, const std::string& str)
 
 	if (ch->IncreaseChatCounter() >= 2) // Guild Comment Flood Exploit fix
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("퀘스트를 로드하는 중입니다. 잠시만 기다려 주십시오."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("í€˜ìŠ¤íŠ¸ë¥¼ ë¡œë“œí•˜ëŠ” ì¤‘ì…ë‹ˆë‹¤. ì ì‹œë§Œ ê¸°ë‹¤ë ¤ ì£¼ì‹­ì‹œì˜¤."));
 		return;
 	}
 
@@ -1061,7 +1061,7 @@ void CGuild::DeleteComment(LPCHARACTER ch, DWORD comment_id)
 
 	auto* res = pmsg ? pmsg->Get() : nullptr;
 	if (!res || res->uiAffectedRows == 0 || res->uiAffectedRows == (uint32_t)-1)
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 삭제할 수 없는 글입니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ì‚­ì œí•  ìˆ˜ ì—†ëŠ” ê¸€ì…ë‹ˆë‹¤."));
 	else
 		RefreshCommentForce(ch->GetPlayerID());
 }
@@ -1112,7 +1112,7 @@ void CGuild::RefreshCommentForce(DWORD player_id)
 		d->BufferedPacket(szName, sizeof(szName));
 
 		if (i == pmsg->Get()->uiNumRows - 1)
-			d->Packet(szContent, sizeof(szContent)); // 마지막 줄이면 보내기
+			d->Packet(szContent, sizeof(szContent)); // ë§ˆì§€ë§‰ ì¤„ì´ë©´ ë³´ë‚´ê¸°
 		else
 			d->BufferedPacket(szContent, sizeof(szContent));
 	}
@@ -1291,7 +1291,7 @@ void CGuild::UseSkill(DWORD dwVnum, LPCHARACTER ch, DWORD pid)
 
 	if ((pkSk->dwFlag & SKILL_FLAG_SELFONLY))
 	{
-		// 이미 걸려 있으므로 사용하지 않음.
+		// ì´ë¯¸ ê±¸ë ¤ ìˆìœ¼ë¯€ë¡œ ì‚¬ìš©í•˜ì§€ ì•ŠìŒ.
 		if (ch->FindAffect(pkSk->dwVnum))
 			return;
 
@@ -1310,7 +1310,7 @@ void CGuild::UseSkill(DWORD dwVnum, LPCHARACTER ch, DWORD pid)
 
 	if (GetSP() < iNeededSP)
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 용신력이 부족합니다. (%d, %d)"), GetSP(), iNeededSP);
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ìš©ì‹ ë ¥ì´ ë¶€ì¡±í•©ë‹ˆë‹¤. (%d, %d)"), GetSP(), iNeededSP);
 		return;
 	}
 
@@ -1319,7 +1319,7 @@ void CGuild::UseSkill(DWORD dwVnum, LPCHARACTER ch, DWORD pid)
 
 	if (!abSkillUsable[dwRealVnum])
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 쿨타임이 끝나지 않아 길드 스킬을 사용할 수 없습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ì¿¨íƒ€ì„ì´ ëë‚˜ì§€ ì•Šì•„ ê¸¸ë“œ ìŠ¤í‚¬ì„ ì‚¬ìš©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		return;
 	}
 
@@ -1338,12 +1338,12 @@ void CGuild::UseSkill(DWORD dwVnum, LPCHARACTER ch, DWORD pid)
 	//GuildPointChange(POINT_SP, -iNeededSP);
 
 	if (test_server)
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> %d 스킬을 사용함 (%d, %d) to %u"), dwVnum, GetSP(), iNeededSP, pid);
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> %d ìŠ¤í‚¬ì„ ì‚¬ìš©í•¨ (%d, %d) to %u"), dwVnum, GetSP(), iNeededSP, pid);
 
 	switch (dwVnum)
 	{
 		case GUILD_SKILL_TELEPORT:
-			// 현재 서버에 있는 사람을 먼저 시도.
+			// í˜„ì¬ ì„œë²„ì— ìˆëŠ” ì‚¬ëŒì„ ë¨¼ì € ì‹œë„.
 			SendDBSkillUpdate(-iNeededSP);
 			if ((victim = (CHARACTER_MANAGER::instance().FindByPID(pid))))
 				ch->WarpSet(victim->GetX(), victim->GetY());
@@ -1351,15 +1351,15 @@ void CGuild::UseSkill(DWORD dwVnum, LPCHARACTER ch, DWORD pid)
 			{
 				if (m_memberP2POnline.find(pid) != m_memberP2POnline.end())
 				{
-					// 다른 서버에 로그인된 사람이 있음 -> 메시지 보내 좌표를 받아오자
-					// 1. A.pid, B.pid 를 뿌림
-					// 2. B.pid를 가진 서버가 뿌린서버에게 A.pid, 좌표 를 보냄
-					// 3. 워프
+					// ë‹¤ë¥¸ ì„œë²„ì— ë¡œê·¸ì¸ëœ ì‚¬ëŒì´ ìˆìŒ -> ë©”ì‹œì§€ ë³´ë‚´ ì¢Œí‘œë¥¼ ë°›ì•„ì˜¤ì
+					// 1. A.pid, B.pid ë¥¼ ë¿Œë¦¼
+					// 2. B.pidë¥¼ ê°€ì§„ ì„œë²„ê°€ ë¿Œë¦°ì„œë²„ì—ê²Œ A.pid, ì¢Œí‘œ ë¥¼ ë³´ëƒ„
+					// 3. ì›Œí”„
 					CCI * pcci = P2P_MANAGER::instance().FindByPID(pid);
 
 					if (pcci->bChannel != g_bChannel)
 					{
-						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 상대가 %d 채널에 있습니다. (현재 채널 %d)"), pcci->bChannel, g_bChannel);
+						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ìƒëŒ€ê°€ %d ì±„ë„ì— ìˆìŠµë‹ˆë‹¤. (í˜„ì¬ ì±„ë„ %d)"), pcci->bChannel, g_bChannel);
 					}
 					else
 					{
@@ -1373,7 +1373,7 @@ void CGuild::UseSkill(DWORD dwVnum, LPCHARACTER ch, DWORD pid)
 					}
 				}
 				else
-					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 상대가 온라인 상태가 아닙니다."));
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ìƒëŒ€ê°€ ì˜¨ë¼ì¸ ìƒíƒœê°€ ì•„ë‹™ë‹ˆë‹¤."));
 			}
 			break;
 
@@ -1387,13 +1387,13 @@ void CGuild::UseSkill(DWORD dwVnum, LPCHARACTER ch, DWORD pid)
 			{
 				/*if (ch->GetPlayerID() != GetMasterPID())
 				  {
-				  ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 길드장만 길드 스킬을 사용할 수 있습니다."));
+				  ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ê¸¸ë“œì¥ë§Œ ê¸¸ë“œ ìŠ¤í‚¬ì„ ì‚¬ìš©í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤."));
 				  return;
 				  }*/
 
 				if (!UnderAnyWar())
 				{
-					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 길드 스킬은 길드전 중에만 사용할 수 있습니다."));
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ê¸¸ë“œ ìŠ¤í‚¬ì€ ê¸¸ë“œì „ ì¤‘ì—ë§Œ ì‚¬ìš©í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤."));
 					return;
 				}
 
@@ -1763,7 +1763,7 @@ bool CGuild::ChargeSP(LPCHARACTER ch, int iSP)
 
 	SendDBSkillUpdate(iSP);
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> %u의 용신력을 회복하였습니다."), iSP);
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> %uì˜ ìš©ì‹ ë ¥ì„ íšŒë³µí•˜ì˜€ìŠµë‹ˆë‹¤."), iSP);
 	}
 	return true;
 }
@@ -1838,7 +1838,7 @@ void CGuild::RequestDepositMoney(LPCHARACTER ch, int iGold)
 {
 	if (false==ch->CanDeposit())
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 잠시후에 이용해주십시오"));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ì ì‹œí›„ì— ì´ìš©í•´ì£¼ì‹­ì‹œì˜¤"));
 		return;
 	}
 
@@ -1865,19 +1865,19 @@ void CGuild::RequestWithdrawMoney(LPCHARACTER ch, int iGold)
 {
 	if (false==ch->CanDeposit())
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 잠시후에 이용해주십시오"));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ì ì‹œí›„ì— ì´ìš©í•´ì£¼ì‹­ì‹œì˜¤"));
 		return;
 	}
 
 	if (ch->GetPlayerID() != GetMasterPID())
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 길드 금고에선 길드장만 출금할 수 있습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ê¸¸ë“œ ê¸ˆê³ ì—ì„  ê¸¸ë“œì¥ë§Œ ì¶œê¸ˆí•  ìˆ˜ ìˆìŠµë‹ˆë‹¤."));
 		return;
 	}
 
 	if (m_data.gold < iGold)
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 가지고 있는 돈이 부족합니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ê°€ì§€ê³  ìˆëŠ” ëˆì´ ë¶€ì¡±í•©ë‹ˆë‹¤."));
 		return;
 	}
 
@@ -1931,11 +1931,11 @@ bool CGuild::HasLand()
 }
 
 // GUILD_JOIN_BUG_FIX
-/// 길드 초대 event 정보
+/// ê¸¸ë“œ ì´ˆëŒ€ event ì •ë³´
 EVENTINFO(TInviteGuildEventInfo)
 {
-	DWORD	dwInviteePID;		///< 초대받은 character 의 PID
-	DWORD	dwGuildID;		///< 초대한 Guild 의 ID
+	DWORD	dwInviteePID;		///< ì´ˆëŒ€ë°›ì€ character ì˜ PID
+	DWORD	dwGuildID;		///< ì´ˆëŒ€í•œ Guild ì˜ ID
 
 	TInviteGuildEventInfo()
 	: dwInviteePID( 0 )
@@ -1945,8 +1945,8 @@ EVENTINFO(TInviteGuildEventInfo)
 };
 
 /**
- * 길드 초대 event callback 함수.
- * event 가 발동하면 초대 거절로 처리한다.
+ * ê¸¸ë“œ ì´ˆëŒ€ event callback í•¨ìˆ˜.
+ * event ê°€ ë°œë™í•˜ë©´ ì´ˆëŒ€ ê±°ì ˆë¡œ ì²˜ë¦¬í•œë‹¤.
  */
 EVENTFUNC( GuildInviteEvent )
 {
@@ -1973,7 +1973,7 @@ void CGuild::Invite( LPCHARACTER pchInviter, LPCHARACTER pchInvitee )
 {
 	if (quest::CQuestManager::instance().GetPCForce(pchInviter->GetPlayerID())->IsRunning() == true)
 	{
-	    pchInviter->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 상대방이 초대 신청을 받을 수 없는 상태입니다."));
+	    pchInviter->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ìƒëŒ€ë°©ì´ ì´ˆëŒ€ ì‹ ì²­ì„ ë°›ì„ ìˆ˜ ì—†ëŠ” ìƒíƒœì…ë‹ˆë‹¤."));
 	    return;
 	}
 
@@ -1983,17 +1983,17 @@ void CGuild::Invite( LPCHARACTER pchInviter, LPCHARACTER pchInvitee )
 
 	if ( pchInvitee->IsBlockMode( BLOCK_GUILD_INVITE ) ) 
 	{
-		pchInviter->ChatPacket( CHAT_TYPE_INFO, LC_TEXT("<길드> 상대방이 길드 초대 거부 상태입니다.") );
+		pchInviter->ChatPacket( CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ìƒëŒ€ë°©ì´ ê¸¸ë“œ ì´ˆëŒ€ ê±°ë¶€ ìƒíƒœì…ë‹ˆë‹¤.") );
 		return;
 	} 
 	else if ( !HasGradeAuth( GetMember( pchInviter->GetPlayerID() )->grade, GUILD_AUTH_ADD_MEMBER ) ) 
 	{
-		pchInviter->ChatPacket( CHAT_TYPE_INFO, LC_TEXT("<길드> 길드원을 초대할 권한이 없습니다.") );
+		pchInviter->ChatPacket( CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ê¸¸ë“œì›ì„ ì´ˆëŒ€í•  ê¶Œí•œì´ ì—†ìŠµë‹ˆë‹¤.") );
 		return;
 	} 
 	else if ( pchInvitee->GetEmpire() != pchInviter->GetEmpire() ) 
 	{
-		pchInviter->ChatPacket( CHAT_TYPE_INFO, LC_TEXT("<길드> 다른 제국 사람을 길드에 초대할 수 없습니다.") );
+		pchInviter->ChatPacket( CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ë‹¤ë¥¸ ì œêµ­ ì‚¬ëŒì„ ê¸¸ë“œì— ì´ˆëŒ€í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.") );
 		return;
 	}
 
@@ -2003,18 +2003,18 @@ void CGuild::Invite( LPCHARACTER pchInviter, LPCHARACTER pchInvitee )
 		case GERR_NONE: break;
 		case GERR_WITHDRAWPENALTY:
 						pchInviter->ChatPacket( CHAT_TYPE_INFO, 
-								LC_TEXT("<길드> 탈퇴한 후 %d일이 지나지 않은 사람은 길드에 초대할 수 없습니다."), 
+								LC_TEXT("<ê¸¸ë“œ> íƒˆí‡´í•œ í›„ %dì¼ì´ ì§€ë‚˜ì§€ ì•Šì€ ì‚¬ëŒì€ ê¸¸ë“œì— ì´ˆëŒ€í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."), 
 								quest::CQuestManager::instance().GetEventFlag( "guild_withdraw_delay" ) );
 						return;
 		case GERR_COMMISSIONPENALTY:
 						pchInviter->ChatPacket( CHAT_TYPE_INFO, 
-								LC_TEXT("<길드> 길드를 해산한 지 %d일이 지나지 않은 사람은 길드에 초대할 수 없습니다."), 
+								LC_TEXT("<ê¸¸ë“œ> ê¸¸ë“œë¥¼ í•´ì‚°í•œ ì§€ %dì¼ì´ ì§€ë‚˜ì§€ ì•Šì€ ì‚¬ëŒì€ ê¸¸ë“œì— ì´ˆëŒ€í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."), 
 								quest::CQuestManager::instance().GetEventFlag( "guild_disband_delay") );
 						return;
-		case GERR_ALREADYJOIN:	pchInviter->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 상대방이 이미 다른 길드에 속해있습니다.")); return;
-		case GERR_GUILDISFULL:	pchInviter->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 최대 길드원 수를 초과했습니다.")); return;
-		case GERR_GUILD_IS_IN_WAR : pchInviter->ChatPacket( CHAT_TYPE_INFO, LC_TEXT("<길드> 현재 길드가 전쟁 중 입니다.") ); return;
-		case GERR_INVITE_LIMIT : pchInviter->ChatPacket( CHAT_TYPE_INFO, LC_TEXT("<길드> 현재 신규 가입 제한 상태 입니다.") ); return;
+		case GERR_ALREADYJOIN:	pchInviter->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ìƒëŒ€ë°©ì´ ì´ë¯¸ ë‹¤ë¥¸ ê¸¸ë“œì— ì†í•´ìˆìŠµë‹ˆë‹¤.")); return;
+		case GERR_GUILDISFULL:	pchInviter->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ìµœëŒ€ ê¸¸ë“œì› ìˆ˜ë¥¼ ì´ˆê³¼í–ˆìŠµë‹ˆë‹¤.")); return;
+		case GERR_GUILD_IS_IN_WAR : pchInviter->ChatPacket( CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> í˜„ì¬ ê¸¸ë“œê°€ ì „ìŸ ì¤‘ ì…ë‹ˆë‹¤.") ); return;
+		case GERR_INVITE_LIMIT : pchInviter->ChatPacket( CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> í˜„ì¬ ì‹ ê·œ ê°€ì… ì œí•œ ìƒíƒœ ì…ë‹ˆë‹¤.") ); return;
 
 		default: sys_err( "ignore guild join error(%d)", errcode ); return;
 	}
@@ -2023,7 +2023,7 @@ void CGuild::Invite( LPCHARACTER pchInviter, LPCHARACTER pchInvitee )
 		return;
 
 	//
-	// 이벤트 생성
+	// ì´ë²¤íŠ¸ ìƒì„±
 	// 
 	TInviteGuildEventInfo* pInfo = AllocEventInfo<TInviteGuildEventInfo>();
 	pInfo->dwInviteePID = pchInvitee->GetPlayerID();
@@ -2032,7 +2032,7 @@ void CGuild::Invite( LPCHARACTER pchInviter, LPCHARACTER pchInvitee )
 	m_GuildInviteEventMap.insert(EventMap::value_type(pchInvitee->GetPlayerID(), event_create(GuildInviteEvent, pInfo, PASSES_PER_SEC(10))));
 
 	//
-	// 초대 받는 character 에게 초대 패킷 전송
+	// ì´ˆëŒ€ ë°›ëŠ” character ì—ê²Œ ì´ˆëŒ€ íŒ¨í‚· ì „ì†¡
 	// 
 
 	uint32_t gid = GetID();
@@ -2047,7 +2047,7 @@ void CGuild::Invite( LPCHARACTER pchInviter, LPCHARACTER pchInvitee )
 	buf.write( &gid, sizeof(uint32_t) );
 	buf.write( GetName(), GUILD_NAME_MAX_LEN );
 
-	pchInvitee->GetDesc()->Packet( buf.read_peek(), buf.size() );
+	CHARACTER::SafeSendPacketTo(pchInvitee,  buf.read_peek(), buf.size() );
 }
 
 void CGuild::InviteAccept( LPCHARACTER pchInvitee )
@@ -2068,18 +2068,18 @@ void CGuild::InviteAccept( LPCHARACTER pchInvitee )
 		case GERR_NONE: break;
 		case GERR_WITHDRAWPENALTY:
 						pchInvitee->ChatPacket( CHAT_TYPE_INFO, 
-								LC_TEXT("<길드> 탈퇴한 후 %d일이 지나지 않은 사람은 길드에 초대할 수 없습니다."), 
+								LC_TEXT("<ê¸¸ë“œ> íƒˆí‡´í•œ í›„ %dì¼ì´ ì§€ë‚˜ì§€ ì•Šì€ ì‚¬ëŒì€ ê¸¸ë“œì— ì´ˆëŒ€í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."), 
 								quest::CQuestManager::instance().GetEventFlag( "guild_withdraw_delay" ) );
 						return;
 		case GERR_COMMISSIONPENALTY:
 						pchInvitee->ChatPacket( CHAT_TYPE_INFO, 
-								LC_TEXT("<길드> 길드를 해산한 지 %d일이 지나지 않은 사람은 길드에 초대할 수 없습니다."), 
+								LC_TEXT("<ê¸¸ë“œ> ê¸¸ë“œë¥¼ í•´ì‚°í•œ ì§€ %dì¼ì´ ì§€ë‚˜ì§€ ì•Šì€ ì‚¬ëŒì€ ê¸¸ë“œì— ì´ˆëŒ€í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."), 
 								quest::CQuestManager::instance().GetEventFlag( "guild_disband_delay") );
 						return;
-		case GERR_ALREADYJOIN:	pchInvitee->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 상대방이 이미 다른 길드에 속해있습니다.")); return;
-		case GERR_GUILDISFULL:	pchInvitee->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 최대 길드원 수를 초과했습니다.")); return;
-		case GERR_GUILD_IS_IN_WAR : pchInvitee->ChatPacket( CHAT_TYPE_INFO, LC_TEXT("<길드> 현재 길드가 전쟁 중 입니다.") ); return;
-		case GERR_INVITE_LIMIT : pchInvitee->ChatPacket( CHAT_TYPE_INFO, LC_TEXT("<길드> 현재 신규 가입 제한 상태 입니다.") ); return;
+		case GERR_ALREADYJOIN:	pchInvitee->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ìƒëŒ€ë°©ì´ ì´ë¯¸ ë‹¤ë¥¸ ê¸¸ë“œì— ì†í•´ìˆìŠµë‹ˆë‹¤.")); return;
+		case GERR_GUILDISFULL:	pchInvitee->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ìµœëŒ€ ê¸¸ë“œì› ìˆ˜ë¥¼ ì´ˆê³¼í–ˆìŠµë‹ˆë‹¤.")); return;
+		case GERR_GUILD_IS_IN_WAR : pchInvitee->ChatPacket( CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> í˜„ì¬ ê¸¸ë“œê°€ ì „ìŸ ì¤‘ ì…ë‹ˆë‹¤.") ); return;
+		case GERR_INVITE_LIMIT : pchInvitee->ChatPacket( CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> í˜„ì¬ ì‹ ê·œ ê°€ì… ì œí•œ ìƒíƒœ ì…ë‹ˆë‹¤.") ); return;
 
 		default: sys_err( "ignore guild join error(%d)", errcode ); return;
 	}
@@ -2171,4 +2171,5 @@ void CGuild::SendGuildDataUpdateToAllMember(SQLMsg* pmsg)
 		SendAllGradePacket(*iter);
 	}
 }
+
 
