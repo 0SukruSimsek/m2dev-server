@@ -8,6 +8,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # ASan support
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
 
+# Anti Multiple Farm system (default OFF — no regression without explicit opt-in)
+option(ENABLE_ANTI_MULTIPLE_FARM "Enable HAntiMultipleFarm system" OFF)
+if(ENABLE_ANTI_MULTIPLE_FARM)
+    add_compile_definitions(ENABLE_ANTI_MULTIPLE_FARM)
+    message(STATUS "ENABLE_ANTI_MULTIPLE_FARM: ON")
+endif()
+
 set(CMAKE_MODULE_PATH
 	${CMAKE_MODULE_PATH}
 	"${CMAKE_CURRENT_SOURCE_DIR}/buildtool"
@@ -91,6 +98,9 @@ add_definitions(-DWIN32_LEAN_AND_MEAN)
 
 include_directories(src)
 include_directories(include)
+
+# Wave 6a: nlohmann/json v3.11.3 (MIT, single-header)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/vendor/json)
 
 # MariDB includes
 include_directories(${CMAKE_BINARY_DIR}/vendor/mariadb-connector-c-3.4.5/include)

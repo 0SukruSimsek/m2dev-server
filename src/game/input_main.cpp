@@ -1,4 +1,7 @@
 #include "stdafx.h"
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+#include "HAntiMultipleFarm.h"
+#endif
 #include "constants.h"
 #include "config.h"
 #include "utils.h"
@@ -3443,6 +3446,10 @@ void CInputMain::RegisterHandlers()
 	reg(CG::SCRIPT_SELECT_ITEM, &CInputMain::SimpleHandlerV<&CInputMain::ScriptSelectItem>);
 	reg(CG::QUEST_INPUT_STRING,  &CInputMain::SimpleHandlerV<&CInputMain::QuestInputString>);
 	reg(CG::QUEST_CONFIRM,      &CInputMain::SimpleHandlerV<&CInputMain::QuestConfirm>);
+
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+	reg(CG::ANTI_FARM,          &CInputMain::HandleAntiFarm);
+#endif
 }
 
 // ---------------------------------------------------------------------------
@@ -3503,4 +3510,62 @@ int CInputDead::Analyze(LPDESC d, uint16_t wHeader, const char * c_pData)
 
 	return (this->*(it->second.handler))(d, c_pData);
 }
+
+// ---------------------------------------------------------------------------
+// HAntiMultipleFarm handlers
+// ---------------------------------------------------------------------------
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+int CInputMain::HandleAntiFarm(LPDESC d, const char* p)
+{
+	LPCHARACTER ch = d->GetCharacter();
+	if (!ch) return 0;
+	return RecvAntiFarmUpdateStatus(ch, p, m_iBufferLeft);
+}
+
+int CInputMain::RecvAntiFarmUpdateStatus(LPCHARACTER ch, const char* data, size_t uiBytes)
+{
+	const TSendAntiFarmInfo* p = reinterpret_cast<const TSendAntiFarmInfo*>(data);
+
+	if (uiBytes < sizeof(TSendAntiFarmInfo))
+		return -1;
+
+	LPDESC d = nullptr;
+	if (!ch || !(d = ch->GetDesc()))
+		return -1;
+
+	const char* c_pData = data + sizeof(TSendAntiFarmInfo);
+	uiBytes -= sizeof(TSendAntiFarmInfo);
+
+	switch (p->subheader)
+	{
+	case AF_SH_SEND_STATUS_UPDATE:
+	{
+		size_t extraLen = (sizeof(DWORD) * MULTIPLE_FARM_MAX_ACCOUNT);
+		if (uiBytes < extraLen)
+			return -1;
+
+		std::vector<DWORD> v_dwPIDS;
+		for (uint8_t i = 0; i < MULTIPLE_FARM_MAX_ACCOUNT; ++i)
+			v_dwPIDS.emplace_back(*reinterpret_cast<const DWORD*>(c_pData + (sizeof(DWORD) * i)));
+
+		std::string sMAIf = d->GetLoginMacAdress();
+		CAntiMultipleFarm::instance().SendBlockDropStatusChange(sMAIf, v_dwPIDS);
+
+		{
+			// Broadcast to other game servers via P2P
+			CAntiMultipleFarm::TP2PChangeDropStatus dataPacket(GG::ANTI_FARM);
+			dataPacket.length = sizeof(dataPacket);
+			strlcpy(dataPacket.cMAIf, sMAIf.c_str(), sizeof(dataPacket.cMAIf));
+			for (uint8_t i = 0; i < (uint8_t)v_dwPIDS.size() && i < MULTIPLE_FARM_MAX_ACCOUNT; ++i)
+				dataPacket.dwPIDs[i] = v_dwPIDS[i];
+			P2P_MANAGER::instance().Send(&dataPacket, sizeof(CAntiMultipleFarm::TP2PChangeDropStatus));
+		}
+
+		return (int)extraLen;
+	}
+	}
+
+	return 0;
+}
+#endif
 

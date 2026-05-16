@@ -19,6 +19,10 @@ typedef struct SPacketGGLogin
 	uint8_t	bEmpire;
 	int32_t	lMapIndex;
 	uint8_t	bChannel;
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+	char	cMAIf[MA_LENGTH + 1];
+	int8_t	i8BlockState;
+#endif
 } TPacketGGLogin;
 
 typedef struct SPacketGGLogout
@@ -26,6 +30,9 @@ typedef struct SPacketGGLogout
 	uint16_t	header;
 	uint16_t	length;
 	char	szName[CHARACTER_NAME_MAX_LEN + 1];
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+	bool	bAFisWarping;
+#endif
 } TPacketGGLogout;
 
 typedef struct SPacketGGRelay
@@ -212,6 +219,9 @@ typedef struct command_login2
 	uint16_t	length;
 	char	login[LOGIN_MAX_LEN + 1];
 	uint32_t	dwLoginKey;
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+	char	cMAIf[MA_LENGTH + 1];
+#endif
 } TPacketCGLogin2;
 
 typedef struct command_login3
@@ -1886,5 +1896,39 @@ typedef struct SPacketGCSwitchbotStatus
 	uint32_t stuck_count;
 	uint32_t uptime_sec;
 } TPacketGCSwitchbotStatus;
+
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+// Subheader enum for CG/GC ANTI_FARM packets
+enum EAntiFarmSubHeader
+{
+	AF_SH_SENDING_DATA,
+	AF_SH_SEND_STATUS_UPDATE,
+	AF_SH_SENDING_CONFIRM_DATA,
+};
+
+typedef struct SAntiFarmPlayerInfo
+{
+	SAntiFarmPlayerInfo(DWORD dwPID, bool bDropStatus)
+		: dwPID(dwPID), bDropStatus(bDropStatus)
+	{
+		memset(szName, 0, sizeof(szName));
+	}
+
+	char	szName[CHARACTER_NAME_MAX_LEN + 1];
+	DWORD	dwPID;
+	bool	bDropStatus;
+} TAntiFarmPlayerInfo;
+
+typedef struct SSendAntiFarmInfo
+{
+	SSendAntiFarmInfo(uint16_t header, int size, uint8_t subheader)
+		: header(header), size(size), subheader(subheader)
+	{}
+
+	uint16_t	header;
+	int			size;
+	uint8_t		subheader;
+} TSendAntiFarmInfo;
+#endif // ENABLE_ANTI_MULTIPLE_FARM
 
 #pragma pack()

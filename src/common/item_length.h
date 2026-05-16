@@ -216,8 +216,11 @@ enum EUseSubTypes
 	USE_UNBIND,
 	USE_TIME_CHARGE_PER,
 	USE_TIME_CHARGE_FIX,				// 28
-	USE_PUT_INTO_BELT_SOCKET,			// 29 벨트 소켓에 사용할 수 있는 아이템 
+	USE_PUT_INTO_BELT_SOCKET,			// 29 벨트 소켓에 사용할 수 있는 아이템
 	USE_PUT_INTO_RING_SOCKET,			// 30 반지 소켓에 사용할 수 있는 아이템 (유니크 반지 말고, 새로 추가된 반지 슬롯)
+#ifdef ENABLE_TITLE_SYSTEM
+	USE_TITLE,							// 31 Title System (ybeststudio) — Wave 2.1
+#endif
 };
 
 enum EExtractSubTypes

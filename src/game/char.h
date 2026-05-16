@@ -1189,6 +1189,10 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		LPSHOP			GetMyShop() const { return m_pkMyShop; }
 		void			CloseMyShop();
 
+#ifdef ENABLE_CHANGE_CHANNEL
+		void			ChangeChannel(DWORD channelId);
+#endif
+
 	protected:
 
 		LPSHOP			m_pkShop;
@@ -1232,6 +1236,9 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		bool				__Profile__Damage(LPCHARACTER pAttacker, int dam, EDamageType type = DAMAGE_TYPE_NORMAL);
 		void				DeathPenalty(BYTE bExpLossPercent);
 		void				ReviveInvisible(int iDur);
+#ifdef __WORLDBOSS__
+		const TDamageMap&	GetDamageMap() const { return m_map_kDamage; }
+#endif
 
 		bool				Attack(LPCHARACTER pkVictim, BYTE bType = 0);
 		bool				IsAlive() const		{ return m_pointsInstant.position == POS_DEAD ? false : true; }
@@ -2056,6 +2063,26 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 	private:
 		DWORD m_dwLastCombatTime;
 	// tw1x1: end
+
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+	public:
+		auto HasBlockedDrops() -> bool;
+		auto UpdateCharacterWarpCheck(bool state) -> void { bAFisWarping = state; }
+		auto IsSetWarp() -> bool { return bAFisWarping; }
+
+	protected:
+		bool bAFisWarping;
+#endif
+
+#ifdef __WORLDBOSS__
+	// Wave 6a: Generic integer flag map used by WorldBoss for VID tracking
+	// and open-window state (worldboss_day, i_am_worldboss)
+	public:
+		void SetProtectTime(const std::string& flagname, int value);
+		int  GetProtectTime(const std::string& flagname) const;
+	protected:
+		std::map<std::string, int> m_protection_Time;
+#endif
 };
 
 ESex GET_SEX(LPCHARACTER ch);

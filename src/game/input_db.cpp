@@ -1,4 +1,7 @@
-#include "stdafx.h" 
+#include "stdafx.h"
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+#include "HAntiMultipleFarm.h"
+#endif
 #include "constants.h"
 #include "config.h"
 #include "utils.h"
@@ -41,6 +44,9 @@
 #include "map_location.h"
 
 #include "DragonSoul.h"
+#ifdef __WORLDBOSS__
+#include "worldboss_event.h"
+#endif
 
 extern BYTE		g_bAuthServer;
 extern void gm_insert(const char * name, BYTE level);
@@ -417,6 +423,15 @@ void CInputDB::PlayerLoad(LPDESC d, const char * data)
 		p.bEmpire = ch->GetEmpire();
 		p.lMapIndex = SECTREE_MANAGER::instance().GetMapIndex(ch->GetX(), ch->GetY());
 		p.bChannel = g_bChannel;
+
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+		{
+			const char* sMAIf = d->GetLoginMacAdress();
+			strlcpy(p.cMAIf, sMAIf, sizeof(p.cMAIf));
+			p.i8BlockState = static_cast<int8_t>(
+				CAntiMultipleFarm::instance().GetPlayerDropState(sMAIf, ch->GetPlayerID()));
+		}
+#endif
 
 		P2P_MANAGER::instance().Send(&p, sizeof(TPacketGGLogin));
 
@@ -965,6 +980,10 @@ void CInputDB::Boot(const char* data)
 
 	// castle_boot
 	castle_boot();
+
+#ifdef __WORLDBOSS__
+	CWorldBoss::Instance().Load(true);
+#endif
 }
 
 EVENTINFO(quest_login_event_info)

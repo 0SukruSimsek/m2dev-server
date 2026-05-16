@@ -141,6 +141,11 @@ class DESC
 		bool			isChannelStatusRequested() const { return m_bChannelStatusRequested; }
 		void			SetChannelStatusRequested(bool bChannelStatusRequested) { m_bChannelStatusRequested = bChannelStatusRequested; }
 
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+		auto			SetLoginMacAdress(const char* recv_sMAIf) -> void { m_sMAIf = recv_sMAIf; }
+		auto			GetLoginMacAdress() -> const char* { return m_sMAIf.c_str(); }
+#endif
+
 		bool			IsExpiredHandshake() const;
 		void			SetHandshakeTime(uint32_t handshake_time) { m_handshake_time = handshake_time; }
 
@@ -211,6 +216,10 @@ class DESC
 		uint32_t		m_handshake_time;
 		SecureCipher	m_secureCipher;
 		uint8_t			m_challenge[SecureCipher::CHALLENGE_SIZE];
+
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+		std::string		m_sMAIf;
+#endif
 
 	public:
 		LPEVENT			m_pkDisconnectEvent;

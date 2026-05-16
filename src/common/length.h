@@ -1,6 +1,10 @@
 ﻿#pragma once
 #include <cstdint>
 
+// HAntiMultipleFarm constants
+constexpr int MA_LENGTH = 255;
+constexpr int MULTIPLE_FARM_MAX_ACCOUNT = 2;
+
 #define WORD_MAX 0xffff
 enum EMisc
 {

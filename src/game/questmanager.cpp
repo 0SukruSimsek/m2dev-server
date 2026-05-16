@@ -16,6 +16,9 @@
 #include "party.h"
 #include "locale_service.h"
 #include "dungeon.h"
+#ifdef __WORLDBOSS__
+#include "worldboss_event.h"
+#endif
 
 #include <filesystem>
 
@@ -1428,6 +1431,16 @@ namespace quest
 		{
 			g_GoldDropTimeLimitValue = value * 1000;
 		}
+#ifdef __WORLDBOSS__
+		else if (name == "worldboss_rank")
+		{
+			CWorldBoss::Instance().ReloadRank(value, true);
+		}
+		else if (name == "worldboss_reload")
+		{
+			CWorldBoss::Instance().Load(true);
+		}
+#endif
 		else if (name == "new_xmas_event")
 		{
 			// 20126 new산타.

@@ -43,6 +43,7 @@ namespace CG
 {
     // Control
     constexpr uint16_t PONG               = 0x0006;
+    constexpr uint16_t ANTI_FARM          = 0x0B30; // HAntiMultipleFarm client->game
     constexpr uint16_t KEY_RESPONSE       = 0x000A;
     constexpr uint16_t CLIENT_VERSION     = 0x000D;
     constexpr uint16_t STATE_CHECKER      = 0x000F;
@@ -145,6 +146,7 @@ namespace GC
 {
     // Control
     constexpr uint16_t PING               = 0x0007;
+    constexpr uint16_t ANTI_FARM          = 0x0B30; // HAntiMultipleFarm game->client
     constexpr uint16_t PHASE              = 0x0008;
     constexpr uint16_t KEY_CHALLENGE      = 0x000B;
     constexpr uint16_t KEY_COMPLETE       = 0x000C;
@@ -310,6 +312,7 @@ enum EPhases
 namespace GG
 {
     constexpr uint16_t LOGIN                   = 0x8001;
+    constexpr uint16_t ANTI_FARM               = 0x801E; // HAntiMultipleFarm P2P packet
     constexpr uint16_t LOGOUT                  = 0x8002;
     constexpr uint16_t RELAY                   = 0x8003;
     constexpr uint16_t NOTICE                  = 0x8004;

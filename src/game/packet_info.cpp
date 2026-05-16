@@ -2,6 +2,9 @@
 #include "common/stl.h"
 #include "constants.h"
 #include "packet_info.h"
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+#include "HAntiMultipleFarm.h"
+#endif
 
 CPacketInfo::CPacketInfo()
 	: m_pCurrentPacket(NULL), m_dwStartTime(0)
@@ -183,6 +186,9 @@ CPacketInfoCG::CPacketInfoCG()
 	// switchbot dev framework
 	Set(CG::SWITCHBOT_TOGGLE, sizeof(TPacketCGSwitchbotToggle), "SwitchbotToggle");
 
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+	Set(CG::ANTI_FARM, sizeof(TSendAntiFarmInfo), "AntiFarmUpdateStatus");
+#endif
 }
 
 CPacketInfoCG::~CPacketInfoCG()
@@ -219,6 +225,9 @@ CPacketInfoGG::CPacketInfoGG()
 	Set(GG::SIEGE,		sizeof(TPacketGGSiege),		"Siege");
 	Set(GG::CHECK_AWAKENESS,	sizeof(TPacketGGCheckAwakeness),	"CheckAwakeness");
 	Set(GG::MARK_UPDATE,		sizeof(TPacketGGMarkUpdate),		"MarkUpdate");
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+	Set(GG::ANTI_FARM,			sizeof(CAntiMultipleFarm::TP2PChangeDropStatus),	"AntiFarmP2P");
+#endif
 }
 
 CPacketInfoGG::~CPacketInfoGG()

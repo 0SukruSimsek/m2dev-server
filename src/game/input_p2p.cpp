@@ -1,4 +1,7 @@
-#include "stdafx.h" 
+#include "stdafx.h"
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+#include "HAntiMultipleFarm.h"
+#endif
 #include "config.h"
 #include "desc_client.h"
 #include "desc_manager.h"
@@ -526,6 +529,9 @@ void CInputP2P::RegisterHandlers()
 	m_handlers[GG::SIEGE]              = &CInputP2P::HandleSiege;
 	m_handlers[GG::RELOAD_CRC_LIST]    = &CInputP2P::HandleReloadCRC;
 	m_handlers[GG::CHECK_CLIENT_VERSION] = &CInputP2P::HandleCheckClientVersion;
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+	m_handlers[GG::ANTI_FARM]         = &CInputP2P::HandleAntiFarmP2P;
+#endif
 }
 
 int CInputP2P::Analyze(LPDESC d, uint16_t wHeader, const char * c_pData)
@@ -542,3 +548,25 @@ int CInputP2P::Analyze(LPDESC d, uint16_t wHeader, const char * c_pData)
 
 	return (this->*(it->second))(d, c_pData);
 }
+
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+int CInputP2P::HandleAntiFarmP2P(LPDESC d, const char* c_pData)
+{
+	RecvAntiFarmUpdateStatus(d, c_pData);
+	return 0;
+}
+
+void CInputP2P::RecvAntiFarmUpdateStatus(LPDESC d, const char* c_pData)
+{
+	if (!d) return;
+
+	const CAntiMultipleFarm::TP2PChangeDropStatus* p =
+		reinterpret_cast<const CAntiMultipleFarm::TP2PChangeDropStatus*>(c_pData);
+
+	std::vector<DWORD> dwPIDs;
+	for (uint8_t i = 0; i < MULTIPLE_FARM_MAX_ACCOUNT; ++i)
+		dwPIDs.emplace_back(p->dwPIDs[i]);
+
+	CAntiMultipleFarm::instance().P2PSendBlockDropStatusChange(p->cMAIf, dwPIDs);
+}
+#endif

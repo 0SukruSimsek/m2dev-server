@@ -1,4 +1,7 @@
 #include "stdafx.h"
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+#include "HAntiMultipleFarm.h"
+#endif
 #include "constants.h"
 #include "config.h"
 #include "event.h"
@@ -55,6 +58,9 @@
 #include "skill_power.h"
 #include "DragonSoul.h"
 #include "switchbot.h"
+#ifdef __WORLDBOSS__
+#include "worldboss_event.h"
+#endif
 
 // #ifndef OS_WINDOWS
 // #include <gtest/gtest.h>
@@ -250,6 +256,11 @@ void heartbeat(LPHEART ht, int pulse)
 
 	s_dwProfiler[PROF_HEARTBEAT] += (get_dword_time() - t);
 
+#ifdef __WORLDBOSS__
+	if (!g_bAuthServer)
+		CWorldBoss::Instance().Process();
+#endif
+
 	DBManager::instance().Process();
 	AccountDB::instance().Process();
 	CPVPManager::instance().Process();
@@ -330,9 +341,16 @@ int main(int argc, char **argv)
 	CItemAddonManager	item_addon_manager;
 	CArenaManager arena_manager;
 	COXEventManager OXEvent_manager;
+#ifdef __WORLDBOSS__
+	CWorldBoss worldBoss;
+#endif
 	CHorseNameManager horsename_manager;
 
 	DESC_MANAGER	desc_manager;
+
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+	CAntiMultipleFarm c_anti_multiple_farm;
+#endif
 
 	CTableBySkill SkillPowerByLevel;
 	CPolymorphUtils polymorph_utils;
@@ -396,6 +414,10 @@ int main(int argc, char **argv)
 	arena_manager.Destroy();
 	sys_log(0, "<shutdown> Destroying COXEventManager...");
 	OXEvent_manager.Destroy();
+#ifdef __WORLDBOSS__
+	sys_log(0, "<shutdown> Destroying CWorldBoss...");
+	worldBoss.Clear(true);
+#endif
 
 	sys_log(0, "<shutdown> Disabling signal timer...");
 	signal_timer_disable();

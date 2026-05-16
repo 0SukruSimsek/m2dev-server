@@ -232,6 +232,11 @@ class CInputMain : public CInputProcessor
 		int			MyShop(LPCHARACTER ch, const char * c_pData, size_t uiBytes);
 
 		void		Refine(LPCHARACTER ch, const char* c_pData);
+
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+		int			RecvAntiFarmUpdateStatus(LPCHARACTER ch, const char* data, size_t uiBytes);
+		int			HandleAntiFarm(LPDESC d, const char* p);
+#endif
 };
 
 class CInputDead : public CInputMain
@@ -431,6 +436,11 @@ class CInputP2P : public CInputProcessor
 		void		MessengerRequestAdd(const char* c_pData);
 		void		MessengerResponse(const char* c_pData);
 		void		GuildMarkUpdate(const char * c_pData);
+
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+		int			HandleAntiFarmP2P(LPDESC d, const char* p);
+		void		RecvAntiFarmUpdateStatus(LPDESC d, const char* c_pData);
+#endif
 
 	protected:
 		CPacketInfoGG 	m_packetInfoGG;

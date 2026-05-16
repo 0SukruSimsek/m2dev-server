@@ -6,6 +6,10 @@
 #include "log.h"
 #include "desc.h"
 
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+ACMD(do_debug_anti_multiple_farm);
+#endif
+
 ACMD(do_user_horse_ride);
 ACMD(do_user_horse_back);
 ACMD(do_user_horse_feed);
@@ -17,6 +21,12 @@ ACMD(do_stun);
 
 ACMD(do_warp);
 ACMD(do_goto);
+#ifdef ENABLE_CHANGE_CHANNEL
+ACMD(do_change_channel);
+#endif
+#ifdef __WORLDBOSS__
+ACMD(do_worldboss);
+#endif
 ACMD(do_item);
 ACMD(do_mob);
 ACMD(do_mob_ld);
@@ -240,6 +250,15 @@ struct command_info cmd_info[] =
 	{ "who",		do_who,			0,			POS_DEAD,	GM_IMPLEMENTOR	},
 	{ "war",		do_war,			0,			POS_DEAD,	GM_PLAYER	},
 	{ "warp",		do_warp,		0,			POS_DEAD,	GM_LOW_WIZARD	},
+#ifdef ENABLE_CHANGE_CHANNEL
+	{ "cs",			do_change_channel,	0,	POS_DEAD,	GM_PLAYER	},  // Wave 5: Seamless channel switch
+#endif
+#ifdef __WORLDBOSS__
+	{ "worldboss",	do_worldboss,		0,	POS_DEAD,	GM_PLAYER	},  // Wave 6a: WorldBoss event
+#endif
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+	{ "wanti_farm_info",	do_debug_anti_multiple_farm,	0,	POS_DEAD,	GM_PLAYER	},
+#endif
 	{ "user",		do_user,		0,			POS_DEAD,	GM_HIGH_WIZARD	},
 	{ "notice",		do_notice,		0,			POS_DEAD,	GM_HIGH_WIZARD	},
 	{ "notice_map",	do_map_notice,	0,			POS_DEAD,	GM_LOW_WIZARD	},

@@ -1,5 +1,8 @@
 #include "stdafx.h"
 #include <sodium.h>
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+#include "HAntiMultipleFarm.h"
+#endif
 
 #include "utils.h"
 #include "config.h"
@@ -2060,3 +2063,84 @@ ACMD(do_ride)
     // 타거나 내릴 수 없을때
     ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("말을 먼저 소환해주세요."));
 }
+
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+ACMD(do_debug_anti_multiple_farm)
+{
+    LPDESC d = nullptr;
+    if (!ch || (ch && !(d = ch->GetDesc())))
+        return;
+    CAntiMultipleFarm::instance().PrintPlayerDropState(d->GetLoginMacAdress(), ch);
+}
+#endif
+
+#ifdef __WORLDBOSS__
+#include "worldboss_event.h"
+
+static void worldboss_split_args(const char* argument, std::vector<std::string>& vecArgs)
+{
+	// Simple whitespace tokenizer (no boost dependency)
+	const char* p = argument;
+	while (*p)
+	{
+		while (*p == ' ' || *p == '\t') ++p;
+		if (!*p) break;
+		const char* start = p;
+		while (*p && *p != ' ' && *p != '\t') ++p;
+		vecArgs.emplace_back(start, p);
+	}
+}
+
+ACMD(do_worldboss)
+{
+	std::vector<std::string> vecArgs;
+	worldboss_split_args(argument, vecArgs);
+	if (vecArgs.size() < 1) { return; }
+
+	const std::string& wbcmd = vecArgs[0];
+
+	if (wbcmd == "reload")
+	{
+		if (!ch->IsGM())
+			return;
+		if (CWorldBoss::Instance().Load(false))
+			ch->ChatPacket(CHAT_TYPE_INFO, "[Worldboss] Reload success");
+		else
+			ch->ChatPacket(CHAT_TYPE_INFO, "[Worldboss] Reload failed");
+	}
+	else if (wbcmd == "remove_rank")
+	{
+		if (!ch->IsGM())
+			return;
+		if (vecArgs.size() < 2) { return; }
+		BYTE bDayIdx;
+		if (!str_to_number(bDayIdx, vecArgs[1].c_str()))
+			return;
+		else if (bDayIdx < 1 || bDayIdx > 7)
+			return;
+		CWorldBoss::Instance().RemoveRank(bDayIdx);
+		CWorldBoss::Instance().ReloadRank(bDayIdx);
+		ch->ChatPacket(CHAT_TYPE_INFO, "[Worldboss] Remove rank success");
+	}
+	else if (wbcmd == "load")
+	{
+		if (vecArgs.size() < 2) { return; }
+		BYTE bDayIdx;
+		if (!str_to_number(bDayIdx, vecArgs[1].c_str()))
+			return;
+		else if (bDayIdx < 1 || bDayIdx > 7)
+			return;
+		CWorldBoss::Instance().SendData(ch, bDayIdx, ch->GetProtectTime("worldboss_day") == 0);
+	}
+	else if (wbcmd == "teleport")
+	{
+		if (vecArgs.size() < 2) { return; }
+		BYTE bDayIdx;
+		if (!str_to_number(bDayIdx, vecArgs[1].c_str()))
+			return;
+		else if (bDayIdx < 1 || bDayIdx > 7)
+			return;
+		CWorldBoss::Instance().Teleport(ch, bDayIdx);
+	}
+}
+#endif

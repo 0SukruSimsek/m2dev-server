@@ -1,4 +1,7 @@
 #include "stdafx.h"
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+#include "HAntiMultipleFarm.h"
+#endif
 #include "constants.h"
 #include "config.h"
 #include "utils.h"
@@ -122,6 +125,10 @@ void CInputLogin::LoginByKey(LPDESC d, const char * data)
 	sys_log(0, "LOGIN_BY_KEY: %s key %u", login, pinfo->dwLoginKey);
 
 	d->SetLoginKey(pinfo->dwLoginKey);
+
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+	d->SetLoginMacAdress(pinfo->cMAIf);
+#endif
 
 	TPacketGDLoginByKey ptod;
 
@@ -525,7 +532,17 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 
 	CGuildManager::instance().LoginMember(ch);
 
-	// 캐릭터를 맵에 추가 
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+	{
+		// Register this player in the anti-farm system
+		std::string sMAIf = d->GetLoginMacAdress();
+		int8_t i8OldState = static_cast<int8_t>(
+			CAntiMultipleFarm::instance().GetPlayerDropState(sMAIf, ch->GetPlayerID()));
+		CAntiMultipleFarm::instance().Login(sMAIf, ch->GetPlayerID(), i8OldState);
+	}
+#endif
+
+	// 캐릭터를 맵에 추가
 	ch->Show(ch->GetMapIndex(), pos.x, pos.y, pos.z);
 
 	SECTREE_MANAGER::instance().SendNPCPosition(ch);
@@ -576,6 +593,10 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 	p2.length = sizeof(p2);
 	p2.channel = g_bChannel;
 	d->Packet(&p2, sizeof(p2));
+
+	// Wave 5+ UI fix: client-side minimap "Metin2, CHX" refresh icin server-command yolla.
+	// /cs sonrasi destination channel PlayerLoad'da otomatik tetiklenir.
+	ch->ChatPacket(CHAT_TYPE_COMMAND, "setch %d", g_bChannel);
 
 	_send_bonus_info(ch);
 	

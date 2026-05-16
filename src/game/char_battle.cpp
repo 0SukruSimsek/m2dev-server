@@ -37,6 +37,9 @@
 #include "threeway_war.h"
 #include "BlueDragon.h"
 #include "DragonLair.h"
+#ifdef __WORLDBOSS__
+#include "worldboss_event.h"
+#endif
 
 #include <random>
 #include <algorithm>
@@ -819,6 +822,11 @@ void CHARACTER::Reward(bool bItemDrop)
 	if (!bItemDrop)
 		return;
 
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+	if (pkAttacker->IsPC() && pkAttacker->HasBlockedDrops())
+		return;
+#endif
+
 	PIXEL_POSITION pos = GetXYZ();
 
 	if (!SECTREE_MANAGER::instance().GetMovablePosition(GetMapIndex(), pos.x, pos.y, pos))
@@ -1585,6 +1593,11 @@ void CHARACTER::Dead(LPCHARACTER pkKiller, bool bImmediateDead)
 			sys_err("DragonLair: Dragon killed by nobody");
 		}
 	}
+
+#ifdef __WORLDBOSS__
+	if (GetProtectTime("i_am_worldboss"))
+		CWorldBoss::Instance().Dead(this);
+#endif
 }
 
 struct FuncSetLastAttacked

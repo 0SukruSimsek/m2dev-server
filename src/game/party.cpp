@@ -1205,7 +1205,12 @@ LPCHARACTER CParty::GetNextOwnership(LPCHARACTER ch, long x, long y)
 		if (pkMember && DISTANCE_APPROX(pkMember->GetX() - x, pkMember->GetY() - y) < 3000)
 		{
 			IncreaseOwnership();
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+			if (pkMember->IsPC() && !pkMember->HasBlockedDrops())
+				return pkMember;
+#else
 			return pkMember;
+#endif
 		}
 
 		IncreaseOwnership();

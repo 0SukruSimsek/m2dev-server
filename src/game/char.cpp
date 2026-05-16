@@ -1,4 +1,7 @@
 #include "stdafx.h"
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+#include "HAntiMultipleFarm.h"
+#endif
 
 #include "common/VnumHelper.h"
 
@@ -126,6 +129,10 @@ void CHARACTER::Initialize()
 	CEntity::Initialize(ENTITY_CHARACTER);
 
 	m_bNoOpenedShop = true;
+
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+	bAFisWarping = false;
+#endif
 
 	m_bOpeningSafebox = false;
 
@@ -393,6 +400,10 @@ void CHARACTER::Create(const char * c_pszName, DWORD vid, bool isPC)
 void CHARACTER::Destroy()
 {
 	CloseMyShop();
+
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+	bAFisWarping = false;
+#endif
 
 	if (m_pkRegen)
 	{
@@ -791,6 +802,179 @@ void CHARACTER::CloseMyShop()
 			SetPolymorph(GetJob(), true);
 	}
 }
+
+#ifdef ENABLE_CHANGE_CHANNEL
+// Wave 5: Seamless Channel Switch — server tarafi optimizasyonu (cooldown + combat + safe-zone check)
+// Player'ı mevcut karaktere koruyarak hedef channel core'una GC::WARP packet ile yönlendirir.
+// M2Dev port pattern: 11000 + channel*10 + core (her channel 10 port aralık)
+
+// Wave 5 opt: per-player warp cooldown — flood/abuse koruma
+// Oyuncu: 60 saniye (DB load koruma — dakikada 1 kanal degisim).
+// GM: 5 saniye (test/yonetim hizliligi).
+// Not: per-core static map. Warp sonrasi yeni core'un map'i bos — bu core'da ilk warp
+// tum cooldown'lardan gecer. Esas client-side defense (constInfo cross-warp persistent).
+// Gelecek: P2P broadcast ile global cooldown sync.
+static const DWORD WARP_COOLDOWN_PLAYER_MS = 60000;
+static const DWORD WARP_COOLDOWN_GM_MS     = 5000;
+static std::map<DWORD, DWORD> s_lastWarpTime;
+
+void CHARACTER::ChangeChannel(DWORD channelId)
+{
+	uint32_t lAddr;
+	int32_t lMapIndex;
+	uint16_t wPort;
+	long x = this->GetX();
+	long y = this->GetY();
+
+	if (!CMapLocation::instance().Get(x, y, lMapIndex, lAddr, wPort))
+	{
+		sys_err("ChangeChannel: cannot find map location x=%ld y=%ld name=%s", x, y, GetName());
+		ChatPacket(CHAT_TYPE_INFO, "Mevcut harita bilgisi alinamadi.");
+		return;
+	}
+
+	if (lMapIndex >= 10000)
+	{
+		ChatPacket(CHAT_TYPE_INFO, "Bu haritada kanal degistirilemez.");
+		return;
+	}
+
+	if (channelId < 1 || channelId > 12)
+	{
+		ChatPacket(CHAT_TYPE_INFO, "Gecersiz kanal: %u (1-12 arasi olmali)", channelId);
+		return;
+	}
+
+	if ((DWORD)g_bChannel == channelId)
+	{
+		ChatPacket(CHAT_TYPE_INFO, "Zaten CH%u kanalindasiniz.", channelId);
+		return;
+	}
+
+	// Wave 5 opt A1: cooldown check (flood/abuse koruma)
+	// GM hesaplari icin kisa cooldown (test kolayligi), regular oyuncular icin 60sn (DB koruma)
+	BYTE gmLvl = GetGMLevel();
+	DWORD cooldownMs = (gmLvl > GM_PLAYER) ? WARP_COOLDOWN_GM_MS : WARP_COOLDOWN_PLAYER_MS;
+	sys_log(0, "ChangeChannel: GM debug — name=%s gm_level=%d (GM_PLAYER=%d) cooldown=%ums",
+		GetName(), (int)gmLvl, (int)GM_PLAYER, cooldownMs);
+	DWORD nowMs = get_dword_time();
+	DWORD pid = GetPlayerID();
+	auto it = s_lastWarpTime.find(pid);
+	if (it != s_lastWarpTime.end())
+	{
+		DWORD elapsed = nowMs - it->second;
+		if (elapsed < cooldownMs)
+		{
+			DWORD remaining = (cooldownMs - elapsed) / 1000 + 1;
+			ChatPacket(CHAT_TYPE_INFO, "Kanal degistirmek icin %u saniye bekleyin.", remaining);
+			return;
+		}
+	}
+
+	// Wave 5 opt A3: hareketsizlik check — son saldiri uzerinden en az 5sn gecmeli
+	// (GetVictim mevcut hedef, GetLastAttackTime son saldiri zamani — NPC otomatik
+	// agro da last_attack_time set eder, o yuzden mesaj "savasta" yerine "hareketsiz").
+	if (GetVictim())
+	{
+		ChatPacket(CHAT_TYPE_INFO, "Aktif savas hedefi varken kanal degistiremezsiniz.");
+		return;
+	}
+	if (get_dword_time() - GetLastAttackTime() < 5000)
+	{
+		DWORD remaining = (5000 - (get_dword_time() - GetLastAttackTime())) / 1000 + 1;
+		ChatPacket(CHAT_TYPE_INFO, "Hareketsiz olduğunuzdan emin olun. %u sn bekleyin.", remaining);
+		return;
+	}
+
+	if (IsDead())
+	{
+		ChatPacket(CHAT_TYPE_INFO, "Olu durumunda kanal degistiremezsiniz.");
+		return;
+	}
+
+	// Wave 5 opt: ITEM GUVENLIGI — acik exchange/shop/safebox/cube state'inde /cs ENGELLE.
+	// Aksi halde transit item kaybi yasanabilir (trade ortagi farkli kanalda kalir,
+	// shop kapanmadan warp olur, safebox commit olmamis is bekler).
+	if (GetExchange())
+	{
+		ChatPacket(CHAT_TYPE_INFO, "Acik takas penceresi varken kanal degistiremezsiniz.");
+		return;
+	}
+	if (GetMyShop())
+	{
+		ChatPacket(CHAT_TYPE_INFO, "Acik dukkan varken kanal degistiremezsiniz.");
+		return;
+	}
+	if (GetShop())
+	{
+		ChatPacket(CHAT_TYPE_INFO, "Acik dukkan ekrani varken kanal degistiremezsiniz.");
+		return;
+	}
+	if (GetSafebox())
+	{
+		ChatPacket(CHAT_TYPE_INFO, "Acik depo varken kanal degistiremezsiniz.");
+		return;
+	}
+	if (IsCubeOpen())
+	{
+		ChatPacket(CHAT_TYPE_INFO, "Acik cube varken kanal degistiremezsiniz.");
+		return;
+	}
+
+	// Wave 5 opt A2 KALDIRILDI:
+	// M2Dev P2P mesh tam degil — her core sadece subset core'lara outbound, geri kalanlar
+	// inbound olarak bagli. IsP2PDescExist sadece outbound listesini tariyor → false
+	// positive "offline" produces. Detection cost > benefit. Kanal gercekten offline ise
+	// client warp paketi sonrasi connection refused alacak ve login'e duser (kullanici icin
+	// cok daha az sik bir senaryo).
+
+	// Cooldown'u SET et (warp basarili olacak, baski sayilir)
+	s_lastWarpTime[pid] = nowMs;
+
+	Stop();
+	Save();
+
+	if (GetSectree())
+	{
+		GetSectree()->RemoveEntity(this);
+		ViewCleanup();
+		EncodeRemovePacket(this);
+	}
+
+	TPacketGCWarp p;
+	p.header = GC::WARP;
+	p.length = sizeof(p);
+	p.lX = (int32_t)x;
+	p.lY = (int32_t)y;
+	p.lAddr = lAddr;
+	// M2Dev port formula (CORE-aware delta):
+	// MapLocation::Get(x,y) -> wPort, map'i barindiran CORE'un kaynak portunu döndürür
+	// (örn: ch1/core3 = 11013 — map 41/44/45 burada). Hedef kanalda AYNI core, port'a
+	// kanal_delta * 10 ekleyerek bulunur (ch7 core3 = 11013 + 60 = 11073).
+	// Aksi halde core1 portuna yonlendirilir → o core'da map yok → PlayerLoad fail → kick.
+	p.wPort = (uint16_t)((int)wPort + 10 * ((int)channelId - (int)g_bChannel));
+
+	sys_log(0, "ChangeChannel: %s ch%d -> ch%u port %u -> %u",
+		GetName(), g_bChannel, channelId, wPort, p.wPort);
+
+	GetDesc()->Packet(&p, sizeof(TPacketGCWarp));
+
+	// Wave 5 fix v3 (M2Dev native): warp sonrasi DB'ye SENKRON GD::LOGOUT yolla.
+	// Aksi halde hedef kanal LOGIN_BY_KEY sordugunda DB hala "admin online on CH1" der,
+	// LoginAlready paketi gelir, DisconnectOfSameLogin tetiklenir, oyuncu 5sn icinde atilir.
+	// LOGOUT packet'i hemen DB'ye gider, admin online listesinden cikar.
+	{
+		TLogoutPacket logoutPack;
+		strlcpy(logoutPack.login, GetDesc()->GetAccountTable().login, sizeof(logoutPack.login));
+		strlcpy(logoutPack.passwd, GetDesc()->GetAccountTable().passwd, sizeof(logoutPack.passwd));
+		db_clientdesc->DBPacket(GD::LOGOUT, GetDesc()->GetHandle(), &logoutPack, sizeof(TLogoutPacket));
+		sys_log(0, "ChangeChannel: GD::LOGOUT sent for %s (login=%s)", GetName(), logoutPack.login);
+	}
+
+	// Kaynak desc'i 2sn sonra kapat — paket flush, sonra clean exit.
+	GetDesc()->DelayedDisconnect(2);
+}
+#endif
 
 void EncodeMovePacket(TPacketGCMove & pack, DWORD dwVID, BYTE bFunc, BYTE bArg, DWORD x, DWORD y, DWORD dwDuration, DWORD dwTime, BYTE bRot)
 {
@@ -1354,11 +1538,23 @@ void CHARACTER::Disconnect(const char * c_pszReason)
 
 	marriage::CManager::instance().Logout(this);
 
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+	{
+		LPDESC d_af = GetDesc();
+		// Disconnect is always a real logout (not a warp), so is_warping=false
+		if (d_af)
+			CAntiMultipleFarm::instance().Logout(d_af->GetLoginMacAdress(), GetPlayerID(), false);
+	}
+#endif
+
 	// P2P Logout
 	TPacketGGLogout p;
 	p.header = GG::LOGOUT;
 	p.length = sizeof(p);
 	strlcpy(p.szName, GetName(), sizeof(p.szName));
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+	p.bAFisWarping = false; // Disconnect = real logout
+#endif
 	P2P_MANAGER::instance().Send(&p, sizeof(TPacketGGLogout));
 	char buf[51];
 	snprintf(buf, sizeof(buf), "%s %d %d %ld %d", 
@@ -5429,6 +5625,11 @@ bool CHARACTER::WarpSet(long x, long y, long lPrivateMapIndex)
 
 	GetDesc()->Packet(&p, sizeof(TPacketGCWarp));
 
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+	// Mark that this logout is due to warp (not real disconnect)
+	UpdateCharacterWarpCheck(true);
+#endif
+
 	//if (!LC_IsNewCIBN())
 	{
 		char buf[256];
@@ -5468,6 +5669,11 @@ void CHARACTER::WarpEnd()
 	m_lWarpMapIndex = 0;
 	m_posWarp.x = m_posWarp.y = m_posWarp.z = 0;
 
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+	// Warp finished — reset warp flag
+	UpdateCharacterWarpCheck(false);
+#endif
+
 	{
 		// P2P Login
 		TPacketGGLogin p;
@@ -5480,9 +5686,31 @@ void CHARACTER::WarpEnd()
 		p.lMapIndex = SECTREE_MANAGER::instance().GetMapIndex(GetX(), GetY());
 		p.bChannel = g_bChannel;
 
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+		{
+			LPDESC d_af = GetDesc();
+			std::string sMAIf = (d_af ? d_af->GetLoginMacAdress() : "");
+			strlcpy(p.cMAIf, sMAIf.c_str(), sizeof(p.cMAIf));
+			p.i8BlockState = static_cast<int8_t>(
+				CAntiMultipleFarm::instance().GetPlayerDropState(sMAIf, GetPlayerID()));
+		}
+#endif
+
 		P2P_MANAGER::instance().Send(&p, sizeof(TPacketGGLogin));
 	}
 }
+
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+auto CHARACTER::HasBlockedDrops() -> bool
+{
+	LPDESC d = nullptr;
+	if (!(d = GetDesc()))
+		return false;
+
+	std::string sMAIf = d->GetLoginMacAdress();
+	return CAntiMultipleFarm::instance().GetPlayerDropState(sMAIf, GetPlayerID());
+}
+#endif
 
 bool CHARACTER::Return()
 {
@@ -7486,3 +7714,21 @@ bool CHARACTER::CheckDamageImmunityConditions(LPCHARACTER pAttacker) const
 	return true;
 }
 // MR-8: -- END OF -- Snow dungeon - All-damage immunity with exceptions
+
+#ifdef __WORLDBOSS__
+// Wave 6a: ProtectTime helpers (generic key-value flag map on CHARACTER)
+void CHARACTER::SetProtectTime(const std::string& flagname, int value)
+{
+	const auto it = m_protection_Time.find(flagname);
+	if (it != m_protection_Time.end())
+		it->second = value;
+	else
+		m_protection_Time.emplace_hint(it, flagname, value);
+}
+
+int CHARACTER::GetProtectTime(const std::string& flagname) const
+{
+	const auto it = m_protection_Time.find(flagname);
+	return (it != m_protection_Time.end()) ? it->second : 0;
+}
+#endif
