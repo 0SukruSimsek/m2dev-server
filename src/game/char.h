@@ -614,8 +614,19 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		BYTE			GetJob() const;
 		BYTE			GetCharType() const;
 
-		bool			IsPC() const		{ return GetDesc() ? true : false; }
+		// Keyf.Online v10: IsPC art1k DESC degil m_bCharType uzerinden — server-side bot (DESC=NULL ama CHAR_TYPE_PC) icin gerekli.
+		// Esti hat: GetDesc() ? true : false → bot'lar IsPC()==false donerdi, battle.cpp mob path'1na girip GetMobAttackRange NULL deref crash olurdu.
+		bool			IsPC() const		{ return m_bCharType == CHAR_TYPE_PC; }
 		bool			IsNPC()	const		{ return m_bCharType != CHAR_TYPE_PC; }
+		// Keyf.Online v10: server-side bot icin m_bCharType=CHAR_TYPE_PC set etmeye yarayan public setter.
+		// Normal akista SetPlayerProto bunu yapar, ama Yontem 4 bot spawn SetPlayerProto'yu atlad1g1 icin manuel set sart.
+		void			SetCharType(BYTE bType) { m_bCharType = bType; }
+		// Keyf.Online v11: server-side bot icin m_pointsInstant.bBasePart set etmeye yarayan public setter.
+		// bBasePart body model'i belirler, 0 olursa client'ta render eksik (yarim yamalak)
+		void			SetBasePart(BYTE bBasePart) { m_pointsInstant.bBasePart = bBasePart; }
+		// Keyf.Online v14: bot icin m_pSkillLevels array'i allocate (SetPlayerProto atlandi)
+		// SetSkillLevel cagrisindan ONCE bu cagrilir, yoksa NULL guard early return.
+		void			EnsureSkillLevels();
 		bool			IsMonster()	const	{ return m_bCharType == CHAR_TYPE_MONSTER; }
 		bool			IsStone() const		{ return m_bCharType == CHAR_TYPE_STONE; }
 		bool			IsDoor() const		{ return m_bCharType == CHAR_TYPE_DOOR; } 
@@ -831,6 +842,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		bool			IsSyncOwner(LPCHARACTER ch) const;
 
 		bool			WarpSet(long x, long y, long lRealMapIndex = 0);
+		bool			BotTeleport(long x, long y);  // server-side teleport (client WARP packet yok, sectree direct register)
 		void			SetWarpLocation(long lMapIndex, long x, long y);
 		void			WarpEnd();
 		const PIXEL_POSITION & GetWarpPosition() const { return m_posWarp; }
@@ -2083,7 +2095,149 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 	protected:
 		std::map<std::string, int> m_protection_Time;
 #endif
+
+	// ============================================================================
+	// AUTOFARM BOT (Faz 3 — server-side AI farm bot)
+	// ai_bot quest flag set ise login sonrasi SetAutoBot(true) cagrilir.
+	// Pulse event her 500ms BotTick() cagirir: HP pot, target find, attack, loot.
+	// Switchbot framework (monitoring) paralel calisir, AI bot active eylemde bulunur.
+	// ============================================================================
+	public:
+		bool         IsAutoBot() const { return m_bIsAutoBot; }
+		void         SetAutoBot(bool b) { m_bIsAutoBot = b; }
+		void         BotTick();   // Faz 3 char_bot.cpp implementation
+		LPCHARACTER  GetBotTarget() const { return m_pBotTarget; }
+		void         SetBotTarget(LPCHARACTER ch) { m_pBotTarget = ch; }
+
+		// v12 Real-Player Simulation accessors
+		BYTE         GetBotPersonality() const { return m_byBotPersonality; }
+		void         SetBotPersonality(BYTE p) { m_byBotPersonality = p; }
+		void         SetBotReactionMs(WORD ms) { m_wBotReactionMs = ms; }
+		WORD         GetBotReactionMs() const { return m_wBotReactionMs; }
+		// v16 — Mimari konsolidasyon: shared helper'lar
+		BYTE         GetBotFatigue() const { return m_byBotFatigue; }      // BuildContext.fatigue icin
+		bool         IsBotIdleNow() const;                                  // BuildContext.in_afk icin (impl char.cpp)
+		// v16 Adim 6.1 — ChatAction cooldown accessor
+		bool         IsBotChatReady() const { return get_dword_time() >= m_dwBotNextChatTime; }
+		void         SetBotChatCooldown(DWORD ms) { m_dwBotNextChatTime = get_dword_time() + ms; }
+		// v16 Adim 6.2 — RestockAction per-bot cooldown (E5 fix: eski static s_lastAutoClean global'di)
+		bool         IsBotRestockReady() const { return get_dword_time() - m_dwBotLastRestockCheck > 30000; }
+		void         MarkBotRestockChecked() { m_dwBotLastRestockCheck = get_dword_time(); }
+		// v16 Adim 6.3 — WanderAction NO_MOB_30s village fallback accessor
+		DWORD        GetBotNoTargetMs() const { return get_dword_time() - m_dwBotLastWanderTime; }
+		void         MarkBotWanderReset() { m_dwBotLastWanderTime = get_dword_time(); }
+		// v16 Adim 6.5 fix — SkillCombatAction per-bot cooldown (CanUseSkill cooldown bypass tespit)
+		bool         IsBotSkillReady() const { return get_dword_time() - m_dwBotLastSkillCast > 6000; }
+		void         MarkBotSkillUsed() { m_dwBotLastSkillCast = get_dword_time(); }
+		// v22 — Per-bot self-buff cooldown (Geomkyung/Magic Armor 5dk renewal)
+		bool         IsBotBuffReady() const { return get_dword_time() - m_dwBotLastBuffCast > 300000; }
+		void         MarkBotBuffUsed() { m_dwBotLastBuffCast = get_dword_time(); }
+		// Server-side bot semantik: AutoBot + DESC=null. Tum guard'larda kullanilir.
+		bool         IsServerSideBot() const { return m_bIsAutoBot && !GetDesc(); }
+		// Shared move helper — char_bot.cpp chase + bot_ai_utility KiteAction/WanderAction kullanir.
+		// SendMovePacket + SetXYZ + sectree relocate (smooth, isinlanma yok).
+		// type: "CHASE" / "KITE" / "WANDER" (log icin).
+		// step_size: 150 wander, 200 chase, 250 kite.
+		// Donen deger: hareket etti mi (false = zaten yakin, no-op).
+		bool         BotMoveStep(long target_x, long target_y, double step_size, const char* type);
+		// Bot icin HP veya SP'yi internal regen (server-side, paket yok).
+		// stat: POINT_HP veya POINT_SP. Donen deger: regen miktari (delta).
+		int          BotInternalHeal(BYTE stat);
+	protected:
+		bool         m_bIsAutoBot{false};
+		LPCHARACTER  m_pBotTarget{nullptr};
+		DWORD        m_dwBotNextThinkTime{0};
+		DWORD        m_dwBotLastWanderTime{0};
+		DWORD        m_dwBotPotionRefillCheck{0};
+		DWORD        m_dwBotLastTargetMobVID{0};  // anti mob-steal: son hedef mob VID
+		long         m_lBotStuckPosX{0};          // stuck detection
+		long         m_lBotStuckPosY{0};
+		DWORD        m_dwBotStuckCheckTime{0};
+		BYTE         m_byBotStuckCount{0};        // 3 ardisik fail -> DC
+		BYTE         m_byBotLastKnownLevel{0};    // level-up progression
+		// v12 Real-Player Simulation fields (NCSOFT 2024 framework anti-detection)
+		BYTE         m_byBotPersonality{0};       // 0=aggressive,1=cautious,2=explorer,3=lazy,4=social
+		DWORD        m_dwBotIdleUntil{0};         // AFK pencere bitis ms
+		DWORD        m_dwBotNextChatTime{0};      // chat cooldown ms
+		DWORD        m_dwBotChatSeed{0};          // per-bot deterministik RNG seed (pid)
+		DWORD        m_dwBotNextAFKCheck{0};      // bir sonraki AFK olasilik kontrolu
+		WORD         m_wBotReactionMs{300};       // persona baseline tick interval (180-450)
+		BYTE         m_byBotFatigue{0};           // 0-100 yorgunluk (her aksiyon ++)
+		DWORD        m_dwBotLastActionTime{0};    // anti-burst, son aksiyon zamani
+		DWORD        m_dwBotFatigueRecover{0};    // fatigue son azalma zamani
+		DWORD        m_dwBotReactionDelay{0};     // hedef bulunca delay'li attack icin
+		DWORD        m_dwBotLastRestockCheck{0};  // v16 Adim 6.2 per-bot restock timer (E5 fix)
+		DWORD        m_dwBotLastSkillCast{0};     // v16 Adim 6.5 fix SkillCombatAction per-bot cooldown
+		DWORD        m_dwBotLastBuffCast{0};      // v22 per-bot self-buff cooldown
+		DWORD        m_dwBotLastSync{0};          // v27 periyodik SyncPacket cooldown
+		BYTE         m_byBotComboIndex{0};        // v33 per-bot combo rotation (0..7, Anka2 pattern)
+		// v28 — Bot home pos (spawn'da SetBotHome, STUCK/respawn'da burayi referans alir)
+		// pid%4 dagilim bug fix (GetPlayerID() bot icin tutarsiz, log'da hepsi East'e gidiyordu)
+		long         m_lBotHomeX{0};
+		long         m_lBotHomeY{0};
+	public:
+		void         SetBotHome(long x, long y) { m_lBotHomeX = x; m_lBotHomeY = y; }
+		void         GetBotHome(long& x, long& y) const {
+			x = m_lBotHomeX ? m_lBotHomeX : 484096;
+			y = m_lBotHomeY ? m_lBotHomeY : 970001;
+		}
+		bool         HasBotHome() const { return m_lBotHomeX != 0 && m_lBotHomeY != 0; }
+	protected:
+		// v24 Sorun 2 — Chat dedup ring buffer (son 5 chat secimi)
+		WORD         m_aBotChatHistory[5]{0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF};
+		BYTE         m_byBotChatHistoryHead{0};
+		// v24 Sorun 2 — Mention pending (PC bot adi gecirdiyse cevap kuyrugu)
+		std::string  m_strBotMentionPending;
+		DWORD        m_dwBotMentionTime{0};
+	public:
+		// v24 — Dedup buffer query (bot_chat.cpp BotChat_PickLineDedup tarafindan kullanilir)
+		bool         BotChatHasIndex(WORD idx) const {
+			for (int i = 0; i < 5; ++i) if (m_aBotChatHistory[i] == idx) return true;
+			return false;
+		}
+		void         BotChatPushIndex(WORD idx) {
+			m_aBotChatHistory[m_byBotChatHistoryHead] = idx;
+			m_byBotChatHistoryHead = (m_byBotChatHistoryHead + 1) % 5;
+		}
+		// v24 — Mention pending (input_main.cpp PC chat hook tarafindan set edilir)
+		bool         HasBotMention() const { return !m_strBotMentionPending.empty(); }
+		const std::string& GetBotMention() const { return m_strBotMentionPending; }
+		void         SetBotMention(const char* msg) {
+			if (msg) m_strBotMentionPending = msg;
+			m_dwBotMentionTime = get_dword_time();
+		}
+		void         ClearBotMention() { m_strBotMentionPending.clear(); }
+		// v30 — UnstuckAction icin stuck sayaci public erisim
+		BYTE         GetBotStuckCount() const { return m_byBotStuckCount; }
+		void         ResetBotStuckCount() { m_byBotStuckCount = 0; }
+
+		// v37 — M6 KOK FIX: tek noktadan DESC guard (SafeSendPacket helper)
+		// GetDesc()->Packet(buf,sz) yerine SafeSendPacket(buf,sz) kullan — NULL crash engeller.
+		// Implementation: char.cpp (non-inline, desc.h forward declare problemi yok)
+		void SafeSendPacket(const void* buf, int size);
+		static void SafeSendPacketTo(CHARACTER* pTo, const void* buf, int size);
+		// v33 — Per-bot combo index (Anka2 pattern, thread_local race fix)
+		BYTE         GetAndAdvanceBotComboIndex() {
+			BYTE idx = m_byBotComboIndex;
+			m_byBotComboIndex = (m_byBotComboIndex + 1) % 8;
+			return idx;
+		}
+	protected:
 };
+
+// v12 Gaussian tick utility (Box-Muller) — bot reaksiyon timing'i icin
+// Seed deterministik (her bot icin pid), NaN/inf clamp. ms cinsinden dondurur.
+DWORD GaussianTick(WORD mean_ms, WORD stddev_ms, DWORD seed);
+// Persona -> baseline reaction (ms): 0=aggressive 180, 1=cautious 280, 2=explorer 240, 3=lazy 360, 4=social 260
+WORD  PersonaBaselineMs(BYTE persona);
+// Persona adi (log icin)
+const char* PersonaName(BYTE persona);
+// v16 — Persona-bazli combat reaction time (skill cast/attack delay icin)
+// Tick interval (PersonaBaselineMs) ile karistirilmamali — bu combat-specific
+WORD  PersonaCombatReactionMs(BYTE persona);
+// v16 — Chat locale picker (bot_chat_tr.txt'den persona-bazli secim)
+// Locale loader'i ilk cagri da yukler, sonraki cagrilarda cache'den doner.
+const char* BotChatPick(BYTE persona, DWORD seed);
 
 ESex GET_SEX(LPCHARACTER ch);
 

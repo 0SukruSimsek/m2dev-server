@@ -957,7 +957,7 @@ void CHARACTER::ChangeChannel(DWORD channelId)
 	sys_log(0, "ChangeChannel: %s ch%d -> ch%u port %u -> %u",
 		GetName(), g_bChannel, channelId, wPort, p.wPort);
 
-	GetDesc()->Packet(&p, sizeof(TPacketGCWarp));
+	SafeSendPacket(&p, sizeof(TPacketGCWarp));
 
 	// Wave 5 fix v3 (M2Dev native): warp sonrasi DB'ye SENKRON GD::LOGOUT yolla.
 	// Aksi halde hedef kanal LOGIN_BY_KEY sordugunda DB hala "admin online on CH1" der,
@@ -1169,7 +1169,7 @@ void CHARACTER::EncodeInsertPacket(LPENTITY entity)
 			p.length = sizeof(p);
 			p.vid = ch->GetVID();
 			p.mode = ch->m_bNowWalking ? WALKMODE_WALK : WALKMODE_RUN;
-			GetDesc()->Packet(&p, sizeof(p));
+			SafeSendPacket(&p, sizeof(p));
 		}
 	}
 
@@ -1269,29 +1269,23 @@ void CHARACTER::UpdatePacket()
 
 							if (GetEmpire() == pChar->GetEmpire() || pChar->GetGMLevel() > GM_PLAYER)
 							{
-								pEntity->GetDesc()->Packet(&pack, sizeof(pack));
+								CHARACTER::SafeSendPacketTo((CHARACTER*)pEntity, &pack, sizeof(pack));
 							}
 							else
 							{
-								pEntity->GetDesc()->Packet(&pack2, sizeof(pack2));
+								CHARACTER::SafeSendPacketTo((CHARACTER*)pEntity, &pack2, sizeof(pack2));
 							}
 						}
 					}
 					else
 					{
-						if (pEntity->GetDesc() != NULL)
-						{
-							pEntity->GetDesc()->Packet(&pack, sizeof(pack));
-						}
+						CHARACTER::SafeSendPacketTo((CHARACTER*)pEntity, &pack, sizeof(pack));
 					}
 				}
 			}
 		}
 
-		if (GetDesc() != NULL)
-		{
-			GetDesc()->Packet(&pack, sizeof(pack));
-		}
+		SafeSendPacket(&pack, sizeof(pack));
 	}
 	else
 	{
@@ -1628,7 +1622,7 @@ void CHARACTER::Disconnect(const char * c_pszReason)
 		pack.value = GetRealPoint(POINT_PLAYTIME) + (get_dword_time() - m_dwPlayStartTime) / 60000;
 		pack.amount = 0;
 
-		GetDesc()->Packet(&pack, sizeof(struct packet_point_change));
+		SafeSendPacket(&pack, sizeof(struct packet_point_change));
 		GetDesc()->BindCharacter(NULL);
 //		BindDesc(NULL);
 	}
@@ -1759,6 +1753,8 @@ bool CHARACTER_IsBGMVolumeEnable()
 
 void CHARACTER::MainCharacterPacket()
 {
+	if (!GetDesc()) return;  // v37 M6 defense-in-depth: bot/NULL desc guard
+
 	const unsigned mapIndex = GetMapIndex();
 	const BGMInfo& bgmInfo = CHARACTER_GetBGMInfo(mapIndex);
 
@@ -1787,7 +1783,7 @@ void CHARACTER::MainCharacterPacket()
 		sys_log(0, "bgm_info.play(%d, DEFAULT_BGM_NAME)", mapIndex);
 	}
 
-	GetDesc()->Packet(&pack, sizeof(pack));
+	SafeSendPacket(&pack, sizeof(pack));
 
 }
 
@@ -1818,7 +1814,7 @@ void CHARACTER::PointsPacket()
 	for (int i = POINT_IQ + 1; i < POINT_MAX_NUM; ++i)
 		pack.points[i] = GetPoint(i);
 
-	GetDesc()->Packet(&pack, sizeof(TPacketGCPoints));
+	SafeSendPacket(&pack, sizeof(TPacketGCPoints));
 }
 
 bool CHARACTER::ChangeSex()
@@ -2240,14 +2236,18 @@ BYTE CHARACTER::GetMobSize() const
 }
 
 WORD CHARACTER::GetMobAttackRange() const
-{ 
+{
+	// Keyf.Online v10: defensive NULL-guard — IsPC() yanl1s donerse veya farkl1 path'tan girilirse
+	// m_pkMobData NULL olabilir. Crash yerine guvenli varsayilan don.
+	if (!m_pkMobData)
+		return 100;  // PC default melee range
 	switch (GetMobBattleType())
 	{
 		case BATTLE_TYPE_RANGE:
 		case BATTLE_TYPE_MAGIC:
-			return m_pkMobData->m_table.wAttackRange + GetPoint(POINT_BOW_DISTANCE);  
+			return m_pkMobData->m_table.wAttackRange + GetPoint(POINT_BOW_DISTANCE);
 		default:
-			return m_pkMobData->m_table.wAttackRange; 
+			return m_pkMobData->m_table.wAttackRange;
 	}
 }
 
@@ -2952,6 +2952,10 @@ bool CHARACTER::Goto(long x, long y)
 	}
 
 	GotoState(m_stateMove);
+
+	// v16 — Bot icin Goto eski m_bIsAutoBot patch KALDIRILDI.
+	// Bot artik BotMoveStep (char.cpp) helper'i kullaniyor — SendMovePacket + SetXYZ ile
+	// dogrudan hareket eder. Goto FSM PC icin run etmiyor zaten, bu patch yari-olu idi.
 
 	return true;
 }
@@ -3938,7 +3942,7 @@ void CHARACTER::PointChange(BYTE type, int amount, bool bAmount, bool bBroadcast
 			pack.amount = 0;
 
 		if (!bBroadcast)
-			GetDesc()->Packet(&pack, sizeof(struct packet_point_change));
+			SafeSendPacket(&pack, sizeof(struct packet_point_change));
 		else
 			PacketAround(&pack, sizeof(pack));
 	}
@@ -4923,7 +4927,7 @@ void CHARACTER::PartyInvite(LPCHARACTER pchInvitee)
 	p.header = GC::PARTY_INVITE;
 	p.length = sizeof(p);
 	p.leader_vid = GetVID();
-	pchInvitee->GetDesc()->Packet(&p, sizeof(p));
+	CHARACTER::SafeSendPacketTo(pchInvitee, &p, sizeof(p));
 }
 
 void CHARACTER::PartyInviteAccept(LPCHARACTER pchInvitee)
@@ -5408,13 +5412,16 @@ void CHARACTER::ClearTarget()
 		LPCHARACTER pkChr = *(it++);
 		pkChr->m_pkChrTarget = NULL;
 
+		// v33.2 — Bot-safe (DESC=NULL skip, abort yerine) — ClearTarget aynı pattern.
+		// Bot mob target eder, mob olunce destructor ClearTarget cagrir, bot DESC=null -> abort.
 		if (!pkChr->GetDesc())
 		{
-			sys_err("%s %p does not have desc", pkChr->GetName(), get_pointer(pkChr));
-			abort();
+			if (!pkChr->IsServerSideBot())
+				sys_err("%s %p does not have desc", pkChr->GetName(), get_pointer(pkChr));
+			continue;
 		}
 
-		pkChr->GetDesc()->Packet(&p, sizeof(TPacketGCTarget));
+		CHARACTER::SafeSendPacketTo(pkChr, &p, sizeof(TPacketGCTarget));
 	}
 
 	m_set_pkChrTargetedBy.clear();
@@ -5485,7 +5492,8 @@ void CHARACTER::SetTarget(LPCHARACTER pkChrTarget)
 		p.bHPPercent = 0;
 	}
 
-	GetDesc()->Packet(&p, sizeof(TPacketGCTarget));
+	// v33/v37 — Bot-safe (DESC=NULL crash fix). SafeSendPacket guard iceriyor.
+	SafeSendPacket(&p, sizeof(TPacketGCTarget));
 }
 
 void CHARACTER::BroadcastTargetPacket()
@@ -5510,13 +5518,17 @@ void CHARACTER::BroadcastTargetPacket()
 	{
 		LPCHARACTER pkChr = *it++;
 
+		// v33 — Bot-safe (server-side bot DESC=NULL durumunda abort yerine skip).
+		// Anka2 pattern: bot mob'u target eder, mob targetedBy listesinde bot var,
+		// mob HP degisince BroadcastTargetPacket bot'a packet yollamaya calisir -> NULL deref/abort.
 		if (!pkChr->GetDesc())
 		{
+			if (pkChr->IsServerSideBot()) continue;  // bot tracking icin paket yok, skip
 			sys_err("%s %p does not have desc", pkChr->GetName(), get_pointer(pkChr));
-			abort();
+			continue;  // abort yerine skip (production safety)
 		}
 
-		pkChr->GetDesc()->Packet(&p, sizeof(TPacketGCTarget));
+		CHARACTER::SafeSendPacketTo(pkChr, &p, sizeof(TPacketGCTarget));
 	}
 }
 
@@ -5623,7 +5635,7 @@ bool CHARACTER::WarpSet(long x, long y, long lPrivateMapIndex)
 
 	p.wPort	= wPort;
 
-	GetDesc()->Packet(&p, sizeof(TPacketGCWarp));
+	SafeSendPacket(&p, sizeof(TPacketGCWarp));
 
 #ifdef ENABLE_ANTI_MULTIPLE_FARM
 	// Mark that this logout is due to warp (not real disconnect)
@@ -5635,6 +5647,88 @@ bool CHARACTER::WarpSet(long x, long y, long lPrivateMapIndex)
 		char buf[256];
 		snprintf(buf, sizeof(buf), "%s MapIdx %ld DestMapIdx%ld DestX%ld DestY%ld Empire%d", GetName(), GetMapIndex(), lPrivateMapIndex, x, y, GetEmpire());
 		LogManager::instance().CharLog(this, 0, "WARP", buf);
+	}
+
+	return true;
+}
+
+// ============================================================================
+// BotTeleport — server-side direct teleport for AutoBot
+//
+// WarpSet() client'a WARP paketi yollar ve client reconnect yapana kadar
+// WarpEnd() (sectree register) ertelenir. Bot Python client WARP paketi
+// implement etmediği için sectree NULL döngüsü olusur.
+//
+// BotTeleport: client paketi yollamadan WarpEnd akisini direkt calistir.
+// - Eski sectree'den entity remove
+// - Show() ile yeni pos'a kayit (server-side sectree Insert)
+// - P2P Login broadcast (diger core'lara bildir)
+//
+// Sadece IsAutoBot() icin guvenli — gercek oyuncu icin WarpSet kullanilmali.
+// ============================================================================
+bool CHARACTER::BotTeleport(long x, long y)
+{
+	if (!IsPC() || !IsAutoBot())
+		return false;
+
+	uint32_t lAddr;
+	int32_t  lMapIndex;
+	uint16_t wPort;
+	if (!CMapLocation::instance().Get(x, y, lMapIndex, lAddr, wPort))
+	{
+		sys_err("BotTeleport: cannot find map location x=%ld y=%ld name=%s",
+			x, y, GetName());
+		return false;
+	}
+
+	Stop();
+	// Keyf.Online v11: server-side bot (DESC=null) icin Save() atla — DB save'in DESC'e ihtiyaci yok
+	// ama Save() icindeki bazi callback'ler DESC kullanabilir, riski elemine et.
+	if (GetDesc())
+		Save();
+
+	if (GetSectree())
+	{
+		GetSectree()->RemoveEntity(this);
+		ViewCleanup();
+		EncodeRemovePacket(this);
+	}
+
+	m_lWarpMapIndex = lMapIndex;
+	m_posWarp.x = x;
+	m_posWarp.y = y;
+	m_posWarp.z = 0;
+
+	sys_log(0, "BotTeleport %s %ld %ld -> map %d (server-side)",
+		GetName(), x, y, lMapIndex);
+
+	// CLIENT WARP PACKET ATLA — direkt Show() server-side sectree register
+	Show(lMapIndex, x, y, 0);
+	Stop();
+
+	m_lWarpMapIndex = 0;
+	m_posWarp.x = m_posWarp.y = m_posWarp.z = 0;
+
+	// P2P Login broadcast (diger core'lara bot yeni pos bildir)
+	{
+		TPacketGGLogin p;
+		p.header   = GG::LOGIN;
+		p.length   = sizeof(p);
+		strlcpy(p.szName, GetName(), sizeof(p.szName));
+		p.dwPID    = GetPlayerID();
+		p.bEmpire  = GetEmpire();
+		p.lMapIndex = SECTREE_MANAGER::instance().GetMapIndex(GetX(), GetY());
+		p.bChannel = g_bChannel;
+#ifdef ENABLE_ANTI_MULTIPLE_FARM
+		{
+			LPDESC d_af = GetDesc();
+			std::string sMAIf = (d_af ? d_af->GetLoginMacAdress() : "");
+			strlcpy(p.cMAIf, sMAIf.c_str(), sizeof(p.cMAIf));
+			p.i8BlockState = static_cast<int8_t>(
+				CAntiMultipleFarm::instance().GetPlayerDropState(sMAIf, GetPlayerID()));
+		}
+#endif
+		P2P_MANAGER::instance().Send(&p, sizeof(TPacketGGLogin));
 	}
 
 	return true;
@@ -5978,7 +6072,7 @@ void CHARACTER::LoadSafebox(int iSize, DWORD dwGold, int iItemCount, TPlayerItem
 	p.length = sizeof(p);
 	p.bSize = iSize;
 
-	GetDesc()->Packet(&p, sizeof(TPacketCGSafeboxSize));
+	SafeSendPacket(&p, sizeof(TPacketCGSafeboxSize));
 
 	if (!bLoaded)
 	{
@@ -6020,7 +6114,7 @@ void CHARACTER::ChangeSafeboxSize(BYTE bSize)
 	p.length = sizeof(p);
 	p.bSize = bSize;
 
-	GetDesc()->Packet(&p, sizeof(TPacketCGSafeboxSize));
+	SafeSendPacket(&p, sizeof(TPacketCGSafeboxSize));
 
 	if (m_pkSafebox)
 		m_pkSafebox->ChangeSize(bSize);
@@ -6075,7 +6169,7 @@ void CHARACTER::LoadMall(int iItemCount, TPlayerItem * pItems)
 	p.length = sizeof(p);
 	p.bSize = 3 * SAFEBOX_PAGE_SIZE;
 
-	GetDesc()->Packet(&p, sizeof(TPacketCGSafeboxSize));
+	SafeSendPacket(&p, sizeof(TPacketCGSafeboxSize));
 
 	if (!bLoaded)
 	{
@@ -6657,7 +6751,7 @@ void CHARACTER::SendEquipment(LPCHARACTER ch)
 			p.equips[i].vnum = 0;
 		}
 	}
-	ch->GetDesc()->Packet(&p, sizeof(p));
+	CHARACTER::SafeSendPacketTo(ch, &p, sizeof(p));
 }
 
 bool CHARACTER::CanSummon(int iLeaderShip)
@@ -6901,7 +6995,7 @@ void CHARACTER::ConfirmWithMsg(const char* szMsg, int iTimeout, DWORD dwRequestP
 	p.timeout = iTimeout;
 	strlcpy(p.msg, szMsg, sizeof(p.msg));
 
-	GetDesc()->Packet(&p, sizeof(p));
+	SafeSendPacket(&p, sizeof(p));
 }
 
 int CHARACTER::GetPremiumRemainSeconds(BYTE bType) const
@@ -7121,7 +7215,7 @@ void CHARACTER::Say(const std::string & s)
 
 	if (IsPC())
 	{
-		GetDesc()->Packet(buf.read_peek(), buf.size());
+		SafeSendPacket(buf.read_peek(), buf.size());
 	}
 }
 
@@ -7732,3 +7826,206 @@ int CHARACTER::GetProtectTime(const std::string& flagname) const
 	return (it != m_protection_Time.end()) ? it->second : 0;
 }
 #endif
+
+// ============================================================================
+// v12 — Bot AI Real-Player Simulation Utilities
+// GaussianTick: Box-Muller normal distribution, deterministik seed (per-bot pid).
+// Clamp [mean-3*stddev, mean+3*stddev], min 50ms (asla negatif tick yapmaz).
+// ============================================================================
+#include <cmath>
+#include <algorithm>
+
+DWORD GaussianTick(WORD mean_ms, WORD stddev_ms, DWORD seed)
+{
+	// Hafif xorshift PRNG (per-call advance, seed dis state ile dondurulmuyor — caller artirir)
+	// Box-Muller iki uniform [0,1) sayidan normal dagilim
+	static thread_local DWORD s_state = 0;
+	if (s_state == 0 || (seed != 0 && (s_state ^ seed) < 1000))
+	{
+		// Yeni seed enjeksiyonu
+		s_state = seed ? seed : 0x9E3779B9u;
+	}
+	// xorshift32
+	auto next_rand = [](DWORD& state) -> double {
+		state ^= state << 13;
+		state ^= state >> 17;
+		state ^= state << 5;
+		return (state & 0xFFFFFFFFu) / 4294967296.0;
+	};
+	double u1 = next_rand(s_state);
+	double u2 = next_rand(s_state);
+	if (u1 < 1e-9) u1 = 1e-9;  // log(0) koru
+	constexpr double TWO_PI = 6.283185307179586476925286766559;  // M_PI portability fix
+	double z0 = std::sqrt(-2.0 * std::log(u1)) * std::cos(TWO_PI * u2);
+	double sample = (double)mean_ms + (double)stddev_ms * z0;
+
+	// Clamp 3-sigma + min 50ms
+	double lo = (double)mean_ms - 3.0 * (double)stddev_ms;
+	double hi = (double)mean_ms + 3.0 * (double)stddev_ms;
+	if (sample < lo) sample = lo;
+	if (sample > hi) sample = hi;
+	if (sample < 50.0) sample = 50.0;
+	if (sample > 60000.0) sample = 60000.0;  // sanity cap 60sn
+	return (DWORD)sample;
+}
+
+WORD PersonaBaselineMs(BYTE persona)
+{
+	// 0=aggressive (hizli reaks), 1=cautious (orta-yavas), 2=explorer (orta),
+	// 3=lazy (yavas), 4=social (orta)
+	static const WORD baseline[5] = { 180, 280, 240, 360, 260 };
+	if (persona >= 5) persona = 0;
+	return baseline[persona];
+}
+
+const char* PersonaName(BYTE persona)
+{
+	static const char* names[5] = { "aggressive", "cautious", "explorer", "lazy", "social" };
+	if (persona >= 5) persona = 0;
+	return names[persona];
+}
+
+// v14: bot icin m_pSkillLevels lazy-init. SetPlayerProto'da yapilan
+// `m_pSkillLevels = M2_NEW TPlayerSkill[SKILL_MAX_NUM]` pattern'i bot'a tasidik.
+void CHARACTER::EnsureSkillLevels()
+{
+	if (m_pSkillLevels) return;
+	m_pSkillLevels = M2_NEW TPlayerSkill[SKILL_MAX_NUM];
+	// memset to 0 — TPlayerSkill bLevel=0 bMasterType=0
+	memset(m_pSkillLevels, 0, sizeof(TPlayerSkill) * SKILL_MAX_NUM);
+	sys_log(0, "EnsureSkillLevels: allocated SKILL_MAX_NUM=%d entries for %s",
+		SKILL_MAX_NUM, GetName());
+}
+
+// ============================================================================
+// v16 — Shared bot helper'lar (mimari konsolidasyon)
+// char_bot.cpp ve bot_ai_utility.cpp kullaniyor.
+// ============================================================================
+
+// Bot AFK pencere icinde mi (BuildContext.in_afk icin)
+bool CHARACTER::IsBotIdleNow() const
+{
+	return m_bIsAutoBot && (m_dwBotIdleUntil > get_dword_time());
+}
+
+// Persona-bazli combat reaction time (skill cast/attack delay icin).
+// Tick interval (PersonaBaselineMs) ile karistirilmamali — bu daha kisa,
+// combat'a-spesifik reaction-to-hit (insan refleksi simulasyonu).
+WORD PersonaCombatReactionMs(BYTE persona)
+{
+	// 0=aggressive (hizli), 1=cautious (yavas), 2=explorer (orta),
+	// 3=lazy (en yavas), 4=social (orta)
+	static const WORD reaction[5] = { 120, 280, 200, 320, 220 };
+	if (persona >= 5) persona = 0;
+	return reaction[persona];
+}
+
+// Bot icin HP veya SP'yi internal regen (server-side, paket yok).
+// Sadece IsServerSideBot icin calisir. Donen deger: regen miktari (delta).
+int CHARACTER::BotInternalHeal(BYTE stat)
+{
+	if (!IsServerSideBot()) return 0;
+	int delta = 0;
+	if (stat == POINT_HP)
+	{
+		delta = GetMaxHP() - GetHP();
+		if (delta > 0)
+		{
+			PointChange(POINT_HP, delta);
+			sys_log(0, "[BOT_HEAL] %s HP %d -> %d/%d (internal)",
+				GetName(), GetHP() - delta, GetHP(), GetMaxHP());
+		}
+	}
+	else if (stat == POINT_SP)
+	{
+		delta = GetMaxSP() - GetSP();
+		if (delta > 0)
+		{
+			PointChange(POINT_SP, delta);
+			sys_log(0, "[BOT_HEAL] %s SP %d -> %d/%d (internal)",
+				GetName(), GetSP() - delta, GetSP(), GetMaxSP());
+		}
+	}
+	return delta;
+}
+
+// Chat locale picker — Adim 6.1: bot_chat.cpp BotChat_PickLine'a delege.
+const char* BotChatPick(BYTE persona, DWORD seed)
+{
+	extern const char* BotChat_PickLine(BYTE, DWORD);
+	return BotChat_PickLine(persona, seed);
+}
+
+// Shared move helper — chase + kite + wander kullanir.
+// SendMovePacket (smooth animasyon 500ms) + SetXYZ + sectree relocate.
+// Show() KULLANMAZ (ISINLAMA yapar — v14.7 fix).
+// step_size: 150 wander, 200 chase, 250 kite.
+// type: "CHASE" / "KITE" / "WANDER" (log icin).
+// Donen deger: hareket etti mi (false = zaten yakin, no-op).
+bool CHARACTER::BotMoveStep(long target_x, long target_y, double step_size, const char* type)
+{
+	long mdx = target_x - GetX();
+	long mdy = target_y - GetY();
+	double mdist = std::sqrt((double)mdx*mdx + (double)mdy*mdy);
+	if (mdist < step_size + 50.0)
+		return false;  // zaten yakin, no-op
+
+	long nx = GetX() + (long)((double)mdx * step_size / mdist);
+	long ny = GetY() + (long)((double)mdy * step_size / mdist);
+
+	long old_x = GetX();
+	long old_y = GetY();
+
+	// v27 arastirici onerisi 2: m_posDest snap (FUNC_WAIT semantik) — stale m_posDest
+	// EncodeInsertPacket'te yanlis hedef vermesin
+	m_posDest.x = nx;
+	m_posDest.y = ny;
+	m_posStart.x = old_x;
+	m_posStart.y = old_y;
+
+	// v34 hiz fix: 500ms -> 300ms (kullanici raporu "yavas hareket -> isinlanma hissi")
+	// step_size caller'da 200->350 yapildi (CHASE/KITE). 350u/300ms = 1166u/sn = warrior~hizi.
+	SendMovePacket(FUNC_MOVE, 0, (DWORD)nx, (DWORD)ny, 300, 0, -1);
+	SetXYZ(nx, ny, GetZ());
+
+	// Sectree-aware relocate (sectree degisirse)
+	LPSECTREE new_sec = SECTREE_MANAGER::instance().Get(GetMapIndex(), nx, ny);
+	if (new_sec && new_sec != GetSectree())
+	{
+		if (auto old_sec = GetSectree()) old_sec->RemoveEntity(this);
+		new_sec->InsertEntity(this);
+	}
+
+	// v27 arastirici onerisi 1: UpdateSectree() — m_map_view tazele
+	// Civar PC'lere EncodeInsertPacket gonderilir, bot client'ta create olur,
+	// sonraki MOVE/ATTACK paketleri __FindActor non-NULL doner.
+	// 8 pulse modulo limit (yaklasik 4sn) maliyet azaltma.
+	static thread_local DWORD s_last_update_view = 0;
+	DWORD now_view = get_dword_time();
+	if (now_view - s_last_update_view > 4000)
+	{
+		UpdateSectree();
+		s_last_update_view = now_view;
+	}
+
+	// BOT_MOVE tag log (type ile)
+	sys_log(0, "[BOT_MOVE] %s (%ld,%ld)->(%ld,%ld) type=%s",
+		GetName(), old_x, old_y, nx, ny, type ? type : "?");
+	return true;
+}
+
+// v37 � M6 SafeSendPacket helper implementation (non-inline, desc.h forward declare problemi yok)
+void CHARACTER::SafeSendPacket(const void* buf, int size)
+{
+	LPDESC d = GetDesc();
+	if (!d) return;
+	d->Packet(buf, size);
+}
+
+/*static*/ void CHARACTER::SafeSendPacketTo(CHARACTER* pTo, const void* buf, int size)
+{
+	if (!pTo) return;
+	LPDESC d = pTo->GetDesc();
+	if (!d) return;
+	d->Packet(buf, size);
+}
