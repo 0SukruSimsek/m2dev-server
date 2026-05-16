@@ -304,7 +304,7 @@ EVENTFUNC(ready_to_start_event)
 
 				buf.write(&duelStart, sizeof(TPacketGCDuelStart));
 				buf.write(&dwOppList[0], 4);
-				chA->GetDesc()->Packet(buf.read_peek(), buf.size());
+				CHARACTER::SafeSendPacketTo(chA, buf.read_peek(), buf.size());
 
 
 				dwOppList[0] = (DWORD)chA->GetVID();
@@ -312,7 +312,7 @@ EVENTFUNC(ready_to_start_event)
 
 				buf2.write(&duelStart, sizeof(TPacketGCDuelStart));
 				buf2.write(&dwOppList[0], 4);
-				chB->GetDesc()->Packet(buf2.read_peek(), buf2.size());
+				CHARACTER::SafeSendPacketTo(chB, buf2.read_peek(), buf2.size());
 
 				return 0;
 			}
@@ -354,12 +354,12 @@ EVENTFUNC(ready_to_start_event)
 				dwOppList[0] = (DWORD)chB->GetVID();
 				buf.write(&duelStart, sizeof(TPacketGCDuelStart));
 				buf.write(&dwOppList[0], 4);
-				chA->GetDesc()->Packet(buf.read_peek(), buf.size());
+				CHARACTER::SafeSendPacketTo(chA, buf.read_peek(), buf.size());
 
 				dwOppList[0] = (DWORD)chA->GetVID();
 				buf2.write(&duelStart, sizeof(TPacketGCDuelStart));
 				buf2.write(&dwOppList[0], 4);
-				chB->GetDesc()->Packet(buf2.read_peek(), buf2.size());
+				CHARACTER::SafeSendPacketTo(chB, buf2.read_peek(), buf2.size());
 
 				chA->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련이 시작되었습니다."));
 				chB->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련이 시작되었습니다."));
@@ -447,8 +447,8 @@ EVENTFUNC(duel_time_out)
 				duelStart.header = GC::DUEL_START;
 				duelStart.length = sizeof(TPacketGCDuelStart);
 
-				chA->GetDesc()->Packet(&duelStart, sizeof(TPacketGCDuelStart));
-				chA->GetDesc()->Packet(&duelStart, sizeof(TPacketGCDuelStart));
+				CHARACTER::SafeSendPacketTo(chA, &duelStart, sizeof(TPacketGCDuelStart));
+				CHARACTER::SafeSendPacketTo(chB, &duelStart, sizeof(TPacketGCDuelStart));  // v37 M6 bug fix: chA->chB
 
 				info->state++;
 
@@ -992,10 +992,7 @@ void CArena::SendPacketToObserver(const void * c_pvData, int iSize)
 
 		if (pChar != NULL)
 		{
-			if (pChar->GetDesc() != NULL)
-			{
-				pChar->GetDesc()->Packet(c_pvData, iSize);
-			}
+			CHARACTER::SafeSendPacketTo(pChar, c_pvData, iSize);
 		}
 	}
 	*/
