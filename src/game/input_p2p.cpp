@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #ifdef ENABLE_ANTI_MULTIPLE_FARM
 #include "HAntiMultipleFarm.h"
 #endif
@@ -69,7 +69,7 @@ int CInputP2P::Relay(LPDESC d, const char * c_pData, size_t uiBytes)
 	{
 		if (pkChr->IsBlockMode(BLOCK_WHISPER))
 		{
-			// 귓속말 거부 상태에서 귓속말 거부.
+			// ê·“ì†ë§ ê±°ë¶€ ìƒíƒœì—ì„œ ê·“ì†ë§ ê±°ë¶€.
 			return p->lSize;
 		}
 
@@ -77,12 +77,12 @@ int CInputP2P::Relay(LPDESC d, const char * c_pData, size_t uiBytes)
 		memcpy(buf, c_pbData, MIN(p->lSize, sizeof(buf)));
 
 		TPacketGCWhisper* p2 = (TPacketGCWhisper*) buf;
-		// bType 상위 4비트: Empire 번호
-		// bType 하위 4비트: EWhisperType
+		// bType ìƒìœ„ 4ë¹„íŠ¸: Empire ë²ˆí˜¸
+		// bType í•˜ìœ„ 4ë¹„íŠ¸: EWhisperType
 		BYTE bToEmpire = (p2->bType >> 4);
 		p2->bType = p2->bType & 0x0F;
 		if(p2->bType == 0x0F) {
-			// 시스템 메세지 귓속말은 bType의 상위비트까지 모두 사용함.
+			// ì‹œìŠ¤í…œ ë©”ì„¸ì§€ ê·“ì†ë§ì€ bTypeì˜ ìƒìœ„ë¹„íŠ¸ê¹Œì§€ ëª¨ë‘ ì‚¬ìš©í•¨.
 			p2->bType = WHISPER_TYPE_SYSTEM;
 		} else {
 			if (!pkChr->IsEquipUniqueGroup(UNIQUE_GROUP_RING_OF_LANGUAGE))
@@ -95,10 +95,10 @@ int CInputP2P::Relay(LPDESC d, const char * c_pData, size_t uiBytes)
 				}
 		}
 
-		pkChr->GetDesc()->Packet(buf, p->lSize);
+		CHARACTER::SafeSendPacketTo(pkChr, buf, p->lSize);
 	}
 	else
-		pkChr->GetDesc()->Packet(c_pbData, p->lSize);
+		CHARACTER::SafeSendPacketTo(pkChr, c_pbData, p->lSize);
 
 	return (p->lSize);
 }
@@ -250,11 +250,11 @@ void CInputP2P::MessengerResponse(const char* c_pData)
             break;
             
         case 2: // quest_running
-            ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상대방이 친구 추가를 받을 수 없는 상태입니다."));
+            ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒëŒ€ë°©ì´ ì¹œêµ¬ ì¶”ê°€ë¥¼ ë°›ì„ ìˆ˜ ì—†ëŠ” ìƒíƒœì…ë‹ˆë‹¤."));
             break;
 			
 		case 3: // blocking_requests
-			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상대방이 메신져 추가 거부 상태입니다."));
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒëŒ€ë°©ì´ ë©”ì‹ ì ¸ ì¶”ê°€ ê±°ë¶€ ìƒíƒœì…ë‹ˆë‹¤."));
 			break;
     }
 }
@@ -285,7 +285,7 @@ void CInputP2P::MessengerRemove(const char * c_pData)
         BYTE bLen = strlen(p->szAccount);
         deletee->GetDesc()->BufferedPacket(&pack, sizeof(pack));
         deletee->GetDesc()->BufferedPacket(&bLen, sizeof(BYTE));
-        deletee->GetDesc()->Packet(p->szAccount, strlen(p->szAccount));
+        CHARACTER::SafeSendPacketTo(deletee, p->szAccount, strlen(p->szAccount));
     }
 
 	// MR-3: Remove from messenger Fix
@@ -359,7 +359,7 @@ void CInputP2P::XmasWarpSanta(const char * c_pData)
 		else
 			iNextSpawnDelay = 50 * 60;
 
-		xmas::SpawnSanta(p->lMapIndex, iNextSpawnDelay); // 50분있다가 새로운 산타가 나타남 (한국은 20분)
+		xmas::SpawnSanta(p->lMapIndex, iNextSpawnDelay); // 50ë¶„ìˆë‹¤ê°€ ìƒˆë¡œìš´ ì‚°íƒ€ê°€ ë‚˜íƒ€ë‚¨ (í•œêµ­ì€ 20ë¶„)
 
 		TPacketGGXmasWarpSantaReply pack_reply;
 		pack_reply.header = GG::XMAS_WARP_SANTA_REPLY;
@@ -498,7 +498,7 @@ int CInputP2P::HandleCheckClientVersion(LPDESC, const char*)
 
 void CInputP2P::RegisterHandlers()
 {
-	// void(LPDESC, const char*) â€” via DescHandler template
+	// void(LPDESC, const char*) Ã¢â‚¬â€ via DescHandler template
 	m_handlers[GG::SETUP]              = &CInputP2P::DescHandler<&CInputP2P::Setup>;
 	m_handlers[GG::LOGIN]              = &CInputP2P::DescHandler<&CInputP2P::Login>;
 	m_handlers[GG::LOGOUT]             = &CInputP2P::DescHandler<&CInputP2P::Logout>;
@@ -506,7 +506,7 @@ void CInputP2P::RegisterHandlers()
 	m_handlers[GG::LOGIN_PING]         = &CInputP2P::DescHandler<&CInputP2P::LoginPing>;
 	m_handlers[GG::CHECK_AWAKENESS]    = &CInputP2P::DescHandler<&CInputP2P::IamAwake>;
 
-	// void(const char*) â€” via DataHandler template
+	// void(const char*) Ã¢â‚¬â€ via DataHandler template
 	m_handlers[GG::SHOUT]              = &CInputP2P::DataHandler<&CInputP2P::Shout>;
 	m_handlers[GG::DISCONNECT]         = &CInputP2P::DataHandler<&CInputP2P::Disconnect>;
 	m_handlers[GG::MESSENGER_ADD]      = &CInputP2P::DataHandler<&CInputP2P::MessengerAdd>;
@@ -570,3 +570,4 @@ void CInputP2P::RecvAntiFarmUpdateStatus(LPDESC d, const char* c_pData)
 	CAntiMultipleFarm::instance().P2PSendBlockDropStatusChange(p->cMAIf, dwPIDs);
 }
 #endif
+

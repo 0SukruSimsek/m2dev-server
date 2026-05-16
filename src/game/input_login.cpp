@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #ifdef ENABLE_ANTI_MULTIPLE_FARM
 #include "HAntiMultipleFarm.h"
 #endif
@@ -47,22 +47,22 @@ static void _send_bonus_info(LPCHARACTER ch)
 	if (item_drop_bonus)
 	{
 		ch->ChatPacket(CHAT_TYPE_NOTICE, 
-				LC_TEXT("아이템 드롭률  %d%% 추가 이벤트 중입니다."), item_drop_bonus);
+				LC_TEXT("ì•„ì´í…œ ë“œë¡­ë¥   %d%% ì¶”ê°€ ì´ë²¤íŠ¸ ì¤‘ì…ë‹ˆë‹¤."), item_drop_bonus);
 	}
 	if (gold_drop_bonus)
 	{
 		ch->ChatPacket(CHAT_TYPE_NOTICE, 
-				LC_TEXT("골드 드롭률 %d%% 추가 이벤트 중입니다."), gold_drop_bonus);
+				LC_TEXT("ê³¨ë“œ ë“œë¡­ë¥  %d%% ì¶”ê°€ ì´ë²¤íŠ¸ ì¤‘ì…ë‹ˆë‹¤."), gold_drop_bonus);
 	}
 	if (gold10_drop_bonus)
 	{
 		ch->ChatPacket(CHAT_TYPE_NOTICE, 
-				LC_TEXT("대박골드 드롭률 %d%% 추가 이벤트 중입니다."), gold10_drop_bonus);
+				LC_TEXT("ëŒ€ë°•ê³¨ë“œ ë“œë¡­ë¥  %d%% ì¶”ê°€ ì´ë²¤íŠ¸ ì¤‘ì…ë‹ˆë‹¤."), gold10_drop_bonus);
 	}
 	if (exp_bonus)
 	{
 		ch->ChatPacket(CHAT_TYPE_NOTICE, 
-				LC_TEXT("경험치 %d%% 추가 획득 이벤트 중입니다."), exp_bonus);
+				LC_TEXT("ê²½í—˜ì¹˜ %d%% ì¶”ê°€ íšë“ ì´ë²¤íŠ¸ ì¤‘ì…ë‹ˆë‹¤."), exp_bonus);
 	}
 }
 
@@ -70,13 +70,13 @@ static bool FN_is_battle_zone(LPCHARACTER ch)
 {
 	switch (ch->GetMapIndex())
 	{
-		case 1:         // 신수 1차 마을
-		case 2:         // 신수 2차 마을
-		case 21:        // 천조 1차 마을
-		case 23:        // 천조 2차 마을
-		case 41:        // 진노 1차 마을
-		case 43:        // 진노 2차 마을
-		case 113:       // OX 맵
+		case 1:         // ì‹ ìˆ˜ 1ì°¨ ë§ˆì„
+		case 2:         // ì‹ ìˆ˜ 2ì°¨ ë§ˆì„
+		case 21:        // ì²œì¡° 1ì°¨ ë§ˆì„
+		case 23:        // ì²œì¡° 2ì°¨ ë§ˆì„
+		case 41:        // ì§„ë…¸ 1ì°¨ ë§ˆì„
+		case 43:        // ì§„ë…¸ 2ì°¨ ë§ˆì„
+		case 113:       // OX ë§µ
 			return false;
 	}
 
@@ -328,7 +328,7 @@ bool RaceToJob(unsigned race, unsigned* ret_job)
 	return true;
 }
 
-// 신규 캐릭터 지원
+// ì‹ ê·œ ìºë¦­í„° ì§€ì›
 bool NewPlayerTable2(TPlayerTable * table, const char * name, BYTE race, BYTE shape, BYTE bEmpire)
 {
 	if (race >= MAIN_RACE_MAX_NUM)
@@ -352,7 +352,7 @@ bool NewPlayerTable2(TPlayerTable * table, const char * name, BYTE race, BYTE sh
 	strlcpy(table->name, name, sizeof(table->name));
 
 	table->level		= 1;
-	table->job			= race;	// 직업대신 종족을 넣는다
+	table->job			= race;	// ì§ì—…ëŒ€ì‹  ì¢…ì¡±ì„ ë„£ëŠ”ë‹¤
 	table->voice		= 0;
 	table->part_base	= shape;
 
@@ -406,7 +406,7 @@ void CInputLogin::CharacterCreate(LPDESC d, const char * data)
 		return;
 	}
 
-	// 사용할 수 없는 이름이거나, 잘못된 평상복이면 생설 실패
+	// ì‚¬ìš©í•  ìˆ˜ ì—†ëŠ” ì´ë¦„ì´ê±°ë‚˜, ì˜ëª»ëœ í‰ìƒë³µì´ë©´ ìƒì„¤ ì‹¤íŒ¨
 	if (!check_name(pinfo->name) || pinfo->shape > 1)
 	{
 		if (LC_IsCanada() == true)
@@ -542,7 +542,7 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 	}
 #endif
 
-	// 캐릭터를 맵에 추가
+	// ìºë¦­í„°ë¥¼ ë§µì— ì¶”ê°€
 	ch->Show(ch->GetMapIndex(), pos.x, pos.y, pos.z);
 
 	SECTREE_MANAGER::instance().SendNPCPosition(ch);
@@ -551,8 +551,8 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 
 	d->SetPhase(PHASE_GAME);
 
-	if(ch->GetItemAward_cmd())																		//게임페이즈 들어가면
-		quest::CQuestManager::instance().ItemInformer(ch->GetPlayerID(),ch->GetItemAward_vnum());	//questmanager 호출
+	if(ch->GetItemAward_cmd())																		//ê²Œì„í˜ì´ì¦ˆ ë“¤ì–´ê°€ë©´
+		quest::CQuestManager::instance().ItemInformer(ch->GetPlayerID(),ch->GetItemAward_vnum());	//questmanager í˜¸ì¶œ
 	
 	sys_log(0, "ENTERGAME: %s %dx%dx%d %s map_index %d", 
 			ch->GetName(), ch->GetX(), ch->GetY(), ch->GetZ(), d->GetHostName(), ch->GetMapIndex());
@@ -562,10 +562,10 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 		ch->EnterHorse();
 	}
 
-	// 플레이시간 레코딩 시작
+	// í”Œë ˆì´ì‹œê°„ ë ˆì½”ë”© ì‹œì‘
 	ch->ResetPlayTime();
 
-	// 자동 저장 이벤트 추가
+	// ìë™ ì €ì¥ ì´ë²¤íŠ¸ ì¶”ê°€
 	ch->StartSaveEvent();
 	ch->StartRecoveryEvent();
 	ch->StartCheckSpeedHackEvent();
@@ -598,6 +598,30 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 	// /cs sonrasi destination channel PlayerLoad'da otomatik tetiklenir.
 	ch->ChatPacket(CHAT_TYPE_COMMAND, "setch %d", g_bChannel);
 
+	// Faz 3 (autofarm bot): ai_bot quest flag set ise VEYA karakter ismi "Bot"
+	// ile baÅŸlÄ±yorsa SetAutoBot(true). Quest flag DB'den yÃ¼klenmesi quest_manager
+	// timing'e baÄŸlÄ±, isim check fail-safe olarak.
+	// Pulse event main.cpp'de tum PC'leri her saniye tarar, IsAutoBot ise BotTick().
+	{
+		bool isBot = false;
+		const char* name = ch->GetName();
+		if (name && strncmp(name, "Bot", 3) == 0)
+		{
+			isBot = true;
+		}
+		else
+		{
+			auto* pc = quest::CQuestManager::instance().GetPCForce(ch->GetPlayerID());
+			if (pc && pc->GetFlag("ai_bot") == 1)
+				isBot = true;
+		}
+		if (isBot)
+		{
+			ch->SetAutoBot(true);
+			sys_log(0, "AutoBot: %s pid=%u marked as bot", ch->GetName(), ch->GetPlayerID());
+		}
+	}
+
 	_send_bonus_info(ch);
 	
 	for (int i = 0; i <= PREMIUM_MAX_NUM; ++i)
@@ -626,7 +650,7 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 		{
 			if (version != date)
 			{
-				ch->ChatPacket(CHAT_TYPE_NOTICE, LC_TEXT("클라이언트 버전이 틀려 로그아웃 됩니다. 정상적으로 패치 후 접속하세요."));
+				ch->ChatPacket(CHAT_TYPE_NOTICE, LC_TEXT("í´ë¼ì´ì–¸íŠ¸ ë²„ì „ì´ í‹€ë ¤ ë¡œê·¸ì•„ì›ƒ ë©ë‹ˆë‹¤. ì •ìƒì ìœ¼ë¡œ íŒ¨ì¹˜ í›„ ì ‘ì†í•˜ì„¸ìš”."));
 				d->DelayedDisconnect(10);
 				LogManager::instance().HackLog("VERSION_CONFLICT", ch);
 
@@ -702,7 +726,7 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 			duelStart.header = GC::DUEL_START;
 			duelStart.length = sizeof(TPacketGCDuelStart);
 
-			ch->GetDesc()->Packet(&duelStart, sizeof(TPacketGCDuelStart));
+			CHARACTER::SafeSendPacketTo(ch, &duelStart, sizeof(TPacketGCDuelStart));
 
 			if (ch->IsHorseRiding() == true)
 			{
@@ -735,10 +759,10 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 	}
 	else if (ch->GetMapIndex() == 113)
 	{
-		// ox 이벤트 맵
+		// ox ì´ë²¤íŠ¸ ë§µ
 		if (COXEventManager::instance().Enter(ch) == false)
 		{
-			// ox 맵 진입 허가가 나지 않음. 플레이어면 마을로 보내자
+			// ox ë§µ ì§„ì… í—ˆê°€ê°€ ë‚˜ì§€ ì•ŠìŒ. í”Œë ˆì´ì–´ë©´ ë§ˆì„ë¡œ ë³´ë‚´ì
 			if (ch->GetGMLevel() == GM_PLAYER)
 				ch->WarpSet(EMPIRE_START_X(ch->GetEmpire()), EMPIRE_START_Y(ch->GetEmpire()));
 		}
@@ -761,14 +785,14 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 			db_clientdesc->DBPacket(GD::REQ_HORSE_NAME, 0, &pid, sizeof(DWORD));
 	}
 
-	// 중립맵에 들어갔을때 안내하기
+	// ì¤‘ë¦½ë§µì— ë“¤ì–´ê°”ì„ë•Œ ì•ˆë‚´í•˜ê¸°
 	if (g_noticeBattleZone)
 	{
 		if (FN_is_battle_zone(ch))
 		{
-			ch->ChatPacket(CHAT_TYPE_NOTICE, LC_TEXT("이 맵에선 강제적인 대전이 있을수 도 있습니다."));
-			ch->ChatPacket(CHAT_TYPE_NOTICE, LC_TEXT("이 조항에 동의하지 않을시"));
-			ch->ChatPacket(CHAT_TYPE_NOTICE, LC_TEXT("본인의 주성 및 부성으로 돌아가시기 바랍니다."));
+			ch->ChatPacket(CHAT_TYPE_NOTICE, LC_TEXT("ì´ ë§µì—ì„  ê°•ì œì ì¸ ëŒ€ì „ì´ ìˆì„ìˆ˜ ë„ ìˆìŠµë‹ˆë‹¤."));
+			ch->ChatPacket(CHAT_TYPE_NOTICE, LC_TEXT("ì´ ì¡°í•­ì— ë™ì˜í•˜ì§€ ì•Šì„ì‹œ"));
+			ch->ChatPacket(CHAT_TYPE_NOTICE, LC_TEXT("ë³¸ì¸ì˜ ì£¼ì„± ë° ë¶€ì„±ìœ¼ë¡œ ëŒì•„ê°€ì‹œê¸° ë°”ëë‹ˆë‹¤."));
 		}
 	}
 }
@@ -821,13 +845,13 @@ int CInputLogin::GuildSymbolUpload(LPDESC d, const char* c_pData, size_t uiBytes
 
 	if (iSymbolSize <= 0 || iSymbolSize > 64 * 1024)
 	{
-		// 64k 보다 큰 길드 심볼은 올릴수없다
-		// 접속을 끊고 무시
+		// 64k ë³´ë‹¤ í° ê¸¸ë“œ ì‹¬ë³¼ì€ ì˜¬ë¦´ìˆ˜ì—†ë‹¤
+		// ì ‘ì†ì„ ëŠê³  ë¬´ì‹œ
 		d->SetPhase(PHASE_CLOSE);
 		return 0;
 	}
 
-	// 땅을 소유하지 않은 길드인 경우.
+	// ë•…ì„ ì†Œìœ í•˜ì§€ ì•Šì€ ê¸¸ë“œì¸ ê²½ìš°.
 	if (!test_server)
 		if (!building::CManager::instance().FindLandByGuild(p->guild_id))
 		{
@@ -965,7 +989,7 @@ void CInputLogin::GuildMarkCRCList(LPDESC d, const char* c_pData)
 	CGuildMarkManager::instance().GetDiffBlocks(pCG->imgIdx, pCG->crclist, mapDiffBlocks);
 
 	DWORD blockCount = 0;
-	TEMP_BUFFER buf(1024 * 1024); // 1M 버퍼
+	TEMP_BUFFER buf(1024 * 1024); // 1M ë²„í¼
 
 	for (itertype(mapDiffBlocks) it = mapDiffBlocks.begin(); it != mapDiffBlocks.end(); ++it)
 	{
@@ -1021,7 +1045,7 @@ int CInputLogin::HandleMarkLogin(LPDESC d, const char*)
 	}
 
 	sys_log(0, "MARK_SERVER: Login (from LOGIN phase)");
-	// Already in LOGIN phase — no phase change needed
+	// Already in LOGIN phase â€” no phase change needed
 	return 0;
 }
 
@@ -1066,3 +1090,4 @@ int CInputLogin::Analyze(LPDESC d, uint16_t wHeader, const char * c_pData)
 
 	return (this->*(it->second))(d, c_pData);
 }
+

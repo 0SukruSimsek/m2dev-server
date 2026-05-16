@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #ifdef ENABLE_ANTI_MULTIPLE_FARM
 #include "HAntiMultipleFarm.h"
 #endif
@@ -12,6 +12,7 @@
 #include "switchbot.h"
 #include "protocol.h"
 #include "char.h"
+#include "bot_chat.h"   // v24 Sorun 2 â€” BotChat_ScanForMentions
 #include "char_manager.h"
 #include "item.h"
 #include "item_manager.h"
@@ -64,14 +65,14 @@ int CInputMain::SimpleHandlerV(LPDESC d, const char* p)
 
 static int __deposit_limit()
 {
-	return (1000*10000); // 1천만
+	return (1000*10000); // 1ì²œë§Œ
 }
 
 void SendBlockChatInfo(LPCHARACTER ch, int sec)
 {
 	if (sec <= 0)
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("채팅 금지 상태입니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì±„íŒ… ê¸ˆì§€ ìƒíƒœì…ë‹ˆë‹¤."));
 		return;
 	}
 
@@ -84,13 +85,13 @@ void SendBlockChatInfo(LPCHARACTER ch, int sec)
 	char buf[128+1];
 
 	if (hour > 0 && min > 0)
-		snprintf(buf, sizeof(buf), LC_TEXT("%d 시간 %d 분 %d 초 동안 채팅금지 상태입니다"), hour, min, sec);
+		snprintf(buf, sizeof(buf), LC_TEXT("%d ì‹œê°„ %d ë¶„ %d ì´ˆ ë™ì•ˆ ì±„íŒ…ê¸ˆì§€ ìƒíƒœì…ë‹ˆë‹¤"), hour, min, sec);
 	else if (hour > 0 && min == 0)
-		snprintf(buf, sizeof(buf), LC_TEXT("%d 시간 %d 초 동안 채팅금지 상태입니다"), hour, sec);
+		snprintf(buf, sizeof(buf), LC_TEXT("%d ì‹œê°„ %d ì´ˆ ë™ì•ˆ ì±„íŒ…ê¸ˆì§€ ìƒíƒœì…ë‹ˆë‹¤"), hour, sec);
 	else if (hour == 0 && min > 0)
-		snprintf(buf, sizeof(buf), LC_TEXT("%d 분 %d 초 동안 채팅금지 상태입니다"), min, sec);
+		snprintf(buf, sizeof(buf), LC_TEXT("%d ë¶„ %d ì´ˆ ë™ì•ˆ ì±„íŒ…ê¸ˆì§€ ìƒíƒœì…ë‹ˆë‹¤"), min, sec);
 	else
-		snprintf(buf, sizeof(buf), LC_TEXT("%d 초 동안 채팅금지 상태입니다"), sec);
+		snprintf(buf, sizeof(buf), LC_TEXT("%d ì´ˆ ë™ì•ˆ ì±„íŒ…ê¸ˆì§€ ìƒíƒœì…ë‹ˆë‹¤"), sec);
 
 	ch->ChatPacket(CHAT_TYPE_INFO, buf);
 }
@@ -200,7 +201,7 @@ int GetTextTag(const char * src, int maxLen, int & tagLen, std::string & extraIn
 
 	const char * cur = ++src;
 
-	if (*cur == '|') // ||는 |로 표시한다.
+	if (*cur == '|') // ||ëŠ” |ë¡œ í‘œì‹œí•œë‹¤.
 	{
 		tagLen = 2;
 		return TEXT_TAG_TAG;
@@ -210,7 +211,7 @@ int GetTextTag(const char * src, int maxLen, int & tagLen, std::string & extraIn
 		tagLen = 2;
 		return TEXT_TAG_COLOR;
 	}
-	else if (*cur == 'H') // hyperlink |Hitem:10000:0:0:0:0|h[이름]|h
+	else if (*cur == 'H') // hyperlink |Hitem:10000:0:0:0:0|h[ì´ë¦„]|h
 	{
 		tagLen = 2;
 		return TEXT_TAG_HYPERLINK_START;
@@ -248,12 +249,12 @@ void GetTextTagInfo(const char * src, int src_len, int & hyperlinks, bool & colo
 
 int ProcessTextTag(LPCHARACTER ch, const char * c_pszText, size_t len)
 {
-	//2012.05.17 김용욱
-	//0 : 정상적으로 사용
-	//1 : 금강경 부족
-	//2 : 금강경이 있으나, 개인상점에서 사용중
-	//3 : 교환중
-	//4 : 에러
+	//2012.05.17 ê¹€ìš©ìš±
+	//0 : ì •ìƒì ìœ¼ë¡œ ì‚¬ìš©
+	//1 : ê¸ˆê°•ê²½ ë¶€ì¡±
+	//2 : ê¸ˆê°•ê²½ì´ ìˆìœ¼ë‚˜, ê°œì¸ìƒì ì—ì„œ ì‚¬ìš©ì¤‘
+	//3 : êµí™˜ì¤‘
+	//4 : ì—ëŸ¬
 	int hyperlinks;
 	bool colored;
 	
@@ -323,7 +324,7 @@ int CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 
 	if (ch->FindAffect(AFFECT_BLOCK_CHAT))
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("채팅 금지 상태입니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì±„íŒ… ê¸ˆì§€ ìƒíƒœì…ë‹ˆë‹¤."));
 		return (iExtraLen);
 	}
 
@@ -356,7 +357,7 @@ int CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 			pack.bType = WHISPER_TYPE_SENDER_BLOCKED;
 			pack.length = sizeof(TPacketGCWhisper);
 			strlcpy(pack.szNameFrom, pinfo->szNameTo, sizeof(pack.szNameFrom));
-			ch->GetDesc()->Packet(&pack, sizeof(pack));
+			CHARACTER::SafeSendPacketTo(ch, &pack, sizeof(pack));
 		}
 		return iExtraLen;
 	}
@@ -391,7 +392,7 @@ int CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 			pack.bType = WHISPER_TYPE_NOT_EXIST;
 			pack.length = sizeof(TPacketGCWhisper);
 			strlcpy(pack.szNameFrom, pinfo->szNameTo, sizeof(pack.szNameFrom));
-			ch->GetDesc()->Packet(&pack, sizeof(TPacketGCWhisper));
+			CHARACTER::SafeSendPacketTo(ch, &pack, sizeof(TPacketGCWhisper));
 			sys_log(0, "WHISPER: no player");
 		}
 	}
@@ -406,7 +407,7 @@ int CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 				pack.bType = WHISPER_TYPE_SENDER_BLOCKED;
 				pack.length = sizeof(TPacketGCWhisper);
 				strlcpy(pack.szNameFrom, pinfo->szNameTo, sizeof(pack.szNameFrom));
-				ch->GetDesc()->Packet(&pack, sizeof(pack));
+				CHARACTER::SafeSendPacketTo(ch, &pack, sizeof(pack));
 			}
 		}
 		else if (pkChr && pkChr->IsBlockMode(BLOCK_WHISPER))
@@ -418,7 +419,7 @@ int CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 				pack.bType = WHISPER_TYPE_TARGET_BLOCKED;
 				pack.length = sizeof(TPacketGCWhisper);
 				strlcpy(pack.szNameFrom, pinfo->szNameTo, sizeof(pack.szNameFrom));
-				ch->GetDesc()->Packet(&pack, sizeof(pack));
+				CHARACTER::SafeSendPacketTo(ch, &pack, sizeof(pack));
 			}
 		}
 		else
@@ -451,18 +452,18 @@ int CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 			if (g_bEmpireWhisper)
 				if (!ch->IsEquipUniqueGroup(UNIQUE_GROUP_RING_OF_LANGUAGE))
 					if (!(pkChr && pkChr->IsEquipUniqueGroup(UNIQUE_GROUP_RING_OF_LANGUAGE)))
-						if (bOpponentEmpire != ch->GetEmpire() && ch->GetEmpire() && bOpponentEmpire // 서로 제국이 다르면서
-								&& ch->GetGMLevel() == GM_PLAYER && gm_get_level(pinfo->szNameTo) == GM_PLAYER) // 둘다 일반 플레이어이면
-							// 이름 밖에 모르니 gm_get_level 함수를 사용
+						if (bOpponentEmpire != ch->GetEmpire() && ch->GetEmpire() && bOpponentEmpire // ì„œë¡œ ì œêµ­ì´ ë‹¤ë¥´ë©´ì„œ
+								&& ch->GetGMLevel() == GM_PLAYER && gm_get_level(pinfo->szNameTo) == GM_PLAYER) // ë‘˜ë‹¤ ì¼ë°˜ í”Œë ˆì´ì–´ì´ë©´
+							// ì´ë¦„ ë°–ì— ëª¨ë¥´ë‹ˆ gm_get_level í•¨ìˆ˜ë¥¼ ì‚¬ìš©
 						{
 							if (!pkChr)
 							{
-								// 다른 서버에 있으니 제국 표시만 한다. bType의 상위 4비트를 Empire번호로 사용한다.
+								// ë‹¤ë¥¸ ì„œë²„ì— ìˆìœ¼ë‹ˆ ì œêµ­ í‘œì‹œë§Œ í•œë‹¤. bTypeì˜ ìƒìœ„ 4ë¹„íŠ¸ë¥¼ Empireë²ˆí˜¸ë¡œ ì‚¬ìš©í•œë‹¤.
 								bType = ch->GetEmpire() << 4;
 							}
 							else
 							{
-								ConvertEmpireText(ch->GetEmpire(), buf, buflen, 10 + 2 * pkChr->GetSkillPower(SKILL_LANGUAGE1 + ch->GetEmpire() - 1)/*변환확률*/);
+								ConvertEmpireText(ch->GetEmpire(), buf, buflen, 10 + 2 * pkChr->GetSkillPower(SKILL_LANGUAGE1 + ch->GetEmpire() - 1)/*ë³€í™˜í™•ë¥ */);
 							}
 						}
 
@@ -477,16 +478,16 @@ int CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 					{
 						char buf[128];
 						int len;
-						if (3==processReturn) //교환중
-							len = snprintf(buf, sizeof(buf), LC_TEXT("다른 거래중(창고,교환,상점)에는 개인상점을 사용할 수 없습니다."), pTable->szLocaleName);
+						if (3==processReturn) //êµí™˜ì¤‘
+							len = snprintf(buf, sizeof(buf), LC_TEXT("ë‹¤ë¥¸ ê±°ë˜ì¤‘(ì°½ê³ ,êµí™˜,ìƒì )ì—ëŠ” ê°œì¸ìƒì ì„ ì‚¬ìš©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."), pTable->szLocaleName);
 						else
-							len = snprintf(buf, sizeof(buf), LC_TEXT("%s이 필요합니다."), pTable->szLocaleName);
+							len = snprintf(buf, sizeof(buf), LC_TEXT("%sì´ í•„ìš”í•©ë‹ˆë‹¤."), pTable->szLocaleName);
 						
 
 						if (len < 0 || len >= (int) sizeof(buf))
 							len = sizeof(buf) - 1;
 
-						++len;  // \0 문자 포함
+						++len;  // \0 ë¬¸ì í¬í•¨
 
 						TPacketGCWhisper pack;
 
@@ -496,13 +497,13 @@ int CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 						strlcpy(pack.szNameFrom, pinfo->szNameTo, sizeof(pack.szNameFrom));
 
 						ch->GetDesc()->BufferedPacket(&pack, sizeof(pack));
-						ch->GetDesc()->Packet(buf, len);
+						CHARACTER::SafeSendPacketTo(ch, buf, len);
 
 						sys_log(0, "WHISPER: not enough %s: char: %s", pTable->szLocaleName, ch->GetName());
 					}
 				}
 
-				// 릴래이 상태일 수 있으므로 릴래이를 풀어준다.
+				// ë¦´ë˜ì´ ìƒíƒœì¼ ìˆ˜ ìˆìœ¼ë¯€ë¡œ ë¦´ë˜ì´ë¥¼ í’€ì–´ì¤€ë‹¤.
 				pkDesc->SetRelay("");
 				return (iExtraLen);
 			}
@@ -519,8 +520,8 @@ int CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 				pack.bType = bType;
 				strlcpy(pack.szNameFrom, ch->GetName(), sizeof(pack.szNameFrom));
 
-				// desc->BufferedPacket을 하지 않고 버퍼에 써야하는 이유는 
-				// P2P relay되어 패킷이 캡슐화 될 수 있기 때문이다.
+				// desc->BufferedPacketì„ í•˜ì§€ ì•Šê³  ë²„í¼ì— ì¨ì•¼í•˜ëŠ” ì´ìœ ëŠ” 
+				// P2P relayë˜ì–´ íŒ¨í‚·ì´ ìº¡ìŠí™” ë  ìˆ˜ ìˆê¸° ë•Œë¬¸ì´ë‹¤.
 				TEMP_BUFFER tmpbuf;
 
 				tmpbuf.write(&pack, sizeof(pack));
@@ -555,7 +556,7 @@ struct RawPacketToCharacterFunc
 		if (!c->GetDesc())
 			return;
 
-		c->GetDesc()->Packet(m_buf, m_buf_len);
+		CHARACTER::SafeSendPacketTo(c, m_buf, m_buf_len);
 	}
 };
 
@@ -595,7 +596,7 @@ struct FEmpireChatPacket
 		}
 		else
 		{
-			// 사람마다 스킬레벨이 다르니 매번 해야합니다
+			// ì‚¬ëŒë§ˆë‹¤ ìŠ¤í‚¬ë ˆë²¨ì´ ë‹¤ë¥´ë‹ˆ ë§¤ë²ˆ í•´ì•¼í•©ë‹ˆë‹¤
 			size_t len = strlcpy(converted_msg, orig_msg, sizeof(converted_msg));
 
 			if (len >= sizeof(converted_msg))
@@ -630,17 +631,17 @@ struct FYmirChatPacket
 		m_iMapIndex(iMapIndex), m_bEmpire(empire),
 		m_ring(ring)
 	{
-		m_len_orig_msg = snprintf(m_orig_msg, sizeof(m_orig_msg), "%s : %s", m_szName, m_szChat) + 1; // 널 문자 포함
+		m_len_orig_msg = snprintf(m_orig_msg, sizeof(m_orig_msg), "%s : %s", m_szName, m_szChat) + 1; // ë„ ë¬¸ì í¬í•¨
 
 		if (m_len_orig_msg < 0 || m_len_orig_msg >= (int) sizeof(m_orig_msg))
 			m_len_orig_msg = sizeof(m_orig_msg) - 1;
 
-		m_len_conv_msg = snprintf(m_conv_msg, sizeof(m_conv_msg), "??? : %s", m_szChat) + 1; // 널 문자 미포함
+		m_len_conv_msg = snprintf(m_conv_msg, sizeof(m_conv_msg), "??? : %s", m_szChat) + 1; // ë„ ë¬¸ì ë¯¸í¬í•¨
 
 		if (m_len_conv_msg < 0 || m_len_conv_msg >= (int) sizeof(m_conv_msg))
 			m_len_conv_msg = sizeof(m_conv_msg) - 1;
 
-		ConvertEmpireText(m_bEmpire, m_conv_msg + 6, m_len_conv_msg - 6, 10); // 6은 "??? : "의 길이
+		ConvertEmpireText(m_bEmpire, m_conv_msg + 6, m_len_conv_msg - 6, 10); // 6ì€ "??? : "ì˜ ê¸¸ì´
 	}
 
 	void operator() (LPDESC d)
@@ -708,7 +709,7 @@ int CInputMain::Chat(LPCHARACTER ch, const char * data, size_t uiBytes)
 		return iExtraLen;
 	}
 
-	// 채팅 금지 Affect 처리
+	// ì±„íŒ… ê¸ˆì§€ Affect ì²˜ë¦¬
 	const CAffect* pAffect = ch->FindAffect(AFFECT_BLOCK_CHAT);
 
 	if (pAffect != NULL)
@@ -721,6 +722,11 @@ int CInputMain::Chat(LPCHARACTER ch, const char * data, size_t uiBytes)
 	{
 		return iExtraLen;
 	}
+
+	// v24 Sorun 2 â€” Bot mention scan (PC chat'inde bot ismi varsa pending set)
+	// Yalnizca normal talking chat'te (shout/party degil)
+	if (pinfo->type == CHAT_TYPE_TALKING)
+		BotChat_ScanForMentions(ch, buf);
 
 	char chatbuf[CHAT_MAX_LEN + 1];
 	int len = snprintf(chatbuf, sizeof(chatbuf), "%s : %s", ch->GetName(), buf);
@@ -745,10 +751,10 @@ int CInputMain::Chat(LPCHARACTER ch, const char * data, size_t uiBytes)
 
 		if (NULL != pTable)
 		{
-			if (3==processReturn) //교환중
-				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("다른 거래중(창고,교환,상점)에는 개인상점을 사용할 수 없습니다."), pTable->szLocaleName);
+			if (3==processReturn) //êµí™˜ì¤‘
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë‹¤ë¥¸ ê±°ë˜ì¤‘(ì°½ê³ ,êµí™˜,ìƒì )ì—ëŠ” ê°œì¸ìƒì ì„ ì‚¬ìš©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."), pTable->szLocaleName);
 			else
-				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s이 필요합니다."), pTable->szLocaleName);
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%sì´ í•„ìš”í•©ë‹ˆë‹¤."), pTable->szLocaleName);
 						
 		}
 
@@ -761,7 +767,7 @@ int CInputMain::Chat(LPCHARACTER ch, const char * data, size_t uiBytes)
 
 		if (ch->GetLevel() < SHOUT_LIMIT_LEVEL)
 		{
-			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("외치기는 레벨 %d 이상만 사용 가능 합니다."), SHOUT_LIMIT_LEVEL);
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì™¸ì¹˜ê¸°ëŠ” ë ˆë²¨ %d ì´ìƒë§Œ ì‚¬ìš© ê°€ëŠ¥ í•©ë‹ˆë‹¤."), SHOUT_LIMIT_LEVEL);
 			return (iExtraLen);
 		}
 
@@ -824,7 +830,7 @@ int CInputMain::Chat(LPCHARACTER ch, const char * data, size_t uiBytes)
 		case CHAT_TYPE_PARTY:
 			{
 				if (!ch->GetParty())
-					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("파티 중이 아닙니다."));
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("íŒŒí‹° ì¤‘ì´ ì•„ë‹™ë‹ˆë‹¤."));
 				else
 				{
 					TEMP_BUFFER tbuf;
@@ -841,7 +847,7 @@ int CInputMain::Chat(LPCHARACTER ch, const char * data, size_t uiBytes)
 		case CHAT_TYPE_GUILD:
 			{
 				if (!ch->GetGuild())
-					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("길드에 가입하지 않았습니다."));
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê¸¸ë“œì— ê°€ì…í•˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤."));
 				else
 					ch->GetGuild()->Chat(chatbuf);
 			}
@@ -874,7 +880,7 @@ void CInputMain::ItemDrop(LPCHARACTER ch, const char * data)
 	if (!ch)
 		return;
 
-	// 엘크가 0보다 크면 엘크를 버리는 것 이다.
+	// ì—˜í¬ê°€ 0ë³´ë‹¤ í¬ë©´ ì—˜í¬ë¥¼ ë²„ë¦¬ëŠ” ê²ƒ ì´ë‹¤.
 	if (pinfo->gold > 0)
 		ch->DropGold(pinfo->gold);
 	else
@@ -885,7 +891,7 @@ void CInputMain::ItemDrop2(LPCHARACTER ch, const char * data)
 {
 	TPacketCGItemDrop2 * pinfo = (TPacketCGItemDrop2 *) data;
 
-	// 엘크가 0보다 크면 엘크를 버리는 것 이다.
+	// ì—˜í¬ê°€ 0ë³´ë‹¤ í¬ë©´ ì—˜í¬ë¥¼ ë²„ë¦¬ëŠ” ê²ƒ ì´ë‹¤.
 	
 	if (!ch)
 		return;
@@ -956,7 +962,7 @@ int CInputMain::Messenger(LPCHARACTER ch, const char* c_pData, size_t uiBytes)
 
 				if (ch_companion->IsBlockMode(BLOCK_MESSENGER_INVITE))
 				{
-					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상대방이 메신져 추가 거부 상태입니다."));
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒëŒ€ë°©ì´ ë©”ì‹ ì ¸ ì¶”ê°€ ê±°ë¶€ ìƒíƒœì…ë‹ˆë‹¤."));
 					return sizeof(TPacketCGMessengerAddByVID);
 				}
 
@@ -967,11 +973,11 @@ int CInputMain::Messenger(LPCHARACTER ch, const char* c_pData, size_t uiBytes)
 
 				if (ch->GetGMLevel() == GM_PLAYER && ch_companion->GetGMLevel() != GM_PLAYER)
 				{
-					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<메신져> 운영자는 메신져에 추가할 수 없습니다."));
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ë©”ì‹ ì ¸> ìš´ì˜ìëŠ” ë©”ì‹ ì ¸ì— ì¶”ê°€í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 					return sizeof(TPacketCGMessengerAddByVID);
 				}
 
-				if (ch->GetDesc() == d) // 자신은 추가할 수 없다.
+				if (ch->GetDesc() == d) // ìì‹ ì€ ì¶”ê°€í•  ìˆ˜ ì—†ë‹¤.
 					return sizeof(TPacketCGMessengerAddByVID);
 
 				MessengerManager::instance().RequestToAdd(ch, ch_companion);
@@ -995,7 +1001,7 @@ int CInputMain::Messenger(LPCHARACTER ch, const char* c_pData, size_t uiBytes)
 
 				if (ch->GetGMLevel() == GM_PLAYER && gm_get_level(name) != GM_PLAYER)
 				{
-					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<메신져> 운영자는 메신져에 추가할 수 없습니다."));
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ë©”ì‹ ì ¸> ìš´ì˜ìëŠ” ë©”ì‹ ì ¸ì— ì¶”ê°€í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 					return CHARACTER_NAME_MAX_LEN;
 				}
 
@@ -1007,7 +1013,7 @@ int CInputMain::Messenger(LPCHARACTER ch, const char* c_pData, size_t uiBytes)
 
 					if (!pkCCI)
 					{
-						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s 님은 접속되 있지 않습니다."), name);
+						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s ë‹˜ì€ ì ‘ì†ë˜ ìˆì§€ ì•ŠìŠµë‹ˆë‹¤."), name);
 						return CHARACTER_NAME_MAX_LEN;
 					}
 
@@ -1016,7 +1022,7 @@ int CInputMain::Messenger(LPCHARACTER ch, const char* c_pData, size_t uiBytes)
 				}
 				else
 				{
-					if (tch == ch) // 자신은 추가할 수 없다.
+					if (tch == ch) // ìì‹ ì€ ì¶”ê°€í•  ìˆ˜ ì—†ë‹¤.
 					{
 						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("[Friends] You cannot add yourself as a friend."));
 
@@ -1025,11 +1031,11 @@ int CInputMain::Messenger(LPCHARACTER ch, const char* c_pData, size_t uiBytes)
 
 					if (tch->IsBlockMode(BLOCK_MESSENGER_INVITE) == true)
 					{
-						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상대방이 메신져 추가 거부 상태입니다."));
+						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒëŒ€ë°©ì´ ë©”ì‹ ì ¸ ì¶”ê°€ ê±°ë¶€ ìƒíƒœì…ë‹ˆë‹¤."));
 					}
 					else
 					{
-						// 메신저가 캐릭터단위가 되면서 변경
+						// ë©”ì‹ ì €ê°€ ìºë¦­í„°ë‹¨ìœ„ê°€ ë˜ë©´ì„œ ë³€ê²½
 						MessengerManager::instance().RequestToAdd(ch, tch);
 						//MessengerManager::instance().AddToList(ch->GetName(), tch->GetName());
 					}
@@ -1151,7 +1157,7 @@ void CInputMain::Exchange(LPCHARACTER ch, const char * data)
 	{
 		if (iPulse - to_ch->GetSafeboxLoadTime() < PASSES_PER_SEC(g_nPortalLimitTime))
 		{
-			to_ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("거래 후 %d초 이내에 창고를 열수 없습니다."), g_nPortalLimitTime);
+			to_ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê±°ë˜ í›„ %dì´ˆ ì´ë‚´ì— ì°½ê³ ë¥¼ ì—´ìˆ˜ ì—†ìŠµë‹ˆë‹¤."), g_nPortalLimitTime);
 			return;
 		}
 
@@ -1165,7 +1171,7 @@ void CInputMain::Exchange(LPCHARACTER ch, const char * data)
 
 	if (iPulse - ch->GetSafeboxLoadTime() < PASSES_PER_SEC(g_nPortalLimitTime))
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("거래 후 %d초 이내에 창고를 열수 없습니다."), g_nPortalLimitTime);
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê±°ë˜ í›„ %dì´ˆ ì´ë‚´ì— ì°½ê³ ë¥¼ ì—´ìˆ˜ ì—†ìŠµë‹ˆë‹¤."), g_nPortalLimitTime);
 		return;
 	}
 
@@ -1179,7 +1185,7 @@ void CInputMain::Exchange(LPCHARACTER ch, const char * data)
 				{
 					if (iPulse - ch->GetSafeboxLoadTime() < PASSES_PER_SEC(g_nPortalLimitTime))
 					{
-						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("창고를 연후 %d초 이내에는 거래를 할수 없습니다."), g_nPortalLimitTime);
+						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì°½ê³ ë¥¼ ì—°í›„ %dì´ˆ ì´ë‚´ì—ëŠ” ê±°ë˜ë¥¼ í• ìˆ˜ ì—†ìŠµë‹ˆë‹¤."), g_nPortalLimitTime);
 
 						if (test_server)
 							ch->ChatPacket(CHAT_TYPE_INFO, "[TestOnly][Safebox]Pulse %d LoadTime %d PASS %d", iPulse, ch->GetSafeboxLoadTime(), PASSES_PER_SEC(g_nPortalLimitTime));
@@ -1188,7 +1194,7 @@ void CInputMain::Exchange(LPCHARACTER ch, const char * data)
 
 					if (iPulse - to_ch->GetSafeboxLoadTime() < PASSES_PER_SEC(g_nPortalLimitTime))
 					{
-						to_ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("창고를 연후 %d초 이내에는 거래를 할수 없습니다."), g_nPortalLimitTime);
+						to_ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì°½ê³ ë¥¼ ì—°í›„ %dì´ˆ ì´ë‚´ì—ëŠ” ê±°ë˜ë¥¼ í• ìˆ˜ ì—†ìŠµë‹ˆë‹¤."), g_nPortalLimitTime);
 
 
 						if (test_server)
@@ -1198,7 +1204,7 @@ void CInputMain::Exchange(LPCHARACTER ch, const char * data)
 
 					if (ch->GetGold() >= GOLD_MAX)
 					{	
-						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("액수가 20억 냥을 초과하여 거래를 할수가 없습니다.."));
+						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì•¡ìˆ˜ê°€ 20ì–µ ëƒ¥ì„ ì´ˆê³¼í•˜ì—¬ ê±°ë˜ë¥¼ í• ìˆ˜ê°€ ì—†ìŠµë‹ˆë‹¤.."));
 
 						sys_err("[OVERFLOG_GOLD] START (%u) id %u name %s ", ch->GetGold(), ch->GetPlayerID(), ch->GetName());
 						return;
@@ -1216,7 +1222,7 @@ void CInputMain::Exchange(LPCHARACTER ch, const char * data)
 
 					if (ch->GetMyShop() || ch->IsOpenSafebox() || ch->GetShopOwner() || ch->IsCubeOpen())
 					{
-						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("다른 거래중일경우 개인상점을 열수가 없습니다."));
+						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë‹¤ë¥¸ ê±°ë˜ì¤‘ì¼ê²½ìš° ê°œì¸ìƒì ì„ ì—´ìˆ˜ê°€ ì—†ìŠµë‹ˆë‹¤."));
 						return;
 					}
 
@@ -1248,7 +1254,7 @@ void CInputMain::Exchange(LPCHARACTER ch, const char * data)
 
 				if (GOLD_MAX <= nTotalGold)
 				{
-					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상대방의 총금액이 20억 냥을 초과하여 거래를 할수가 없습니다.."));
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒëŒ€ë°©ì˜ ì´ê¸ˆì•¡ì´ 20ì–µ ëƒ¥ì„ ì´ˆê³¼í•˜ì—¬ ê±°ë˜ë¥¼ í• ìˆ˜ê°€ ì—†ìŠµë‹ˆë‹¤.."));
 
 					sys_err("[OVERFLOW_GOLD] ELK_ADD (%u) id %u name %s ",
 							ch->GetExchange()->GetCompany()->GetOwner()->GetGold(),
@@ -1313,7 +1319,7 @@ static const int ComboSequenceBySkillLevel[3][8] =
 DWORD ClacValidComboInterval( LPCHARACTER ch, BYTE bArg )
 {
 	int nInterval = 300;
-	float fAdjustNum = 1.5f; // 일반 유저가 speed hack 에 걸리는 것을 막기 위해. 2013.09.10 CYH
+	float fAdjustNum = 1.5f; // ì¼ë°˜ ìœ ì €ê°€ speed hack ì— ê±¸ë¦¬ëŠ” ê²ƒì„ ë§‰ê¸° ìœ„í•´. 2013.09.10 CYH
 
 	if( !ch )
 	{
@@ -1344,17 +1350,17 @@ DWORD ClacValidComboInterval( LPCHARACTER ch, BYTE bArg )
 
 bool CheckComboHack(LPCHARACTER ch, BYTE bArg, DWORD dwTime, bool CheckSpeedHack)
 {
-	//	죽거나 기절 상태에서는 공격할 수 없으므로, skip한다.
-	//	이렇게 하지 말고, CHRACTER::CanMove()에 
+	//	ì£½ê±°ë‚˜ ê¸°ì ˆ ìƒíƒœì—ì„œëŠ” ê³µê²©í•  ìˆ˜ ì—†ìœ¼ë¯€ë¡œ, skipí•œë‹¤.
+	//	ì´ë ‡ê²Œ í•˜ì§€ ë§ê³ , CHRACTER::CanMove()ì— 
 	//	if (IsStun() || IsDead()) return false;
-	//	를 추가하는게 맞다고 생각하나,
-	//	이미 다른 부분에서 CanMove()는 IsStun(), IsDead()과
-	//	독립적으로 체크하고 있기 때문에 수정에 의한 영향을
-	//	최소화하기 위해 이렇게 땜빵 코드를 써놓는다.
+	//	ë¥¼ ì¶”ê°€í•˜ëŠ”ê²Œ ë§ë‹¤ê³  ìƒê°í•˜ë‚˜,
+	//	ì´ë¯¸ ë‹¤ë¥¸ ë¶€ë¶„ì—ì„œ CanMove()ëŠ” IsStun(), IsDead()ê³¼
+	//	ë…ë¦½ì ìœ¼ë¡œ ì²´í¬í•˜ê³  ìˆê¸° ë•Œë¬¸ì— ìˆ˜ì •ì— ì˜í•œ ì˜í–¥ì„
+	//	ìµœì†Œí™”í•˜ê¸° ìœ„í•´ ì´ë ‡ê²Œ ë•œë¹µ ì½”ë“œë¥¼ ì¨ë†“ëŠ”ë‹¤.
 	if (ch->IsStun() || ch->IsDead())
 		return false;
 	int ComboInterval = dwTime - ch->GetLastComboTime();
-	int HackScalar = 0; // 기본 스칼라 단위 1
+	int HackScalar = 0; // ê¸°ë³¸ ìŠ¤ì¹¼ë¼ ë‹¨ìœ„ 1
 
 	// [2013 09 11 CYH] debugging log
 		/*sys_log(0, "COMBO_TEST_LOG: %s arg:%u interval:%d valid:%u atkspd:%u riding:%s",
@@ -1369,18 +1375,18 @@ bool CheckComboHack(LPCHARACTER ch, BYTE bArg, DWORD dwTime, bool CheckSpeedHack
 	sys_log(0, "COMBO: %s arg:%u seq:%u delta:%d checkspeedhack:%d",
 			ch->GetName(), bArg, ch->GetComboSequence(), ComboInterval - ch->GetValidComboInterval(), CheckSpeedHack);
 #endif
-	// bArg 14 ~ 21번 까지 총 8콤보 가능
-	// 1. 첫 콤보(14)는 일정 시간 이후에 반복 가능
-	// 2. 15 ~ 21번은 반복 불가능
-	// 3. 차례대로 증가한다.
+	// bArg 14 ~ 21ë²ˆ ê¹Œì§€ ì´ 8ì½¤ë³´ ê°€ëŠ¥
+	// 1. ì²« ì½¤ë³´(14)ëŠ” ì¼ì • ì‹œê°„ ì´í›„ì— ë°˜ë³µ ê°€ëŠ¥
+	// 2. 15 ~ 21ë²ˆì€ ë°˜ë³µ ë¶ˆê°€ëŠ¥
+	// 3. ì°¨ë¡€ëŒ€ë¡œ ì¦ê°€í•œë‹¤.
 	if (bArg == 14)
 	{
 		if (CheckSpeedHack && ComboInterval > 0 && ComboInterval < ch->GetValidComboInterval() - COMBO_HACK_ALLOWABLE_MS)
 		{
-			// FIXME 첫번째 콤보는 이상하게 빨리 올 수가 있어서 300으로 나눔 -_-;
-			// 다수의 몬스터에 의해 다운되는 상황에서 공격을 하면
-			// 첫번째 콤보가 매우 적은 인터벌로 들어오는 상황 발생.
-			// 이로 인해 콤보핵으로 튕기는 경우가 있어 다음 코드 비 활성화.
+			// FIXME ì²«ë²ˆì§¸ ì½¤ë³´ëŠ” ì´ìƒí•˜ê²Œ ë¹¨ë¦¬ ì˜¬ ìˆ˜ê°€ ìˆì–´ì„œ 300ìœ¼ë¡œ ë‚˜ëˆ” -_-;
+			// ë‹¤ìˆ˜ì˜ ëª¬ìŠ¤í„°ì— ì˜í•´ ë‹¤ìš´ë˜ëŠ” ìƒí™©ì—ì„œ ê³µê²©ì„ í•˜ë©´
+			// ì²«ë²ˆì§¸ ì½¤ë³´ê°€ ë§¤ìš° ì ì€ ì¸í„°ë²Œë¡œ ë“¤ì–´ì˜¤ëŠ” ìƒí™© ë°œìƒ.
+			// ì´ë¡œ ì¸í•´ ì½¤ë³´í•µìœ¼ë¡œ íŠ•ê¸°ëŠ” ê²½ìš°ê°€ ìˆì–´ ë‹¤ìŒ ì½”ë“œ ë¹„ í™œì„±í™”.
 			//HackScalar = 1 + (ch->GetValidComboInterval() - ComboInterval) / 300;
 
 			//sys_log(0, "COMBO_HACK: 2 %s arg:%u interval:%d valid:%u atkspd:%u riding:%s",
@@ -1402,13 +1408,13 @@ bool CheckComboHack(LPCHARACTER ch, BYTE bArg, DWORD dwTime, bool CheckSpeedHack
 	{
 		int idx = MIN(2, ch->GetComboIndex());
 
-		if (ch->GetComboSequence() > 5) // 현재 6콤보 이상은 없다.
+		if (ch->GetComboSequence() > 5) // í˜„ì¬ 6ì½¤ë³´ ì´ìƒì€ ì—†ë‹¤.
 		{
 			HackScalar = 1;
 			ch->SetValidComboInterval(300);
 			sys_log(0, "COMBO_HACK: 5 %s combo_seq:%d", ch->GetName(), ch->GetComboSequence());
 		}
-		// 자객 쌍수 콤보 예외처리
+		// ìê° ìŒìˆ˜ ì½¤ë³´ ì˜ˆì™¸ì²˜ë¦¬
 		else if (bArg == 21 &&
 				 idx == 2 &&
 				 ch->GetComboSequence() == 5 &&
@@ -1443,7 +1449,7 @@ bool CheckComboHack(LPCHARACTER ch, BYTE bArg, DWORD dwTime, bool CheckSpeedHack
 						ch->IsRiding() ? "yes" : "no");
 			}
 
-			// 말을 탔을 때는 15번 ~ 16번을 반복한다
+			// ë§ì„ íƒ”ì„ ë•ŒëŠ” 15ë²ˆ ~ 16ë²ˆì„ ë°˜ë³µí•œë‹¤
 			//if (ch->IsHorseRiding())
 			if (ch->IsRiding())
 				ch->SetComboSequence(ch->GetComboSequence() == 1 ? 2 : 1);
@@ -1456,13 +1462,13 @@ bool CheckComboHack(LPCHARACTER ch, BYTE bArg, DWORD dwTime, bool CheckSpeedHack
 			ch->SetLastComboTime(dwTime);
 		}
 	}
-	else if (bArg == 13) // 기본 공격 (둔갑(Polymorph)했을 때 온다)
+	else if (bArg == 13) // ê¸°ë³¸ ê³µê²© (ë‘”ê°‘(Polymorph)í–ˆì„ ë•Œ ì˜¨ë‹¤)
 	{
 		if (CheckSpeedHack && ComboInterval > 0 && ComboInterval < ch->GetValidComboInterval() - COMBO_HACK_ALLOWABLE_MS)
 		{
-			// 다수의 몬스터에 의해 다운되는 상황에서 공격을 하면
-			// 첫번째 콤보가 매우 적은 인터벌로 들어오는 상황 발생.
-			// 이로 인해 콤보핵으로 튕기는 경우가 있어 다음 코드 비 활성화.
+			// ë‹¤ìˆ˜ì˜ ëª¬ìŠ¤í„°ì— ì˜í•´ ë‹¤ìš´ë˜ëŠ” ìƒí™©ì—ì„œ ê³µê²©ì„ í•˜ë©´
+			// ì²«ë²ˆì§¸ ì½¤ë³´ê°€ ë§¤ìš° ì ì€ ì¸í„°ë²Œë¡œ ë“¤ì–´ì˜¤ëŠ” ìƒí™© ë°œìƒ.
+			// ì´ë¡œ ì¸í•´ ì½¤ë³´í•µìœ¼ë¡œ íŠ•ê¸°ëŠ” ê²½ìš°ê°€ ìˆì–´ ë‹¤ìŒ ì½”ë“œ ë¹„ í™œì„±í™”.
 			//HackScalar = 1 + (ch->GetValidComboInterval() - ComboInterval) / 100;
 
 			//sys_log(0, "COMBO_HACK: 6 %s arg:%u interval:%d valid:%u atkspd:%u",
@@ -1485,8 +1491,8 @@ bool CheckComboHack(LPCHARACTER ch, BYTE bArg, DWORD dwTime, bool CheckSpeedHack
 				sys_err("cannot find motion by race %u", ch->GetRaceNum());
 			else
 			{
-				// 정상적 계산이라면 1000.f를 곱해야 하지만 클라이언트가 애니메이션 속도의 90%에서
-				// 다음 애니메이션 블렌딩을 허용하므로 900.f를 곱한다.
+				// ì •ìƒì  ê³„ì‚°ì´ë¼ë©´ 1000.fë¥¼ ê³±í•´ì•¼ í•˜ì§€ë§Œ í´ë¼ì´ì–¸íŠ¸ê°€ ì• ë‹ˆë©”ì´ì…˜ ì†ë„ì˜ 90%ì—ì„œ
+				// ë‹¤ìŒ ì• ë‹ˆë©”ì´ì…˜ ë¸”ë Œë”©ì„ í—ˆìš©í•˜ë¯€ë¡œ 900.fë¥¼ ê³±í•œë‹¤.
 				int k = (int) (pkMotion->GetDuration() / ((float) ch->GetPoint(POINT_ATT_SPEED) / 100.f) * 900.f);
 				ch->SetValidComboInterval(k);
 				ch->SetLastComboTime(dwTime);
@@ -1503,32 +1509,32 @@ bool CheckComboHack(LPCHARACTER ch, BYTE bArg, DWORD dwTime, bool CheckSpeedHack
 		}
 		else
 		{
-			// 말이 안되는 콤보가 왔다 해커일 가능성?
+			// ë§ì´ ì•ˆë˜ëŠ” ì½¤ë³´ê°€ ì™”ë‹¤ í•´ì»¤ì¼ ê°€ëŠ¥ì„±?
 			//if (ch->GetDesc()->DelayedDisconnect(number(2, 9)))
 			//{
 			//	LogManager::instance().HackLog("Hacker", ch);
 			//	sys_log(0, "HACKER: %s arg %u", ch->GetName(), bArg);
 			//}
 
-			// 위 코드로 인해, 폴리모프를 푸는 중에 공격 하면,
-			// 가끔 핵으로 인식하는 경우가 있다.
+			// ìœ„ ì½”ë“œë¡œ ì¸í•´, í´ë¦¬ëª¨í”„ë¥¼ í‘¸ëŠ” ì¤‘ì— ê³µê²© í•˜ë©´,
+			// ê°€ë” í•µìœ¼ë¡œ ì¸ì‹í•˜ëŠ” ê²½ìš°ê°€ ìˆë‹¤.
 
-			// 자세히 말혀면,
-			// 서버에서 poly 0를 처리했지만,
-			// 클라에서 그 패킷을 받기 전에, 몹을 공격. <- 즉, 몹인 상태에서 공격.
+			// ìì„¸íˆ ë§í˜€ë©´,
+			// ì„œë²„ì—ì„œ poly 0ë¥¼ ì²˜ë¦¬í–ˆì§€ë§Œ,
+			// í´ë¼ì—ì„œ ê·¸ íŒ¨í‚·ì„ ë°›ê¸° ì „ì—, ëª¹ì„ ê³µê²©. <- ì¦‰, ëª¹ì¸ ìƒíƒœì—ì„œ ê³µê²©.
 			//
-			// 그러면 클라에서는 서버에 몹 상태로 공격했다는 커맨드를 보내고 (arg == 13)
+			// ê·¸ëŸ¬ë©´ í´ë¼ì—ì„œëŠ” ì„œë²„ì— ëª¹ ìƒíƒœë¡œ ê³µê²©í–ˆë‹¤ëŠ” ì»¤ë§¨ë“œë¥¼ ë³´ë‚´ê³  (arg == 13)
 			//
-			// 서버에서는 race는 인간인데 공격형태는 몹인 놈이다! 라고 하여 핵체크를 했다.
+			// ì„œë²„ì—ì„œëŠ” raceëŠ” ì¸ê°„ì¸ë° ê³µê²©í˜•íƒœëŠ” ëª¹ì¸ ë†ˆì´ë‹¤! ë¼ê³  í•˜ì—¬ í•µì²´í¬ë¥¼ í–ˆë‹¤.
 
-			// 사실 공격 패턴에 대한 것은 클라이언트에서 판단해서 보낼 것이 아니라,
-			// 서버에서 판단해야 할 것인데... 왜 이렇게 해놨을까...
+			// ì‚¬ì‹¤ ê³µê²© íŒ¨í„´ì— ëŒ€í•œ ê²ƒì€ í´ë¼ì´ì–¸íŠ¸ì—ì„œ íŒë‹¨í•´ì„œ ë³´ë‚¼ ê²ƒì´ ì•„ë‹ˆë¼,
+			// ì„œë²„ì—ì„œ íŒë‹¨í•´ì•¼ í•  ê²ƒì¸ë°... ì™œ ì´ë ‡ê²Œ í•´ë†¨ì„ê¹Œ...
 			// by rtsummit
 		}
 	}
 	else
 	{
-		// 말이 안되는 콤보가 왔다 해커일 가능성?
+		// ë§ì´ ì•ˆë˜ëŠ” ì½¤ë³´ê°€ ì™”ë‹¤ í•´ì»¤ì¼ ê°€ëŠ¥ì„±?
 		if (ch->GetDesc()->DelayedDisconnect(number(2, 9)))
 		{
 			LogManager::instance().HackLog("Hacker", ch);
@@ -1541,7 +1547,7 @@ bool CheckComboHack(LPCHARACTER ch, BYTE bArg, DWORD dwTime, bool CheckSpeedHack
 
 	if (HackScalar)
 	{
-		// 말에 타거나 내렸을 때 1.5초간 공격은 핵으로 간주하지 않되 공격력은 없게 하는 처리
+		// ë§ì— íƒ€ê±°ë‚˜ ë‚´ë ¸ì„ ë•Œ 1.5ì´ˆê°„ ê³µê²©ì€ í•µìœ¼ë¡œ ê°„ì£¼í•˜ì§€ ì•Šë˜ ê³µê²©ë ¥ì€ ì—†ê²Œ í•˜ëŠ” ì²˜ë¦¬
 		if (get_dword_time() - ch->GetLastMountTime() > 1500)
 			ch->IncreaseComboHackCount(1 + HackScalar);
 
@@ -1576,9 +1582,9 @@ void CInputMain::Move(LPCHARACTER ch, const char * data)
 	//	FUNC_SKILL = 0x80,
 	//};  
 
-	// 텔레포트 핵 체크
+	// í…”ë ˆí¬íŠ¸ í•µ ì²´í¬
 
-//	if (!test_server)	//2012.05.15 김용욱 : 테섭에서 (무적상태로) 다수 몬스터 상대로 다운되면서 공격시 콤보핵으로 죽는 문제가 있었다.
+//	if (!test_server)	//2012.05.15 ê¹€ìš©ìš± : í…Œì„­ì—ì„œ (ë¬´ì ìƒíƒœë¡œ) ë‹¤ìˆ˜ ëª¬ìŠ¤í„° ìƒëŒ€ë¡œ ë‹¤ìš´ë˜ë©´ì„œ ê³µê²©ì‹œ ì½¤ë³´í•µìœ¼ë¡œ ì£½ëŠ” ë¬¸ì œê°€ ìˆì—ˆë‹¤.
 	{
 		const float fDist = DISTANCE_SQRT((ch->GetX() - pinfo->lX) / 100, (ch->GetY() - pinfo->lY) / 100);
 
@@ -1589,7 +1595,7 @@ void CInputMain::Move(LPCHARACTER ch, const char * data)
 				const PIXEL_POSITION & warpPos = ch->GetWarpPosition();
 
 				if (warpPos.x == 0 && warpPos.y == 0)
-					LogManager::instance().HackLog("Teleport", ch); // 부정확할 수 있음
+					LogManager::instance().HackLog("Teleport", ch); // ë¶€ì •í™•í•  ìˆ˜ ìˆìŒ
 			}
 
 			sys_log(0, "MOVE: %s trying to move too far (dist: %.1fm) Riding(%d)", ch->GetName(), fDist, ch->IsRiding());
@@ -1600,10 +1606,10 @@ void CInputMain::Move(LPCHARACTER ch, const char * data)
 		}
 
 		//
-		// 스피드핵(SPEEDHACK) Check
+		// ìŠ¤í”¼ë“œí•µ(SPEEDHACK) Check
 		//
 		DWORD dwCurTime = get_dword_time();
-		// 시간을 Sync하고 7초 후 부터 검사한다. (20090702 이전엔 5초였음)
+		// ì‹œê°„ì„ Syncí•˜ê³  7ì´ˆ í›„ ë¶€í„° ê²€ì‚¬í•œë‹¤. (20090702 ì´ì „ì—” 5ì´ˆì˜€ìŒ)
 		bool CheckSpeedHack = (dwCurTime - ch->GetDesc()->GetClientTime() > 7000);
 
 		if (CheckSpeedHack)
@@ -1613,13 +1619,13 @@ void CInputMain::Move(LPCHARACTER ch, const char * data)
 
 			iDelta = (int) (dwCurTime - pinfo->dwTime);
 
-			// 시간이 늦게간다. 일단 로그만 해둔다. 진짜 이런 사람들이 많은지 체크해야함. TODO
+			// ì‹œê°„ì´ ëŠ¦ê²Œê°„ë‹¤. ì¼ë‹¨ ë¡œê·¸ë§Œ í•´ë‘”ë‹¤. ì§„ì§œ ì´ëŸ° ì‚¬ëŒë“¤ì´ ë§ì€ì§€ ì²´í¬í•´ì•¼í•¨. TODO
 			if (iDelta >= 30000)
 			{
 				sys_log(0, "SPEEDHACK: slow timer name %s delta %d", ch->GetName(), iDelta);
 				// ch->GetDesc()->DelayedDisconnect(3);
 			}
-			// 1초에 20msec 빨리 가는거 까지는 이해한다.
+			// 1ì´ˆì— 20msec ë¹¨ë¦¬ ê°€ëŠ”ê±° ê¹Œì§€ëŠ” ì´í•´í•œë‹¤.
 			else if (iDelta < -(iServerDelta / 50))
 			{
 				sys_log(0, "SPEEDHACK: DETECTED! %s (delta %d %d)", ch->GetName(), iDelta, iServerDelta);
@@ -1628,11 +1634,11 @@ void CInputMain::Move(LPCHARACTER ch, const char * data)
 		}
 
 		//
-		// 콤보핵 및 스피드핵 체크
+		// ì½¤ë³´í•µ ë° ìŠ¤í”¼ë“œí•µ ì²´í¬
 		//
 		if (pinfo->bFunc == FUNC_COMBO && g_bCheckMultiHack)
 		{
-			CheckComboHack(ch, pinfo->bArg, pinfo->dwTime, CheckSpeedHack); // 콤보 체크
+			CheckComboHack(ch, pinfo->bArg, pinfo->dwTime, CheckSpeedHack); // ì½¤ë³´ ì²´í¬
 		}
 	}
 
@@ -1641,7 +1647,7 @@ void CInputMain::Move(LPCHARACTER ch, const char * data)
 		if (ch->GetLimitPoint(POINT_MOV_SPEED) == 0)
 			return;
 
-		ch->SetRotation(pinfo->bRot * 5);	// 중복 코드
+		ch->SetRotation(pinfo->bRot * 5);	// ì¤‘ë³µ ì½”ë“œ
 		ch->ResetStopTime();				// ""
 
 		ch->Goto(pinfo->lX, pinfo->lY);
@@ -1680,7 +1686,7 @@ void CInputMain::Move(LPCHARACTER ch, const char * data)
 			ch->OnMove();
 		}
 
-		ch->SetRotation(pinfo->bRot * 5);	// 중복 코드
+		ch->SetRotation(pinfo->bRot * 5);	// ì¤‘ë³µ ì½”ë“œ
 		ch->ResetStopTime();				// ""
 
 		ch->Move(pinfo->lX, pinfo->lY);
@@ -1703,13 +1709,13 @@ void CInputMain::Move(LPCHARACTER ch, const char * data)
 
 	ch->PacketAround(&pack, sizeof(TPacketGCMove), ch);
 /*
-	if (pinfo->dwTime == 10653691) // 디버거 발견
+	if (pinfo->dwTime == 10653691) // ë””ë²„ê±° ë°œê²¬
 	{
 		if (ch->GetDesc()->DelayedDisconnect(number(15, 30)))
 			LogManager::instance().HackLog("Debugger", ch);
 
 	}
-	else if (pinfo->dwTime == 10653971) // Softice 발견
+	else if (pinfo->dwTime == 10653971) // Softice ë°œê²¬
 	{
 		if (ch->GetDesc()->DelayedDisconnect(number(15, 30)))
 			LogManager::instance().HackLog("Softice", ch);
@@ -1905,20 +1911,20 @@ int CInputMain::SyncPosition(LPCHARACTER ch, const char * c_pcData, size_t uiByt
 				continue;
 		}
 
-		// 소유권 검사
+		// ì†Œìœ ê¶Œ ê²€ì‚¬
 		if (!victim->SetSyncOwner(ch))
 			continue;
 
 		const float fDistWithSyncOwner = DISTANCE_SQRT( (victim->GetX() - ch->GetX()) / 100, (victim->GetY() - ch->GetY()) / 100 );
 		static const float fLimitDistWithSyncOwner = 2500.f + 1000.f;
-		// victim과의 거리가 2500 + a 이상이면 핵으로 간주.
-		//	거리 참조 : 클라이언트의 __GetSkillTargetRange, __GetBowRange 함수
-		//	2500 : 스킬 proto에서 가장 사거리가 긴 스킬의 사거리, 또는 활의 사거리
-		//	a = POINT_BOW_DISTANCE 값... 인데 실제로 사용하는 값인지는 잘 모르겠음. 아이템이나 포션, 스킬, 퀘스트에는 없는데...
-		//		그래도 혹시나 하는 마음에 버퍼로 사용할 겸해서 1000.f 로 둠...
+		// victimê³¼ì˜ ê±°ë¦¬ê°€ 2500 + a ì´ìƒì´ë©´ í•µìœ¼ë¡œ ê°„ì£¼.
+		//	ê±°ë¦¬ ì°¸ì¡° : í´ë¼ì´ì–¸íŠ¸ì˜ __GetSkillTargetRange, __GetBowRange í•¨ìˆ˜
+		//	2500 : ìŠ¤í‚¬ protoì—ì„œ ê°€ì¥ ì‚¬ê±°ë¦¬ê°€ ê¸´ ìŠ¤í‚¬ì˜ ì‚¬ê±°ë¦¬, ë˜ëŠ” í™œì˜ ì‚¬ê±°ë¦¬
+		//	a = POINT_BOW_DISTANCE ê°’... ì¸ë° ì‹¤ì œë¡œ ì‚¬ìš©í•˜ëŠ” ê°’ì¸ì§€ëŠ” ì˜ ëª¨ë¥´ê² ìŒ. ì•„ì´í…œì´ë‚˜ í¬ì…˜, ìŠ¤í‚¬, í€˜ìŠ¤íŠ¸ì—ëŠ” ì—†ëŠ”ë°...
+		//		ê·¸ë˜ë„ í˜¹ì‹œë‚˜ í•˜ëŠ” ë§ˆìŒì— ë²„í¼ë¡œ ì‚¬ìš©í•  ê²¸í•´ì„œ 1000.f ë¡œ ë‘ ...
 		if (fDistWithSyncOwner > fLimitDistWithSyncOwner)
 		{
-			// g_iSyncHackLimitCount번 까지는 봐줌.
+			// g_iSyncHackLimitCountë²ˆ ê¹Œì§€ëŠ” ë´ì¤Œ.
 			if (ch->GetSyncHackCount() < g_iSyncHackLimitCount)
 			{
 				ch->SetSyncHackCount(ch->GetSyncHackCount() + 1);
@@ -1943,11 +1949,11 @@ int CInputMain::SyncPosition(LPCHARACTER ch, const char * c_pcData, size_t uiByt
 		const timeval &tvLastSyncTime = victim->GetLastSyncTime();
 		timeval *tvDiff = timediff(&tvCurTime, &tvLastSyncTime);
 		
-		// SyncPosition을 악용하여 타유저를 이상한 곳으로 보내는 핵 방어하기 위하여,
-		// 같은 유저를 g_lValidSyncInterval ms 이내에 다시 SyncPosition하려고 하면 핵으로 간주.
+		// SyncPositionì„ ì•…ìš©í•˜ì—¬ íƒ€ìœ ì €ë¥¼ ì´ìƒí•œ ê³³ìœ¼ë¡œ ë³´ë‚´ëŠ” í•µ ë°©ì–´í•˜ê¸° ìœ„í•˜ì—¬,
+		// ê°™ì€ ìœ ì €ë¥¼ g_lValidSyncInterval ms ì´ë‚´ì— ë‹¤ì‹œ SyncPositioní•˜ë ¤ê³  í•˜ë©´ í•µìœ¼ë¡œ ê°„ì£¼.
 		if (tvDiff->tv_sec == 0 && tvDiff->tv_usec < g_lValidSyncInterval)
 		{
-			// g_iSyncHackLimitCount번 까지는 봐줌.
+			// g_iSyncHackLimitCountë²ˆ ê¹Œì§€ëŠ” ë´ì¤Œ.
 			if (ch->GetSyncHackCount() < g_iSyncHackLimitCount)
 			{
 				ch->SetSyncHackCount(ch->GetSyncHackCount() + 1);
@@ -2034,11 +2040,11 @@ void CInputMain::ScriptAnswer(LPCHARACTER ch, const void* c_pData)
 	TPacketCGScriptAnswer * p = (TPacketCGScriptAnswer *) c_pData;
 	sys_log(0, "QUEST ScriptAnswer pid %d answer %d", ch->GetPlayerID(), p->answer);
 
-	if (p->answer > 250) // 다음 버튼에 대한 응답으로 온 패킷인 경우
+	if (p->answer > 250) // ë‹¤ìŒ ë²„íŠ¼ì— ëŒ€í•œ ì‘ë‹µìœ¼ë¡œ ì˜¨ íŒ¨í‚·ì¸ ê²½ìš°
 	{
 		quest::CQuestManager::Instance().Resume(ch->GetPlayerID());
 	}
-	else // 선택 버튼을 골라서 온 패킷인 경우
+	else // ì„ íƒ ë²„íŠ¼ì„ ê³¨ë¼ì„œ ì˜¨ íŒ¨í‚·ì¸ ê²½ìš°
 	{
 		quest::CQuestManager::Instance().Select(ch->GetPlayerID(),  p->answer);
 	}
@@ -2096,7 +2102,7 @@ void CInputMain::Target(LPCHARACTER ch, const char * pcData)
 		pckTarget.header = GC::TARGET;
 		pckTarget.length = sizeof(pckTarget);
 		pckTarget.dwVID = p->dwVID;
-		ch->GetDesc()->Packet(&pckTarget, sizeof(TPacketGCTarget));
+		CHARACTER::SafeSendPacketTo(ch, &pckTarget, sizeof(TPacketGCTarget));
 	}
 	else
 		ch->SetTarget(CHARACTER_MANAGER::instance().Find(p->dwVID));
@@ -2128,31 +2134,31 @@ void CInputMain::SafeboxCheckin(LPCHARACTER ch, const char * c_pData)
 
 	if (pkItem->GetCell() >= INVENTORY_MAX_NUM && IS_SET(pkItem->GetFlag(), ITEM_FLAG_IRREMOVABLE))
 	{
-	    ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<창고> 창고로 옮길 수 없는 아이템 입니다."));
+	    ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ì°½ê³ > ì°½ê³ ë¡œ ì˜®ê¸¸ ìˆ˜ ì—†ëŠ” ì•„ì´í…œ ì…ë‹ˆë‹¤."));
 	    return;
 	}
 
 	if (!pkSafebox->IsEmpty(p->bSafePos, pkItem->GetSize()))
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<창고> 옮길 수 없는 위치입니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ì°½ê³ > ì˜®ê¸¸ ìˆ˜ ì—†ëŠ” ìœ„ì¹˜ì…ë‹ˆë‹¤."));
 		return;
 	}
 
 	if (pkItem->GetVnum() == UNIQUE_ITEM_SAFEBOX_EXPAND)
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<창고> 이 아이템은 넣을 수 없습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ì°½ê³ > ì´ ì•„ì´í…œì€ ë„£ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		return;
 	}
 
 	if( IS_SET(pkItem->GetAntiFlag(), ITEM_ANTIFLAG_SAFEBOX) )
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<창고> 이 아이템은 넣을 수 없습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ì°½ê³ > ì´ ì•„ì´í…œì€ ë„£ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		return;
 	}
 
 	if (true == pkItem->isLocked())
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<창고> 이 아이템은 넣을 수 없습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ì°½ê³ > ì´ ì•„ì´í…œì€ ë„£ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		return;
 	}
 
@@ -2191,9 +2197,9 @@ void CInputMain::SafeboxCheckout(LPCHARACTER ch, const char * c_pData, bool bMal
 	if (!ch->IsEmptyItemGrid(p->ItemPos, pkItem->GetSize()))
 		return;
 
-	// 아이템 몰에서 인벤으로 옮기는 부분에서 용혼석 특수 처리
-	// (몰에서 만드는 아이템은 item_proto에 정의된대로 속성이 붙기 때문에,
-	//  용혼석의 경우, 이 처리를 하지 않으면 속성이 하나도 붙지 않게 된다.)
+	// ì•„ì´í…œ ëª°ì—ì„œ ì¸ë²¤ìœ¼ë¡œ ì˜®ê¸°ëŠ” ë¶€ë¶„ì—ì„œ ìš©í˜¼ì„ íŠ¹ìˆ˜ ì²˜ë¦¬
+	// (ëª°ì—ì„œ ë§Œë“œëŠ” ì•„ì´í…œì€ item_protoì— ì •ì˜ëœëŒ€ë¡œ ì†ì„±ì´ ë¶™ê¸° ë•Œë¬¸ì—,
+	//  ìš©í˜¼ì„ì˜ ê²½ìš°, ì´ ì²˜ë¦¬ë¥¼ í•˜ì§€ ì•Šìœ¼ë©´ ì†ì„±ì´ í•˜ë‚˜ë„ ë¶™ì§€ ì•Šê²Œ ëœë‹¤.)
 	if (pkItem->IsDragonSoul())
 	{
 		if (bMall)
@@ -2203,7 +2209,7 @@ void CInputMain::SafeboxCheckout(LPCHARACTER ch, const char * c_pData, bool bMal
 
 		if (DRAGON_SOUL_INVENTORY != p->ItemPos.window_type)
 		{
-			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<창고> 옮길 수 없는 위치입니다."));
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ì°½ê³ > ì˜®ê¸¸ ìˆ˜ ì—†ëŠ” ìœ„ì¹˜ì…ë‹ˆë‹¤."));
 			return;
 		}
 		
@@ -2213,7 +2219,7 @@ void CInputMain::SafeboxCheckout(LPCHARACTER ch, const char * c_pData, bool bMal
 			int iCell = ch->GetEmptyDragonSoulInventory(pkItem);
 			if (iCell < 0)
 			{
-				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<창고> 옮길 수 없는 위치입니다."));
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ì°½ê³ > ì˜®ê¸¸ ìˆ˜ ì—†ëŠ” ìœ„ì¹˜ì…ë‹ˆë‹¤."));
 				return ;
 			}
 			DestPos = TItemPos (DRAGON_SOUL_INVENTORY, iCell);
@@ -2227,7 +2233,7 @@ void CInputMain::SafeboxCheckout(LPCHARACTER ch, const char * c_pData, bool bMal
 	{
 		if (DRAGON_SOUL_INVENTORY == p->ItemPos.window_type)
 		{
-			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<창고> 옮길 수 없는 위치입니다."));
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ì°½ê³ > ì˜®ê¸¸ ìˆ˜ ì—†ëŠ” ìœ„ì¹˜ì…ë‹ˆë‹¤."));
 			return;
 		}
 
@@ -2239,7 +2245,7 @@ void CInputMain::SafeboxCheckout(LPCHARACTER ch, const char * c_pData, bool bMal
 				sys_err ("pkItem->GetProto() == NULL (id : %d)",pkItem->GetID());
 				return ;
 			}
-			// 100% 확률로 속성이 붙어야 하는데 안 붙어있다면 새로 붙힌다. ...............
+			// 100% í™•ë¥ ë¡œ ì†ì„±ì´ ë¶™ì–´ì•¼ í•˜ëŠ”ë° ì•ˆ ë¶™ì–´ìˆë‹¤ë©´ ìƒˆë¡œ ë¶™íŒë‹¤. ...............
 			if (100 == pkItem->GetProto()->bAlterToMagicItemPct && 0 == pkItem->GetAttributeCount())
 			{
 				pkItem->AlterToMagicItem();
@@ -2279,7 +2285,7 @@ void CInputMain::PartyInvite(LPCHARACTER ch, const char * c_pData)
 {
 	if (ch->GetArena())
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련장에서 사용하실 수 없습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ëŒ€ë ¨ì¥ì—ì„œ ì‚¬ìš©í•˜ì‹¤ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		return;
 	}
 
@@ -2300,7 +2306,7 @@ void CInputMain::PartyInviteAnswer(LPCHARACTER ch, const char * c_pData)
 {
 	if (ch->GetArena())
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련장에서 사용하실 수 없습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ëŒ€ë ¨ì¥ì—ì„œ ì‚¬ìš©í•˜ì‹¤ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		return;
 	}
 
@@ -2308,10 +2314,10 @@ void CInputMain::PartyInviteAnswer(LPCHARACTER ch, const char * c_pData)
 
 	LPCHARACTER pInviter = CHARACTER_MANAGER::instance().Find(p->leader_vid);
 
-	// pInviter 가 ch 에게 파티 요청을 했었다.
+	// pInviter ê°€ ch ì—ê²Œ íŒŒí‹° ìš”ì²­ì„ í–ˆì—ˆë‹¤.
 
 	if (!pInviter)
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<파티> 파티요청을 한 캐릭터를 찾을수 없습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<íŒŒí‹°> íŒŒí‹°ìš”ì²­ì„ í•œ ìºë¦­í„°ë¥¼ ì°¾ì„ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 	else if (!p->accept)
 		pInviter->PartyInviteDeny(ch->GetPlayerID());
 	else
@@ -2323,7 +2329,7 @@ void CInputMain::PartySetState(LPCHARACTER ch, const char* c_pData)
 {
 	if (!CPartyManager::instance().IsEnablePCParty())
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<파티> 서버 문제로 파티 관련 처리를 할 수 없습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<íŒŒí‹°> ì„œë²„ ë¬¸ì œë¡œ íŒŒí‹° ê´€ë ¨ ì²˜ë¦¬ë¥¼ í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		return;
 	}
 
@@ -2334,13 +2340,13 @@ void CInputMain::PartySetState(LPCHARACTER ch, const char* c_pData)
 
 	if (ch->GetParty()->GetLeaderPID() != ch->GetPlayerID())
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<파티> 리더만 변경할 수 있습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<íŒŒí‹°> ë¦¬ë”ë§Œ ë³€ê²½í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤."));
 		return;
 	}
 
 	if (!ch->GetParty()->IsMember(p->pid))
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<파티> 상태를 변경하려는 사람이 파티원이 아닙니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<íŒŒí‹°> ìƒíƒœë¥¼ ë³€ê²½í•˜ë ¤ëŠ” ì‚¬ëŒì´ íŒŒí‹°ì›ì´ ì•„ë‹™ë‹ˆë‹¤."));
 		return;
 	}
 
@@ -2368,7 +2374,7 @@ void CInputMain::PartySetState(LPCHARACTER ch, const char* c_pData)
 				db_clientdesc->DBPacket(GD::PARTY_STATE_CHANGE, 0, &pack, sizeof(pack));
 			}
 			/* else
-			   ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<파티> 어태커 설정에 실패하였습니다.")); */
+			   ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<íŒŒí‹°> ì–´íƒœì»¤ ì„¤ì •ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.")); */
 			break;
 
 		default:
@@ -2381,13 +2387,13 @@ void CInputMain::PartyRemove(LPCHARACTER ch, const char* c_pData)
 {
 	if (ch->GetArena())
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련장에서 사용하실 수 없습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ëŒ€ë ¨ì¥ì—ì„œ ì‚¬ìš©í•˜ì‹¤ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		return;
 	}
 
 	if (!CPartyManager::instance().IsEnablePCParty())
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<파티> 서버 문제로 파티 관련 처리를 할 수 없습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<íŒŒí‹°> ì„œë²„ ë¬¸ì œë¡œ íŒŒí‹° ê´€ë ¨ ì²˜ë¦¬ë¥¼ í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		return;
 	}
 
@@ -2406,7 +2412,7 @@ void CInputMain::PartyRemove(LPCHARACTER ch, const char* c_pData)
 		{
 			if (ch->GetDungeon())
 			{
-				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<파티> 던전 안에서는 파티에서 추방할 수 없습니다."));
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<íŒŒí‹°> ë˜ì „ ì•ˆì—ì„œëŠ” íŒŒí‹°ì—ì„œ ì¶”ë°©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 				return;
 			}
 			else
@@ -2419,7 +2425,7 @@ void CInputMain::PartyRemove(LPCHARACTER ch, const char* c_pData)
 		{
 			if (ch->GetDungeon())
 			{
-				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<파티> 던젼내에서는 파티원을 추방할 수 없습니다."));
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<íŒŒí‹°> ë˜ì ¼ë‚´ì—ì„œëŠ” íŒŒí‹°ì›ì„ ì¶”ë°©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 				return;
 			}
 			else
@@ -2429,7 +2435,7 @@ void CInputMain::PartyRemove(LPCHARACTER ch, const char* c_pData)
 				if (B)
 				{
 					//pParty->SendPartyRemoveOneToAll(B);
-					B->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<파티> 파티에서 추방당하셨습니다."));
+					B->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<íŒŒí‹°> íŒŒí‹°ì—ì„œ ì¶”ë°©ë‹¹í•˜ì…¨ìŠµë‹ˆë‹¤."));
 					//pParty->Unlink(B);
 					//CPartyManager::instance().SetPartyMember(B->GetPlayerID(), NULL);
 				}
@@ -2447,7 +2453,7 @@ void CInputMain::PartyRemove(LPCHARACTER ch, const char* c_pData)
 			{
 				if (ch->GetDungeon())
 				{
-					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<파티> 던전 안에서는 파티에서 추방할 수 없습니다."));
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<íŒŒí‹°> ë˜ì „ ì•ˆì—ì„œëŠ” íŒŒí‹°ì—ì„œ ì¶”ë°©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 					return;
 				}
 				else
@@ -2460,12 +2466,12 @@ void CInputMain::PartyRemove(LPCHARACTER ch, const char* c_pData)
 			{
 				if (ch->GetDungeon())
 				{
-					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<파티> 던젼내에서는 파티를 나갈 수 없습니다."));
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<íŒŒí‹°> ë˜ì ¼ë‚´ì—ì„œëŠ” íŒŒí‹°ë¥¼ ë‚˜ê°ˆ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 					return;
 				}
 				else
 				{
-					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<파티> 파티에서 나가셨습니다."));
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<íŒŒí‹°> íŒŒí‹°ì—ì„œ ë‚˜ê°€ì…¨ìŠµë‹ˆë‹¤."));
 					//pParty->SendPartyRemoveOneToAll(ch);
 					pParty->Quit(ch->GetPlayerID());
 					//pParty->SendPartyRemoveAllToOne(ch);
@@ -2475,7 +2481,7 @@ void CInputMain::PartyRemove(LPCHARACTER ch, const char* c_pData)
 		}
 		else
 		{
-			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<파티> 다른 파티원을 탈퇴시킬 수 없습니다."));
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<íŒŒí‹°> ë‹¤ë¥¸ íŒŒí‹°ì›ì„ íƒˆí‡´ì‹œí‚¬ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		}
 	}
 	// MR-3: -- END OF -- Fix party removal chat messages and improved dungeon logic
@@ -2491,7 +2497,7 @@ void CInputMain::AnswerMakeGuild(LPCHARACTER ch, const char* c_pData)
 	if (get_global_time() - ch->GetQuestFlag("guild_manage.new_disband_time") <
 			CGuildManager::instance().GetDisbandDelay())
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 해산한 후 %d일 이내에는 길드를 만들 수 없습니다."), 
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> í•´ì‚°í•œ í›„ %dì¼ ì´ë‚´ì—ëŠ” ê¸¸ë“œë¥¼ ë§Œë“¤ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."), 
 				quest::CQuestManager::instance().GetEventFlag("guild_disband_delay"));
 		return;
 	}
@@ -2499,7 +2505,7 @@ void CInputMain::AnswerMakeGuild(LPCHARACTER ch, const char* c_pData)
 	if (get_global_time() - ch->GetQuestFlag("guild_manage.new_withdraw_time") <
 			CGuildManager::instance().GetWithdrawDelay())
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 탈퇴한 후 %d일 이내에는 길드를 만들 수 없습니다."), 
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> íƒˆí‡´í•œ í›„ %dì¼ ì´ë‚´ì—ëŠ” ê¸¸ë“œë¥¼ ë§Œë“¤ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."), 
 				quest::CQuestManager::instance().GetEventFlag("guild_withdraw_delay"));
 		return;
 	}
@@ -2517,7 +2523,7 @@ void CInputMain::AnswerMakeGuild(LPCHARACTER ch, const char* c_pData)
 
 	if (cp.name[0] == 0 || !check_name(cp.name))
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("적합하지 않은 길드 이름 입니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì í•©í•˜ì§€ ì•Šì€ ê¸¸ë“œ ì´ë¦„ ì…ë‹ˆë‹¤."));
 		return;
 	}
 
@@ -2525,7 +2531,7 @@ void CInputMain::AnswerMakeGuild(LPCHARACTER ch, const char* c_pData)
 
 	if (dwGuildID)
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> [%s] 길드가 생성되었습니다."), cp.name);
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> [%s] ê¸¸ë“œê°€ ìƒì„±ë˜ì—ˆìŠµë‹ˆë‹¤."), cp.name);
 
 		int GuildCreateFee;
 
@@ -2550,7 +2556,7 @@ void CInputMain::AnswerMakeGuild(LPCHARACTER ch, const char* c_pData)
 		//ch->SendGuildName(dwGuildID);
 	}
 	else
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 길드 생성에 실패하였습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ê¸¸ë“œ ìƒì„±ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤."));
 }
 
 void CInputMain::PartyUseSkill(LPCHARACTER ch, const char* c_pData)
@@ -2561,7 +2567,7 @@ void CInputMain::PartyUseSkill(LPCHARACTER ch, const char* c_pData)
 
 	if (ch->GetPlayerID() != ch->GetParty()->GetLeaderPID())
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<파티> 파티 기술은 파티장만 사용할 수 있습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<íŒŒí‹°> íŒŒí‹° ê¸°ìˆ ì€ íŒŒí‹°ì¥ë§Œ ì‚¬ìš©í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤."));
 		return;
 	}
 
@@ -2576,7 +2582,7 @@ void CInputMain::PartyUseSkill(LPCHARACTER ch, const char* c_pData)
 				if (pch)
 					ch->GetParty()->SummonToLeader(pch->GetPlayerID());
 				else
-					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<파티> 소환하려는 대상을 찾을 수 없습니다."));
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<íŒŒí‹°> ì†Œí™˜í•˜ë ¤ëŠ” ëŒ€ìƒì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 			}
 			break;
 	}
@@ -2642,7 +2648,7 @@ int CInputMain::Guild(LPCHARACTER ch, const char * data, size_t uiBytes)
 	{
 		if (SubHeader != GuildSub::CG::GUILD_INVITE_ANSWER)
 		{
-			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 길드에 속해있지 않습니다."));
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ê¸¸ë“œì— ì†í•´ìˆì§€ ì•ŠìŠµë‹ˆë‹¤."));
 			return SubPacketLen;
 		}
 	}
@@ -2685,20 +2691,20 @@ int CInputMain::GuildSub_DepositMoney(LPCHARACTER ch, const char* data, size_t u
 	const size_t SubPacketLen = GetSubPacketSize(GuildSub::CG::DEPOSIT_MONEY);
 	CGuild* pGuild = ch->GetGuild();
 
-	// by mhh : 길드자금은 당분간 넣을 수 없다.
+	// by mhh : ê¸¸ë“œìê¸ˆì€ ë‹¹ë¶„ê°„ ë„£ì„ ìˆ˜ ì—†ë‹¤.
 	return SubPacketLen;
 
 	const int gold = MIN(*reinterpret_cast<const int*>(c_pData), __deposit_limit());
 
 	if (gold < 0)
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 잘못된 금액입니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ì˜ëª»ëœ ê¸ˆì•¡ì…ë‹ˆë‹¤."));
 		return SubPacketLen;
 	}
 
 	if (ch->GetGold() < gold)
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 가지고 있는 돈이 부족합니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ê°€ì§€ê³  ìˆëŠ” ëˆì´ ë¶€ì¡±í•©ë‹ˆë‹¤."));
 		return SubPacketLen;
 	}
 
@@ -2712,14 +2718,14 @@ int CInputMain::GuildSub_WithdrawMoney(LPCHARACTER ch, const char* data, size_t 
 	const size_t SubPacketLen = GetSubPacketSize(GuildSub::CG::WITHDRAW_MONEY);
 	CGuild* pGuild = ch->GetGuild();
 
-	// by mhh : 길드자금은 당분간 뺄 수 없다.
+	// by mhh : ê¸¸ë“œìê¸ˆì€ ë‹¹ë¶„ê°„ ëº„ ìˆ˜ ì—†ë‹¤.
 	return SubPacketLen;
 
 	const int gold = MIN(*reinterpret_cast<const int*>(c_pData), 500000);
 
 	if (gold < 0)
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 잘못된 금액입니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ì˜ëª»ëœ ê¸ˆì•¡ì…ë‹ˆë‹¤."));
 		return SubPacketLen;
 	}
 
@@ -2739,7 +2745,7 @@ int CInputMain::GuildSub_AddMember(LPCHARACTER ch, const char* data, size_t uiBy
 	// if (!newmember)
 	if (!newmember || !newmember->IsPC()) // Fix
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 그러한 사람을 찾을 수 없습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ê·¸ëŸ¬í•œ ì‚¬ëŒì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		return SubPacketLen;
 	}
 
@@ -2750,7 +2756,7 @@ int CInputMain::GuildSub_AddMember(LPCHARACTER ch, const char* data, size_t uiBy
 	{
 		if (newmember->GetQuestFlag("change_guild_master.be_other_member") > get_global_time())
 		{
-			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 아직 가입할 수 없는 캐릭터입니다"));
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ì•„ì§ ê°€ì…í•  ìˆ˜ ì—†ëŠ” ìºë¦­í„°ì…ë‹ˆë‹¤"));
 			return SubPacketLen;
 		}
 	}
@@ -2767,7 +2773,7 @@ int CInputMain::GuildSub_RemoveMember(LPCHARACTER ch, const char* data, size_t u
 
 	if (pGuild->UnderAnyWar() != 0)
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 길드전 중에는 길드원을 탈퇴시킬 수 없습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ê¸¸ë“œì „ ì¤‘ì—ëŠ” ê¸¸ë“œì›ì„ íƒˆí‡´ì‹œí‚¬ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		return SubPacketLen;
 	}
 
@@ -2783,13 +2789,13 @@ int CInputMain::GuildSub_RemoveMember(LPCHARACTER ch, const char* data, size_t u
 	{
 		if (member->GetGuild() != pGuild)
 		{
-			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 상대방이 같은 길드가 아닙니다."));
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ìƒëŒ€ë°©ì´ ê°™ì€ ê¸¸ë“œê°€ ì•„ë‹™ë‹ˆë‹¤."));
 			return SubPacketLen;
 		}
 
 		if (!pGuild->HasGradeAuth(m->grade, GUILD_AUTH_REMOVE_MEMBER))
 		{
-			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 길드원을 강제 탈퇴 시킬 권한이 없습니다."));
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ê¸¸ë“œì›ì„ ê°•ì œ íƒˆí‡´ ì‹œí‚¬ ê¶Œí•œì´ ì—†ìŠµë‹ˆë‹¤."));
 			return SubPacketLen;
 		}
 
@@ -2805,14 +2811,14 @@ int CInputMain::GuildSub_RemoveMember(LPCHARACTER ch, const char* data, size_t u
 	{
 		if (!pGuild->HasGradeAuth(m->grade, GUILD_AUTH_REMOVE_MEMBER))
 		{
-			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 길드원을 강제 탈퇴 시킬 권한이 없습니다."));
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ê¸¸ë“œì›ì„ ê°•ì œ íƒˆí‡´ ì‹œí‚¬ ê¶Œí•œì´ ì—†ìŠµë‹ˆë‹¤."));
 			return SubPacketLen;
 		}
 
 		if (pGuild->RequestRemoveMember(pid))
-			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 길드원을 강제 탈퇴 시켰습니다."));
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ê¸¸ë“œì›ì„ ê°•ì œ íƒˆí‡´ ì‹œì¼°ìŠµë‹ˆë‹¤."));
 		else
-			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 그러한 사람을 찾을 수 없습니다."));
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ê·¸ëŸ¬í•œ ì‚¬ëŒì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 	}
 
 	return SubPacketLen;
@@ -2834,15 +2840,15 @@ int CInputMain::GuildSub_ChangeGradeName(LPCHARACTER ch, const char* data, size_
 
 	if (m->grade != GUILD_LEADER_GRADE)
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 직위 이름을 변경할 권한이 없습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ì§ìœ„ ì´ë¦„ì„ ë³€ê²½í•  ê¶Œí•œì´ ì—†ìŠµë‹ˆë‹¤."));
 	}
 	else if (*c_pData == GUILD_LEADER_GRADE)
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 길드장의 직위 이름은 변경할 수 없습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ê¸¸ë“œì¥ì˜ ì§ìœ„ ì´ë¦„ì€ ë³€ê²½í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 	}
 	else if (!check_name(gradename))
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 적합하지 않은 직위 이름 입니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ì í•©í•˜ì§€ ì•Šì€ ì§ìœ„ ì´ë¦„ ì…ë‹ˆë‹¤."));
 	}
 	else
 	{
@@ -2865,11 +2871,11 @@ int CInputMain::GuildSub_ChangeGradeAuthority(LPCHARACTER ch, const char* data, 
 
 	if (m->grade != GUILD_LEADER_GRADE)
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 직위 권한을 변경할 권한이 없습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ì§ìœ„ ê¶Œí•œì„ ë³€ê²½í•  ê¶Œí•œì´ ì—†ìŠµë‹ˆë‹¤."));
 	}
 	else if (*c_pData == GUILD_LEADER_GRADE)
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 길드장의 권한은 변경할 수 없습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ê¸¸ë“œì¥ì˜ ê¶Œí•œì€ ë³€ê²½í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 	}
 	else
 	{
@@ -2889,7 +2895,7 @@ int CInputMain::GuildSub_Offer(LPCHARACTER ch, const char* data, size_t uiBytes)
 
 	if (pGuild->GetLevel() >= GUILD_MAX_LEVEL && LC_IsHongKong() == false)
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 길드가 이미 최고 레벨입니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ê¸¸ë“œê°€ ì´ë¯¸ ìµœê³  ë ˆë²¨ì…ë‹ˆë‹¤."));
 	}
 	else
 	{
@@ -2898,11 +2904,11 @@ int CInputMain::GuildSub_Offer(LPCHARACTER ch, const char* data, size_t uiBytes)
 
 		if (pGuild->OfferExp(ch, offer))
 		{
-			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> %u의 경험치를 투자하였습니다."), offer);
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> %uì˜ ê²½í—˜ì¹˜ë¥¼ íˆ¬ìí•˜ì˜€ìŠµë‹ˆë‹¤."), offer);
 		}
 		else
 		{
-			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 경험치 투자에 실패하였습니다."));
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ê²½í—˜ì¹˜ íˆ¬ìì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤."));
 		}
 	}
 
@@ -2920,13 +2926,13 @@ int CInputMain::GuildSub_ChargeGSP(LPCHARACTER ch, const char* data, size_t uiBy
 
 	if (offer < 0 || gold < offer || gold < 0 || ch->GetGold() < gold)
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 돈이 부족합니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ëˆì´ ë¶€ì¡±í•©ë‹ˆë‹¤."));
 		return SubPacketLen;
 	}
 
 	if (!pGuild->ChargeSP(ch, offer))
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 용신력 회복에 실패하였습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ìš©ì‹ ë ¥ íšŒë³µì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤."));
 	}
 
 	return SubPacketLen;
@@ -2941,7 +2947,7 @@ int CInputMain::GuildSub_PostComment(LPCHARACTER ch, const char* data, size_t ui
 
 	if (length > GUILD_COMMENT_MAX_LEN)
 	{
-		// 잘못된 길이.. 끊어주자.
+		// ì˜ëª»ëœ ê¸¸ì´.. ëŠì–´ì£¼ì.
 		sys_err("POST_COMMENT: %s comment too long (length: %u)", ch->GetName(), length);
 		ch->GetDesc()->SetPhase(PHASE_CLOSE);
 		return -1;
@@ -2957,7 +2963,7 @@ int CInputMain::GuildSub_PostComment(LPCHARACTER ch, const char* data, size_t ui
 
 	if (length && !pGuild->HasGradeAuth(m->grade, GUILD_AUTH_NOTICE) && *(c_pData + 1) == '!')
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 공지글을 작성할 권한이 없습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ê³µì§€ê¸€ì„ ì‘ì„±í•  ê¶Œí•œì´ ì—†ìŠµë‹ˆë‹¤."));
 	}
 	else
 	{
@@ -3003,11 +3009,11 @@ int CInputMain::GuildSub_ChangeMemberGrade(LPCHARACTER ch, const char* data, siz
 		return -1;
 
 	if (m->grade != GUILD_LEADER_GRADE)
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 직위를 변경할 권한이 없습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ì§ìœ„ë¥¼ ë³€ê²½í•  ê¶Œí•œì´ ì—†ìŠµë‹ˆë‹¤."));
 	else if (ch->GetPlayerID() == pid)
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 길드장의 직위는 변경할 수 없습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ê¸¸ë“œì¥ì˜ ì§ìœ„ëŠ” ë³€ê²½í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 	else if (grade == 1)
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 길드장으로 직위를 변경할 수 없습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ê¸¸ë“œì¥ìœ¼ë¡œ ì§ìœ„ë¥¼ ë³€ê²½í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 	else
 		pGuild->ChangeMemberGrade(pid, grade);
 
@@ -3041,13 +3047,13 @@ int CInputMain::GuildSub_ChangeMemberGeneral(LPCHARACTER ch, const char* data, s
 
 	if (m->grade != GUILD_LEADER_GRADE)
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 장군을 지정할 권한이 없습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ì¥êµ°ì„ ì§€ì •í•  ê¶Œí•œì´ ì—†ìŠµë‹ˆë‹¤."));
 	}
 	else
 	{
 		if (!pGuild->ChangeMemberGeneral(pid, is_general))
 		{
-			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<길드> 더이상 장수를 지정할 수 없습니다."));
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<ê¸¸ë“œ> ë”ì´ìƒ ì¥ìˆ˜ë¥¼ ì§€ì •í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		}
 	}
 
@@ -3100,7 +3106,7 @@ void CInputMain::ItemGive(LPCHARACTER ch, const char* c_pData)
 	if (to_ch)
 		ch->GiveItem(to_ch, p->ItemPos);
 	else
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("아이템을 건네줄 수 없습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì•„ì´í…œì„ ê±´ë„¤ì¤„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 }
 
 void CInputMain::Hack(LPCHARACTER ch, const char * c_pData)
@@ -3112,7 +3118,7 @@ void CInputMain::Hack(LPCHARACTER ch, const char * c_pData)
 
 	sys_err("HACK_DETECT: %s %s", ch->GetName(), buf);
 
-	// 현재 클라이언트에서 이 패킷을 보내는 경우가 없으므로 무조건 끊도록 한다
+	// í˜„ì¬ í´ë¼ì´ì–¸íŠ¸ì—ì„œ ì´ íŒ¨í‚·ì„ ë³´ë‚´ëŠ” ê²½ìš°ê°€ ì—†ìœ¼ë¯€ë¡œ ë¬´ì¡°ê±´ ëŠë„ë¡ í•œë‹¤
 	ch->GetDesc()->SetPhase(PHASE_CLOSE);
 }
 
@@ -3126,7 +3132,7 @@ int CInputMain::MyShop(LPCHARACTER ch, const char * c_pData, size_t uiBytes)
 
 	if (ch->GetGold() >= GOLD_MAX)
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("소유 돈이 20억냥을 넘어 거래를 핼수가 없습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì†Œìœ  ëˆì´ 20ì–µëƒ¥ì„ ë„˜ì–´ ê±°ë˜ë¥¼ í•¼ìˆ˜ê°€ ì—†ìŠµë‹ˆë‹¤."));
 		sys_log(0, "MyShop ==> OverFlow Gold id %u name %s ", ch->GetPlayerID(), ch->GetName());
 		return (iExtraLen);
 	}
@@ -3136,7 +3142,7 @@ int CInputMain::MyShop(LPCHARACTER ch, const char * c_pData, size_t uiBytes)
 
 	if (ch->GetExchange() || ch->IsOpenSafebox() || ch->GetShopOwner() || ch->IsCubeOpen())
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("다른 거래중일경우 개인상점을 열수가 없습니다."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë‹¤ë¥¸ ê±°ë˜ì¤‘ì¼ê²½ìš° ê°œì¸ìƒì ì„ ì—´ìˆ˜ê°€ ì—†ìŠµë‹ˆë‹¤."));
 		return (iExtraLen);
 	}
 
@@ -3151,7 +3157,7 @@ void CInputMain::Refine(LPCHARACTER ch, const char* c_pData)
 
 	if (ch->GetExchange() || ch->IsOpenSafebox() || ch->GetShopOwner() || ch->GetMyShop() || ch->IsCubeOpen())
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO,  LC_TEXT("창고,거래창등이 열린 상태에서는 개량을 할수가 없습니다"));
+		ch->ChatPacket(CHAT_TYPE_INFO,  LC_TEXT("ì°½ê³ ,ê±°ë˜ì°½ë“±ì´ ì—´ë¦° ìƒíƒœì—ì„œëŠ” ê°œëŸ‰ì„ í• ìˆ˜ê°€ ì—†ìŠµë‹ˆë‹¤"));
 		ch->ClearRefineMode();
 		return;
 	}
@@ -3214,7 +3220,7 @@ void CInputMain::Refine(LPCHARACTER ch, const char* c_pData)
 				}
 				else
 				{
-					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("사귀 타워 완료 보상은 한번까지 사용가능합니다."));
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì‚¬ê·€ íƒ€ì›Œ ì™„ë£Œ ë³´ìƒì€ í•œë²ˆê¹Œì§€ ì‚¬ìš©ê°€ëŠ¥í•©ë‹ˆë‹¤."));
 				}
 			}
 		}
@@ -3267,7 +3273,7 @@ int CInputMain::HandleMove(LPDESC d, const char* c_pData)
 
 		if (version != date)
 		{
-			ch->ChatPacket(CHAT_TYPE_NOTICE, LC_TEXT("클라이언트 버전이 틀려 로그아웃 됩니다. 정상적으로 패치 후 접속하세요."));
+			ch->ChatPacket(CHAT_TYPE_NOTICE, LC_TEXT("í´ë¼ì´ì–¸íŠ¸ ë²„ì „ì´ í‹€ë ¤ ë¡œê·¸ì•„ì›ƒ ë©ë‹ˆë‹¤. ì •ìƒì ìœ¼ë¡œ íŒ¨ì¹˜ í›„ ì ‘ì†í•˜ì„¸ìš”."));
 			d->DelayedDisconnect(10);
 			LogManager::instance().HackLog("VERSION_CONFLICT", d->GetAccountTable().login, ch->GetName(), d->GetHostName());
 		}
@@ -3568,4 +3574,5 @@ int CInputMain::RecvAntiFarmUpdateStatus(LPCHARACTER ch, const char* data, size_
 	return 0;
 }
 #endif
+
 
