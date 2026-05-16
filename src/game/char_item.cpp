@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
 #include <stack>
 
@@ -71,7 +71,7 @@ struct FFindStone
 };
 
 
-//귀환부, 귀환기억부, 결혼반지
+//ê·€í™˜ë¶€, ê·€í™˜ê¸°ì–µë¶€, ê²°í˜¼ë°˜ì§€
 static bool IS_SUMMON_ITEM(int vnum)
 {
 	switch (vnum)
@@ -104,38 +104,38 @@ static bool IS_MONKEY_DUNGEON(int map_index)
 
 bool IS_SUMMONABLE_ZONE(int map_index)
 {
-	// 몽키던전
+	// ëª½í‚¤ë˜ì „
 	if (IS_MONKEY_DUNGEON(map_index))
 		return false;
-	// 성
+	// ì„±
 	if (IS_CASTLE_MAP(map_index))
 		return false;
 
 	switch (map_index)
 	{
-		case 66 : // 사귀타워
-		case 71 : // 거미 던전 2층
-		case 72 : // 천의 동굴
-		case 73 : // 천의 동굴 2층
-		case 193 : // 거미 던전 2-1층
+		case 66 : // ì‚¬ê·€íƒ€ì›Œ
+		case 71 : // ê±°ë¯¸ ë˜ì „ 2ì¸µ
+		case 72 : // ì²œì˜ ë™êµ´
+		case 73 : // ì²œì˜ ë™êµ´ 2ì¸µ
+		case 193 : // ê±°ë¯¸ ë˜ì „ 2-1ì¸µ
 #if 0
-		case 184 : // 천의 동굴(신수)
-		case 185 : // 천의 동굴 2층(신수)
-		case 186 : // 천의 동굴(천조)
-		case 187 : // 천의 동굴 2층(천조)
-		case 188 : // 천의 동굴(진노)
-		case 189 : // 천의 동굴 2층(진노)
+		case 184 : // ì²œì˜ ë™êµ´(ì‹ ìˆ˜)
+		case 185 : // ì²œì˜ ë™êµ´ 2ì¸µ(ì‹ ìˆ˜)
+		case 186 : // ì²œì˜ ë™êµ´(ì²œì¡°)
+		case 187 : // ì²œì˜ ë™êµ´ 2ì¸µ(ì²œì¡°)
+		case 188 : // ì²œì˜ ë™êµ´(ì§„ë…¸)
+		case 189 : // ì²œì˜ ë™êµ´ 2ì¸µ(ì§„ë…¸)
 #endif
-//		case 206 : // 아귀동굴
-		case 216 : // 아귀동굴
-		case 217 : // 거미 던전 3층
-		case 208 : // 천의 동굴 (용방)
+//		case 206 : // ì•„ê·€ë™êµ´
+		case 216 : // ì•„ê·€ë™êµ´
+		case 217 : // ê±°ë¯¸ ë˜ì „ 3ì¸µ
+		case 208 : // ì²œì˜ ë™êµ´ (ìš©ë°©)
 			return false;
 	}
 
 	if (CBattleArena::IsBattleArenaMap(map_index)) return false;
 
-	// 모든 private 맵으론 워프 불가능
+	// ëª¨ë“  private ë§µìœ¼ë¡  ì›Œí”„ ë¶ˆê°€ëŠ¥
 	if (map_index > 10000) return false;
 
 	return true;
@@ -159,7 +159,7 @@ bool IS_BOTARYABLE_ZONE(int nMapIndex)
 	return false;
 }
 
-// item socket 이 프로토타입과 같은지 체크 -- by mhh
+// item socket ì´ í”„ë¡œí† íƒ€ì…ê³¼ ê°™ì€ì§€ ì²´í¬ -- by mhh
 static bool FN_check_item_socket(LPITEM item)
 {
 	for (int i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
@@ -171,7 +171,7 @@ static bool FN_check_item_socket(LPITEM item)
 	return true;
 }
 
-// item socket 복사 -- by mhh
+// item socket ë³µì‚¬ -- by mhh
 static void FN_copy_item_socket(LPITEM dest, LPITEM src)
 {
 	for (int i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
@@ -181,13 +181,13 @@ static void FN_copy_item_socket(LPITEM dest, LPITEM src)
 }
 static bool FN_check_item_sex(LPCHARACTER ch, LPITEM item)
 {
-	// 남자 금지
+	// ë‚¨ì ê¸ˆì§€
 	if (IS_SET(item->GetAntiFlag(), ITEM_ANTIFLAG_MALE))
 	{
 		if (SEX_MALE==GET_SEX(ch))
 			return false;
 	}
-	// 여자금지
+	// ì—¬ìê¸ˆì§€
 	if (IS_SET(item->GetAntiFlag(), ITEM_ANTIFLAG_FEMALE)) 
 	{
 		if (SEX_FEMALE==GET_SEX(ch))
@@ -276,7 +276,7 @@ void CHARACTER::SetItem(TItemPos Cell, LPITEM pItem)
 		assert(!"GetOwner exist");
 		return;
 	}
-	// 기본 인벤토리
+	// ê¸°ë³¸ ì¸ë²¤í† ë¦¬
 	switch(window_type)
 	{
 	case INVENTORY:
@@ -322,8 +322,8 @@ void CHARACTER::SetItem(TItemPos Cell, LPITEM pItem)
 						if (p >= INVENTORY_MAX_NUM)
 							continue;
 
-						// wCell + 1 로 하는 것은 빈곳을 체크할 때 같은
-						// 아이템은 예외처리하기 위함
+						// wCell + 1 ë¡œ í•˜ëŠ” ê²ƒì€ ë¹ˆê³³ì„ ì²´í¬í•  ë•Œ ê°™ì€
+						// ì•„ì´í…œì€ ì˜ˆì™¸ì²˜ë¦¬í•˜ê¸° ìœ„í•¨
 						m_pointsInstant.bItemGrid[p] = wCell + 1;
 					}
 				}
@@ -334,7 +334,7 @@ void CHARACTER::SetItem(TItemPos Cell, LPITEM pItem)
 			m_pointsInstant.pItems[wCell] = pItem;
 		}
 		break;
-	// 용혼석 인벤토리
+	// ìš©í˜¼ì„ ì¸ë²¤í† ë¦¬
 	case DRAGON_SOUL_INVENTORY:
 		{
 			LPITEM pOld = m_pointsInstant.pDSItems[wCell];
@@ -377,8 +377,8 @@ void CHARACTER::SetItem(TItemPos Cell, LPITEM pItem)
 						if (p >= DRAGON_SOUL_INVENTORY_MAX_NUM)
 							continue;
 
-						// wCell + 1 로 하는 것은 빈곳을 체크할 때 같은
-						// 아이템은 예외처리하기 위함
+						// wCell + 1 ë¡œ í•˜ëŠ” ê²ƒì€ ë¹ˆê³³ì„ ì²´í¬í•  ë•Œ ê°™ì€
+						// ì•„ì´í…œì€ ì˜ˆì™¸ì²˜ë¦¬í•˜ê¸° ìœ„í•¨
 						m_pointsInstant.wDSItemGrid[p] = wCell + 1;
 					}
 				}
@@ -396,7 +396,7 @@ void CHARACTER::SetItem(TItemPos Cell, LPITEM pItem)
 
 	if (GetDesc())
 	{
-		// 확장 아이템: 서버에서 아이템 플래그 정보를 보낸다
+		// í™•ì¥ ì•„ì´í…œ: ì„œë²„ì—ì„œ ì•„ì´í…œ í”Œë˜ê·¸ ì •ë³´ë¥¼ ë³´ë‚¸ë‹¤
 		if (pItem)
 		{
 			TPacketGCItemSet pack;
@@ -413,7 +413,7 @@ void CHARACTER::SetItem(TItemPos Cell, LPITEM pItem)
 			thecore_memcpy(pack.alSockets, pItem->GetSockets(), sizeof(pack.alSockets));
 			thecore_memcpy(pack.aAttr, pItem->GetAttributes(), sizeof(pack.aAttr));
 
-			GetDesc()->Packet(&pack, sizeof(TPacketGCItemSet));
+			SafeSendPacket(&pack, sizeof(TPacketGCItemSet));
 		}
 		else
 		{
@@ -421,7 +421,7 @@ void CHARACTER::SetItem(TItemPos Cell, LPITEM pItem)
 			pack.header = GC::ITEM_DEL;
 			pack.length = sizeof(pack);
 			pack.pos = Cell;
-			GetDesc()->Packet(&pack, sizeof(TPacketGCItemDel));
+			SafeSendPacket(&pack, sizeof(TPacketGCItemDel));
 		}
 	}
 
@@ -446,7 +446,7 @@ void CHARACTER::SetItem(TItemPos Cell, LPITEM pItem)
 
 LPITEM CHARACTER::GetWear(BYTE bCell) const
 {
-	// > WEAR_MAX_NUM : 용혼석 슬롯들.
+	// > WEAR_MAX_NUM : ìš©í˜¼ì„ ìŠ¬ë¡¯ë“¤.
 	if (bCell >= WEAR_MAX_NUM + (DWORD)DRAGON_SOUL_DECK_MAX_NUM * (DWORD)DS_SLOT_MAX)
 	{
 		sys_err("CHARACTER::GetWear: invalid wear cell %d", bCell);
@@ -458,7 +458,7 @@ LPITEM CHARACTER::GetWear(BYTE bCell) const
 
 void CHARACTER::SetWear(BYTE bCell, LPITEM item)
 {
-	// > WEAR_MAX_NUM : 용혼석 슬롯들.
+	// > WEAR_MAX_NUM : ìš©í˜¼ì„ ìŠ¬ë¡¯ë“¤.
 	if (bCell >= WEAR_MAX_NUM + (DWORD)DRAGON_SOUL_DECK_MAX_NUM * (DWORD)DS_SLOT_MAX)
 	{
 		sys_err("CHARACTER::SetItem: invalid item cell %d", bCell);
@@ -469,7 +469,7 @@ void CHARACTER::SetWear(BYTE bCell, LPITEM item)
 
 	if (!item && bCell == WEAR_WEAPON)
 	{
-		// 귀검 사용 시 벗는 것이라면 효과를 없애야 한다.
+		// ê·€ê²€ ì‚¬ìš© ì‹œ ë²—ëŠ” ê²ƒì´ë¼ë©´ íš¨ê³¼ë¥¼ ì—†ì• ì•¼ í•œë‹¤.
 		if (IsAffectFlag(AFF_GWIGUM))
 			RemoveAffect(SKILL_GWIGEOM);
 
@@ -530,8 +530,8 @@ bool CHARACTER::IsEmptyItemGrid(TItemPos Cell, BYTE bSize, int iExceptionCell) c
 			{
 				BYTE bCell = Cell.cell;
 
-				// bItemCell은 0이 false임을 나타내기 위해 + 1 해서 처리한다.
-				// 따라서 iExceptionCell에 1을 더해 비교한다.
+				// bItemCellì€ 0ì´ falseì„ì„ ë‚˜íƒ€ë‚´ê¸° ìœ„í•´ + 1 í•´ì„œ ì²˜ë¦¬í•œë‹¤.
+				// ë”°ë¼ì„œ iExceptionCellì— 1ì„ ë”í•´ ë¹„êµí•œë‹¤.
 				++iExceptionCell;
 
 				if (Cell.IsBeltInventoryPosition())
@@ -591,7 +591,7 @@ bool CHARACTER::IsEmptyItemGrid(TItemPos Cell, BYTE bSize, int iExceptionCell) c
 						return false;
 				}
 
-				// 크기가 1이면 한칸을 차지하는 것이므로 그냥 리턴
+				// í¬ê¸°ê°€ 1ì´ë©´ í•œì¹¸ì„ ì°¨ì§€í•˜ëŠ” ê²ƒì´ë¯€ë¡œ ê·¸ëƒ¥ ë¦¬í„´
 				if (1 == bSize)
 					return true;
 				else
@@ -625,8 +625,8 @@ bool CHARACTER::IsEmptyItemGrid(TItemPos Cell, BYTE bSize, int iExceptionCell) c
 				if (wCell >= DRAGON_SOUL_INVENTORY_MAX_NUM)
 					return false;
 
-				// bItemCell은 0이 false임을 나타내기 위해 + 1 해서 처리한다.
-				// 따라서 iExceptionCell에 1을 더해 비교한다.
+				// bItemCellì€ 0ì´ falseì„ì„ ë‚˜íƒ€ë‚´ê¸° ìœ„í•´ + 1 í•´ì„œ ì²˜ë¦¬í•œë‹¤.
+				// ë”°ë¼ì„œ iExceptionCellì— 1ì„ ë”í•´ ë¹„êµí•œë‹¤.
 				iExceptionCell++;
 
 				if (m_pointsInstant.wDSItemGrid[wCell])
@@ -657,7 +657,7 @@ bool CHARACTER::IsEmptyItemGrid(TItemPos Cell, BYTE bSize, int iExceptionCell) c
 						return false;
 				}
 
-				// 크기가 1이면 한칸을 차지하는 것이므로 그냥 리턴
+				// í¬ê¸°ê°€ 1ì´ë©´ í•œì¹¸ì„ ì°¨ì§€í•˜ëŠ” ê²ƒì´ë¯€ë¡œ ê·¸ëƒ¥ ë¦¬í„´
 				if (1 == bSize)
 					return true;
 				else
@@ -688,8 +688,8 @@ bool CHARACTER::IsEmptyItemGrid(TItemPos Cell, BYTE bSize, int iExceptionCell) c
 
 int CHARACTER::GetEmptyInventory(BYTE size) const
 {
-	// NOTE: 현재 이 함수는 아이템 지급, 획득 등의 행위를 할 때 인벤토리의 빈 칸을 찾기 위해 사용되고 있는데,
-	//		벨트 인벤토리는 특수 인벤토리이므로 검사하지 않도록 한다. (기본 인벤토리: INVENTORY_MAX_NUM 까지만 검사)
+	// NOTE: í˜„ì¬ ì´ í•¨ìˆ˜ëŠ” ì•„ì´í…œ ì§€ê¸‰, íšë“ ë“±ì˜ í–‰ìœ„ë¥¼ í•  ë•Œ ì¸ë²¤í† ë¦¬ì˜ ë¹ˆ ì¹¸ì„ ì°¾ê¸° ìœ„í•´ ì‚¬ìš©ë˜ê³  ìˆëŠ”ë°,
+	//		ë²¨íŠ¸ ì¸ë²¤í† ë¦¬ëŠ” íŠ¹ìˆ˜ ì¸ë²¤í† ë¦¬ì´ë¯€ë¡œ ê²€ì‚¬í•˜ì§€ ì•Šë„ë¡ í•œë‹¤. (ê¸°ë³¸ ì¸ë²¤í† ë¦¬: INVENTORY_MAX_NUM ê¹Œì§€ë§Œ ê²€ì‚¬)
 	for ( int i = 0; i < INVENTORY_MAX_NUM; ++i)
 		if (IsEmptyItemGrid(TItemPos (INVENTORY, i), size))
 			return i;
@@ -749,7 +749,7 @@ void TransformRefineItem(LPITEM pkOldItem, LPITEM pkNewItem)
 	// END_OF_ACCESSORY_REFINE
 	else
 	{
-		// 여기서 깨진석이 자동적으로 청소 됨
+		// ì—¬ê¸°ì„œ ê¹¨ì§„ì„ì´ ìë™ì ìœ¼ë¡œ ì²­ì†Œ ë¨
 		for (int i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
 		{
 			if (!pkOldItem->GetSocket(i))
@@ -758,7 +758,7 @@ void TransformRefineItem(LPITEM pkOldItem, LPITEM pkNewItem)
 				pkNewItem->SetSocket(i, 1);
 		}
 
-		// 소켓 설정
+		// ì†Œì¼“ ì„¤ì •
 		int slot = 0;
 
 		for (int i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
@@ -771,7 +771,7 @@ void TransformRefineItem(LPITEM pkOldItem, LPITEM pkNewItem)
 
 	}
 
-	// 매직 아이템 설정
+	// ë§¤ì§ ì•„ì´í…œ ì„¤ì •
 	pkOldItem->CopyAttributeTo(pkNewItem);
 }
 
@@ -815,8 +815,8 @@ bool CHARACTER::DoRefine(LPITEM item, bool bMoneyOnly, int iType)
 		return false;
 	}
 	
-	//개량 시간제한 : upgrade_refine_scroll.quest 에서 개량후 5분이내에 일반 개량을 
-	//진행할수 없음
+	//ê°œëŸ‰ ì‹œê°„ì œí•œ : upgrade_refine_scroll.quest ì—ì„œ ê°œëŸ‰í›„ 5ë¶„ì´ë‚´ì— ì¼ë°˜ ê°œëŸ‰ì„ 
+	//ì§„í–‰í• ìˆ˜ ì—†ìŒ
 	if (quest::CQuestManager::instance().GetEventFlag("update_refine_time") != 0)
 	{
 		if (get_global_time() < quest::CQuestManager::instance().GetEventFlag("update_refine_time") + (60 * 5))
@@ -842,7 +842,7 @@ bool CHARACTER::DoRefine(LPITEM item, bool bMoneyOnly, int iType)
 	{
 		if (!item->CheckItemUseLevel(20) || item->GetType() != ITEM_WEAPON)
 		{
-			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("무료 개량 기회는 20 이하의 무기만 가능합니다"));
+			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë¬´ë£Œ ê°œëŸ‰ ê¸°íšŒëŠ” 20 ì´í•˜ì˜ ë¬´ê¸°ë§Œ ê°€ëŠ¥í•©ë‹ˆë‹¤"));
 			return false;
 		}
 
@@ -853,7 +853,7 @@ bool CHARACTER::DoRefine(LPITEM item, bool bMoneyOnly, int iType)
 
 	if (result_vnum == 0)
 	{
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("더 이상 개량할 수 없습니다."));
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë” ì´ìƒ ê°œëŸ‰í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		return false;
 	}
 
@@ -865,7 +865,7 @@ bool CHARACTER::DoRefine(LPITEM item, bool bMoneyOnly, int iType)
 	if (!pProto)
 	{
 		sys_err("DoRefine NOT GET ITEM PROTO %d", item->GetRefinedVnum());
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이 아이템은 개량할 수 없습니다."));
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ ì•„ì´í…œì€ ê°œëŸ‰í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		return false;
 	}
 
@@ -881,7 +881,7 @@ bool CHARACTER::DoRefine(LPITEM item, bool bMoneyOnly, int iType)
 				case LIMIT_LEVEL:
 					if (GetLevel() < limit)
 					{
-						ChatPacket(CHAT_TYPE_INFO, LC_TEXT("개량된 후 아이템의 레벨 제한보다 레벨이 낮습니다."));
+						ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê°œëŸ‰ëœ í›„ ì•„ì´í…œì˜ ë ˆë²¨ ì œí•œë³´ë‹¤ ë ˆë²¨ì´ ë‚®ìŠµë‹ˆë‹¤."));
 						return false;
 					}
 					break;
@@ -892,7 +892,7 @@ bool CHARACTER::DoRefine(LPITEM item, bool bMoneyOnly, int iType)
 	// REFINE_COST
 	if (GetGold() < cost)
 	{
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("개량을 하기 위한 돈이 부족합니다."));
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê°œëŸ‰ì„ í•˜ê¸° ìœ„í•œ ëˆì´ ë¶€ì¡±í•©ë‹ˆë‹¤."));
 		return false;
 	}
 
@@ -906,7 +906,7 @@ bool CHARACTER::DoRefine(LPITEM item, bool bMoneyOnly, int iType)
 				{
 					ChatPacket(CHAT_TYPE_INFO, "Find %d, count %d, require %d", prt->materials[i].vnum, CountSpecifyItem(prt->materials[i].vnum), prt->materials[i].count);
 				}
-				ChatPacket(CHAT_TYPE_INFO, LC_TEXT("개량을 하기 위한 재료가 부족합니다."));
+				ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê°œëŸ‰ì„ í•˜ê¸° ìœ„í•œ ì¬ë£Œê°€ ë¶€ì¡±í•©ë‹ˆë‹¤."));
 				return false;
 			}
 		}
@@ -924,7 +924,7 @@ bool CHARACTER::DoRefine(LPITEM item, bool bMoneyOnly, int iType)
 
 	if (prob <= prt->prob)
 	{
-		// 성공! 모든 아이템이 사라지고, 같은 속성의 다른 아이템 획득
+		// ì„±ê³µ! ëª¨ë“  ì•„ì´í…œì´ ì‚¬ë¼ì§€ê³ , ê°™ì€ ì†ì„±ì˜ ë‹¤ë¥¸ ì•„ì´í…œ íšë“
 		LPITEM pkNewItem = ITEM_MANAGER::instance().CreateItem(result_vnum, 1, 0, false);
 
 		if (pkNewItem)
@@ -953,7 +953,7 @@ bool CHARACTER::DoRefine(LPITEM item, bool bMoneyOnly, int iType)
 		else
 		{
 			// DETAIL_REFINE_LOG
-			// 아이템 생성에 실패 -> 개량 실패로 간주
+			// ì•„ì´í…œ ìƒì„±ì— ì‹¤íŒ¨ -> ê°œëŸ‰ ì‹¤íŒ¨ë¡œ ê°„ì£¼
 			sys_err("cannot create item %u", result_vnum);
 			NotifyRefineFail(this, item, IsRefineThroughGuild() ? "GUILD" : "POWER", iType);
 			// END_OF_DETAIL_REFINE_LOG
@@ -961,7 +961,7 @@ bool CHARACTER::DoRefine(LPITEM item, bool bMoneyOnly, int iType)
 	}
 	else
 	{
-		// 실패! 모든 아이템이 사라짐.
+		// ì‹¤íŒ¨! ëª¨ë“  ì•„ì´í…œì´ ì‚¬ë¼ì§.
 		DBManager::instance().SendMoneyLog(MONEY_LOG_REFINE, item->GetVnum(), -cost);
 		NotifyRefineFail(this, item, IsRefineThroughGuild() ? "GUILD" : "POWER", iType);
 		item->AttrLog();
@@ -977,7 +977,7 @@ bool CHARACTER::DoRefine(LPITEM item, bool bMoneyOnly, int iType)
 enum enum_RefineScrolls
 {
 	CHUKBOK_SCROLL = 0,
-	HYUNIRON_CHN   = 1, // 중국에서만 사용
+	HYUNIRON_CHN   = 1, // ì¤‘êµ­ì—ì„œë§Œ ì‚¬ìš©
 	YONGSIN_SCROLL = 2,
 	MUSIN_SCROLL   = 3,
 	YAGONG_SCROLL  = 4,
@@ -995,8 +995,8 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item, int iType)
 
 	ClearRefineMode();
 
-	//개량 시간제한 : upgrade_refine_scroll.quest 에서 개량후 5분이내에 일반 개량을 
-	//진행할수 없음
+	//ê°œëŸ‰ ì‹œê°„ì œí•œ : upgrade_refine_scroll.quest ì—ì„œ ê°œëŸ‰í›„ 5ë¶„ì´ë‚´ì— ì¼ë°˜ ê°œëŸ‰ì„ 
+	//ì§„í–‰í• ìˆ˜ ì—†ìŒ
 	if (quest::CQuestManager::instance().GetEventFlag("update_refine_time") != 0)
 	{
 		if (get_global_time() < quest::CQuestManager::instance().GetEventFlag("update_refine_time") + (60 * 5))
@@ -1013,7 +1013,7 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item, int iType)
 
 	LPITEM pkItemScroll;
 
-	// 개량서 체크
+	// ê°œëŸ‰ì„œ ì²´í¬
 	if (m_iRefineAdditionalCell < 0)
 		return false;
 
@@ -1033,7 +1033,7 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item, int iType)
 
 	if (result_vnum == 0)
 	{
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("더 이상 개량할 수 없습니다."));
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë” ì´ìƒ ê°œëŸ‰í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		return false;
 	}
 
@@ -1042,7 +1042,7 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item, int iType)
 	{
 		if (item->GetRefineLevel() >= 4)
 		{
-			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이 개량서로 더 이상 개량할 수 없습니다."));
+			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ ê°œëŸ‰ì„œë¡œ ë” ì´ìƒ ê°œëŸ‰í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 			return false;
 		}
 	}
@@ -1052,7 +1052,7 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item, int iType)
 	{
 		if (item->GetRefineLevel() != pkItemScroll->GetValue(1))
 		{
-			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이 개량서로 개량할 수 없습니다."));
+			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ ê°œëŸ‰ì„œë¡œ ê°œëŸ‰í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 			return false;
 		}
 	}
@@ -1060,7 +1060,7 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item, int iType)
 	{
 		if (item->GetType() != ITEM_METIN || item->GetRefineLevel() != 4)
 		{
-			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이 아이템으로 개량할 수 없습니다."));
+			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ ì•„ì´í…œìœ¼ë¡œ ê°œëŸ‰í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 			return false;
 		}
 	}
@@ -1070,7 +1070,7 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item, int iType)
 	if (!pProto)
 	{
 		sys_err("DoRefineWithScroll NOT GET ITEM PROTO %d", item->GetRefinedVnum());
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이 아이템은 개량할 수 없습니다."));
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ ì•„ì´í…œì€ ê°œëŸ‰í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		return false;
 	}
 
@@ -1086,7 +1086,7 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item, int iType)
 				case LIMIT_LEVEL:
 					if (GetLevel() < limit)
 					{
-						ChatPacket(CHAT_TYPE_INFO, LC_TEXT("개량된 후 아이템의 레벨 제한보다 레벨이 낮습니다."));
+						ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê°œëŸ‰ëœ í›„ ì•„ì´í…œì˜ ë ˆë²¨ ì œí•œë³´ë‹¤ ë ˆë²¨ì´ ë‚®ìŠµë‹ˆë‹¤."));
 						return false;
 					}
 					break;
@@ -1096,7 +1096,7 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item, int iType)
 
 	if (GetGold() < prt->cost)
 	{
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("개량을 하기 위한 돈이 부족합니다."));
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê°œëŸ‰ì„ í•˜ê¸° ìœ„í•œ ëˆì´ ë¶€ì¡±í•©ë‹ˆë‹¤."));
 		return false;
 	}
 
@@ -1108,7 +1108,7 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item, int iType)
 			{
 				ChatPacket(CHAT_TYPE_INFO, "Find %d, count %d, require %d", prt->materials[i].vnum, CountSpecifyItem(prt->materials[i].vnum), prt->materials[i].count);
 			}
-			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("개량을 하기 위한 재료가 부족합니다."));
+			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê°œëŸ‰ì„ í•˜ê¸° ìœ„í•œ ì¬ë£Œê°€ ë¶€ì¡±í•©ë‹ˆë‹¤."));
 			return false;
 		}
 	}
@@ -1124,7 +1124,7 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item, int iType)
 
 	if (pkItemScroll->GetValue(0) == HYUNIRON_CHN || 
 		pkItemScroll->GetValue(0) == YONGSIN_SCROLL || 
-		pkItemScroll->GetValue(0) == YAGONG_SCROLL) // 현철, 용신의 축복서, 야공의 비전서  처리
+		pkItemScroll->GetValue(0) == YAGONG_SCROLL) // í˜„ì² , ìš©ì‹ ì˜ ì¶•ë³µì„œ, ì•¼ê³µì˜ ë¹„ì „ì„œ  ì²˜ë¦¬
 	{
 		const char hyuniron_prob[9] = { 100, 75, 65, 55, 45, 40, 35, 25, 20 };
 		const char hyuniron_prob_euckr[9] = { 100, 75, 65, 55, 45, 40, 35, 30, 25 };
@@ -1155,7 +1155,7 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item, int iType)
 		{
 			ChatPacket(CHAT_TYPE_INFO, "[Only Test] Success_Prob %d, RefineLevel %d ", success_prob, item->GetRefineLevel());
 		}
-		if (pkItemScroll->GetValue(0) == HYUNIRON_CHN) // 현철은 아이템이 부서져야 한다.
+		if (pkItemScroll->GetValue(0) == HYUNIRON_CHN) // í˜„ì² ì€ ì•„ì´í…œì´ ë¶€ì„œì ¸ì•¼ í•œë‹¤.
 			bDestroyWhenFail = true;
 
 		// DETAIL_REFINE_LOG
@@ -1175,7 +1175,7 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item, int iType)
 	}
 
 	// DETAIL_REFINE_LOG
-	if (pkItemScroll->GetValue(0) == MUSIN_SCROLL) // 무신의 축복서는 100% 성공 (+4까지만)
+	if (pkItemScroll->GetValue(0) == MUSIN_SCROLL) // ë¬´ì‹ ì˜ ì¶•ë³µì„œëŠ” 100% ì„±ê³µ (+4ê¹Œì§€ë§Œ)
 	{
 		success_prob = 100;
 
@@ -1197,7 +1197,7 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item, int iType)
 
 	if (prob <= success_prob)
 	{
-		// 성공! 모든 아이템이 사라지고, 같은 속성의 다른 아이템 획득
+		// ì„±ê³µ! ëª¨ë“  ì•„ì´í…œì´ ì‚¬ë¼ì§€ê³ , ê°™ì€ ì†ì„±ì˜ ë‹¤ë¥¸ ì•„ì´í…œ íšë“
 		LPITEM pkNewItem = ITEM_MANAGER::instance().CreateItem(result_vnum, 1, 0, false);
 
 		if (pkNewItem)
@@ -1222,7 +1222,7 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item, int iType)
 		}
 		else
 		{
-			// 아이템 생성에 실패 -> 개량 실패로 간주
+			// ì•„ì´í…œ ìƒì„±ì— ì‹¤íŒ¨ -> ê°œëŸ‰ ì‹¤íŒ¨ë¡œ ê°„ì£¼
 			sys_err("cannot create item %u", result_vnum);
 			// MR-15: Include refine method type in upgrade result
 			NotifyRefineFail(this, item, szRefineType, iType);
@@ -1231,7 +1231,7 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item, int iType)
 	}
 	else if (!bDestroyWhenFail && result_fail_vnum)
 	{
-		// 실패! 모든 아이템이 사라지고, 같은 속성의 낮은 등급의 아이템 획득
+		// ì‹¤íŒ¨! ëª¨ë“  ì•„ì´í…œì´ ì‚¬ë¼ì§€ê³ , ê°™ì€ ì†ì„±ì˜ ë‚®ì€ ë“±ê¸‰ì˜ ì•„ì´í…œ íšë“
 		LPITEM pkNewItem = ITEM_MANAGER::instance().CreateItem(result_fail_vnum, 1, 0, false);
 
 		if (pkNewItem)
@@ -1257,7 +1257,7 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item, int iType)
 		}
 		else
 		{
-			// 아이템 생성에 실패 -> 개량 실패로 간주
+			// ì•„ì´í…œ ìƒì„±ì— ì‹¤íŒ¨ -> ê°œëŸ‰ ì‹¤íŒ¨ë¡œ ê°„ì£¼
 			sys_err("cannot create item %u", result_fail_vnum);
 			// MR-15: Include refine method type in upgrade result
 			NotifyRefineFail(this, item, szRefineType, iType);
@@ -1267,7 +1267,7 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item, int iType)
 	else
 	{
 		// MR-15: Include refine method type in upgrade result
-		NotifyRefineFail(this, item, szRefineType, iType); // 개량시 아이템 사라지지 않음
+		NotifyRefineFail(this, item, szRefineType, iType); // ê°œëŸ‰ì‹œ ì•„ì´í…œ ì‚¬ë¼ì§€ì§€ ì•ŠìŒ
 		// MR-15: -- END OF -- Include refine method type in upgrade result
 
 		PayRefineFee(prt->cost);
@@ -1289,7 +1289,7 @@ bool CHARACTER::RefineInformation(BYTE bCell, BYTE bType, int iAdditionalCell)
 	// REFINE_COST
 	if (bType == REFINE_TYPE_MONEY_ONLY && !GetQuestFlag("deviltower_zone.can_refine"))
 	{
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("사귀 타워 완료 보상은 한번까지 사용가능합니다."));
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì‚¬ê·€ íƒ€ì›Œ ì™„ë£Œ ë³´ìƒì€ í•œë²ˆê¹Œì§€ ì‚¬ìš©ê°€ëŠ¥í•©ë‹ˆë‹¤."));
 		return false;
 	}
 	// END_OF_REFINE_COST
@@ -1308,7 +1308,7 @@ bool CHARACTER::RefineInformation(BYTE bCell, BYTE bType, int iAdditionalCell)
 	if (p.result_vnum == 0)
 	{
 		sys_err("RefineInformation p.result_vnum == 0");
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이 아이템은 개량할 수 없습니다."));
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ ì•„ì´í…œì€ ê°œëŸ‰í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		return false;
 	}
 
@@ -1316,7 +1316,7 @@ bool CHARACTER::RefineInformation(BYTE bCell, BYTE bType, int iAdditionalCell)
 	{
 		if (bType == 0)
 		{
-			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이 아이템은 이 방식으로는 개량할 수 없습니다."));
+			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ ì•„ì´í…œì€ ì´ ë°©ì‹ìœ¼ë¡œëŠ” ê°œëŸ‰í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 			return false;
 		}
 		else
@@ -1324,8 +1324,8 @@ bool CHARACTER::RefineInformation(BYTE bCell, BYTE bType, int iAdditionalCell)
 			LPITEM itemScroll = GetInventoryItem(iAdditionalCell);
 			if (!itemScroll || item->GetVnum() == itemScroll->GetVnum())
 			{
-				ChatPacket(CHAT_TYPE_INFO, LC_TEXT("같은 개량서를 합칠 수는 없습니다."));
-				ChatPacket(CHAT_TYPE_INFO, LC_TEXT("축복의 서와 현철을 합칠 수 있습니다."));
+				ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê°™ì€ ê°œëŸ‰ì„œë¥¼ í•©ì¹  ìˆ˜ëŠ” ì—†ìŠµë‹ˆë‹¤."));
+				ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì¶•ë³µì˜ ì„œì™€ í˜„ì² ì„ í•©ì¹  ìˆ˜ ìˆìŠµë‹ˆë‹¤."));
 				return false;
 			}
 		}
@@ -1338,7 +1338,7 @@ bool CHARACTER::RefineInformation(BYTE bCell, BYTE bType, int iAdditionalCell)
 	if (!prt)
 	{
 		sys_err("RefineInformation NOT GET REFINE SET %d", item->GetRefineSet());
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이 아이템은 개량할 수 없습니다."));
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ ì•„ì´í…œì€ ê°œëŸ‰í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		return false;
 	}
 
@@ -1347,10 +1347,10 @@ bool CHARACTER::RefineInformation(BYTE bCell, BYTE bType, int iAdditionalCell)
 	//MAIN_QUEST_LV7
 	if (GetQuestFlag("main_quest_lv7.refine_chance") > 0)
 	{
-		// 일본은 제외
+		// ì¼ë³¸ì€ ì œì™¸
 		if (!item->CheckItemUseLevel(20) || item->GetType() != ITEM_WEAPON)
 		{
-			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("무료 개량 기회는 20 이하의 무기만 가능합니다"));
+			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë¬´ë£Œ ê°œëŸ‰ ê¸°íšŒëŠ” 20 ì´í•˜ì˜ ë¬´ê¸°ë§Œ ê°€ëŠ¥í•©ë‹ˆë‹¤"));
 			return false;
 		}
 		p.cost = 0;
@@ -1372,7 +1372,7 @@ bool CHARACTER::RefineInformation(BYTE bCell, BYTE bType, int iAdditionalCell)
 	}
 	// END_OF_REFINE_COST
 
-	GetDesc()->Packet(&p, sizeof(TPacketGCRefineInformation));
+	SafeSendPacket(&p, sizeof(TPacketGCRefineInformation));
 
 	SetRefineMode(iAdditionalCell);
 	return true;
@@ -1385,8 +1385,8 @@ bool CHARACTER::RefineItem(LPITEM pkItem, LPITEM pkTarget)
 
 	if (pkItem->GetSubType() == USE_TUNING)
 	{
-		// XXX 성능, 소켓 개량서는 사라졌습니다...
-		// XXX 성능개량서는 축복의 서가 되었다!
+		// XXX ì„±ëŠ¥, ì†Œì¼“ ê°œëŸ‰ì„œëŠ” ì‚¬ë¼ì¡ŒìŠµë‹ˆë‹¤...
+		// XXX ì„±ëŠ¥ê°œëŸ‰ì„œëŠ” ì¶•ë³µì˜ ì„œê°€ ë˜ì—ˆë‹¤!
 		// MUSIN_SCROLL
 		if (pkItem->GetValue(0) == MUSIN_SCROLL)
 			RefineInformation(pkTarget->GetCell(), REFINE_TYPE_MUSIN, pkItem->GetCell());
@@ -1430,7 +1430,7 @@ bool CHARACTER::RefineItem(LPITEM pkItem, LPITEM pkTarget)
 					AutoGiveItem(socket);
 					//TItemTable* pTable = ITEM_MANAGER::instance().GetTable(pkTarget->GetSocket(i));
 					//pkTarget->SetSocket(i, pTable->alValues[2]);
-					// 깨진돌로 대체해준다
+					// ê¹¨ì§„ëŒë¡œ ëŒ€ì²´í•´ì¤€ë‹¤
 					pkTarget->SetSocket(i, ITEM_BROKEN_METIN_VNUM);
 				}
 			}
@@ -1439,7 +1439,7 @@ bool CHARACTER::RefineItem(LPITEM pkItem, LPITEM pkTarget)
 		}
 		else
 		{
-			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("빼낼 수 있는 메틴석이 없습니다."));
+			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë¹¼ë‚¼ ìˆ˜ ìˆëŠ” ë©”í‹´ì„ì´ ì—†ìŠµë‹ˆë‹¤."));
 			return false;
 		}
 	}
@@ -1491,7 +1491,7 @@ bool CHARACTER::GiveRecallItem(LPITEM item)
 
 	if (iEmpireByMapIndex && GetEmpire() != iEmpireByMapIndex)
 	{
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("기억해 둘 수 없는 위치 입니다."));
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê¸°ì–µí•´ ë‘˜ ìˆ˜ ì—†ëŠ” ìœ„ì¹˜ ì…ë‹ˆë‹¤."));
 		return false;
 	}
 
@@ -1517,7 +1517,7 @@ bool CHARACTER::GiveRecallItem(LPITEM item)
 	}
 	else
 	{
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("소지품에 빈 공간이 없습니다."));
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì†Œì§€í’ˆì— ë¹ˆ ê³µê°„ì´ ì—†ìŠµë‹ˆë‹¤."));
 		return false;
 	}
 
@@ -1548,14 +1548,14 @@ void CHARACTER::ProcessRecallItem(LPITEM item)
 		case 216:
 			iEmpireByMapIndex = -1;
 			break;
-		// 악룡군도 일때
+		// ì•…ë£¡êµ°ë„ ì¼ë•Œ
 		case 301:
 		case 302:
 		case 303:
 		case 304:
 			if( GetLevel() < 90 )
 			{
-				ChatPacket(CHAT_TYPE_INFO, LC_TEXT("아이템의 레벨 제한보다 레벨이 낮습니다."));
+				ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì•„ì´í…œì˜ ë ˆë²¨ ì œí•œë³´ë‹¤ ë ˆë²¨ì´ ë‚®ìŠµë‹ˆë‹¤."));
 				return;
 			}
 			else
@@ -1564,7 +1564,7 @@ void CHARACTER::ProcessRecallItem(LPITEM item)
 
 	if (iEmpireByMapIndex && GetEmpire() != iEmpireByMapIndex)
 	{
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("기억된 위치가 타제국에 속해 있어서 귀환할 수 없습니다."));
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê¸°ì–µëœ ìœ„ì¹˜ê°€ íƒ€ì œêµ­ì— ì†í•´ ìˆì–´ì„œ ê·€í™˜í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		item->SetSocket(0, 0);
 		item->SetSocket(1, 0);
 	}
@@ -1587,7 +1587,7 @@ void CHARACTER::__OpenPrivateShop()
 			ChatPacket(CHAT_TYPE_COMMAND, "OpenPrivateShop");
 			break;
 		default:
-			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("갑옷을 벗어야 개인 상점을 열 수 있습니다."));
+			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê°‘ì˜·ì„ ë²—ì–´ì•¼ ê°œì¸ ìƒì ì„ ì—´ ìˆ˜ ìˆìŠµë‹ˆë‹¤."));
 			break;
 	}
 }
@@ -1602,14 +1602,14 @@ void CHARACTER::SendMyShopPriceListCmd(DWORD dwItemVnum, DWORD dwItemPrice)
 }
 
 //
-// DB 캐시로 부터 받은 리스트를 User 에게 전송하고 상점을 열라는 커맨드를 보낸다.
+// DB ìºì‹œë¡œ ë¶€í„° ë°›ì€ ë¦¬ìŠ¤íŠ¸ë¥¼ User ì—ê²Œ ì „ì†¡í•˜ê³  ìƒì ì„ ì—´ë¼ëŠ” ì»¤ë§¨ë“œë¥¼ ë³´ë‚¸ë‹¤.
 //
 void CHARACTER::UseSilkBotaryReal(const TPacketMyshopPricelistHeader* p)
 {
 	const TItemPriceInfo* pInfo = (const TItemPriceInfo*)(p + 1);
 
 	if (!p->byCount)
-		// 가격 리스트가 없다. dummy 데이터를 넣은 커맨드를 보내준다.
+		// ê°€ê²© ë¦¬ìŠ¤íŠ¸ê°€ ì—†ë‹¤. dummy ë°ì´í„°ë¥¼ ë„£ì€ ì»¤ë§¨ë“œë¥¼ ë³´ë‚´ì¤€ë‹¤.
 		SendMyShopPriceListCmd(1, 0);
 	else {
 		for (int idx = 0; idx < p->byCount; idx++)
@@ -1620,8 +1620,8 @@ void CHARACTER::UseSilkBotaryReal(const TPacketMyshopPricelistHeader* p)
 }
 
 //
-// 이번 접속 후 처음 상점을 Open 하는 경우 리스트를 Load 하기 위해 DB 캐시에 가격정보 리스트 요청 패킷을 보낸다.
-// 이후부터는 바로 상점을 열라는 응답을 보낸다.
+// ì´ë²ˆ ì ‘ì† í›„ ì²˜ìŒ ìƒì ì„ Open í•˜ëŠ” ê²½ìš° ë¦¬ìŠ¤íŠ¸ë¥¼ Load í•˜ê¸° ìœ„í•´ DB ìºì‹œì— ê°€ê²©ì •ë³´ ë¦¬ìŠ¤íŠ¸ ìš”ì²­ íŒ¨í‚·ì„ ë³´ë‚¸ë‹¤.
+// ì´í›„ë¶€í„°ëŠ” ë°”ë¡œ ìƒì ì„ ì—´ë¼ëŠ” ì‘ë‹µì„ ë³´ë‚¸ë‹¤.
 //
 void CHARACTER::UseSilkBotary(void)
 {
@@ -1649,14 +1649,14 @@ int CalculateConsume(LPCHARACTER ch)
 		const int needLife = ch->GetMaxHP() * needPercent / 100;
 		if (curLife < needLife)
 		{
-			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("남은 생명력 양이 모자라 사용할 수 없습니다."));
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë‚¨ì€ ìƒëª…ë ¥ ì–‘ì´ ëª¨ìë¼ ì‚¬ìš©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 			return -1;
 		}
 
 		consumeLife = needLife;
 
 
-		// CheckMinLifeForWarp: 독에 의해서 죽으면 안되므로 생명력 최소량는 남겨준다
+		// CheckMinLifeForWarp: ë…ì— ì˜í•´ì„œ ì£½ìœ¼ë©´ ì•ˆë˜ë¯€ë¡œ ìƒëª…ë ¥ ìµœì†ŒëŸ‰ëŠ” ë‚¨ê²¨ì¤€ë‹¤
 		const int minPercent	= WARP_MIN_LIFE_PERCENT;
 		const int minLife	= ch->GetMaxHP() * minPercent / 100;
 		if (curLife - needLife < minLife)
@@ -1678,7 +1678,7 @@ int CalculateConsumeSP(LPCHARACTER lpChar)
 
 	if (curSP < needSP)
 	{
-		lpChar->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("남은 정신력 양이 모자라 사용할 수 없습니다."));
+		lpChar->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë‚¨ì€ ì •ì‹ ë ¥ ì–‘ì´ ëª¨ìë¼ ì‚¬ìš©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		return -1;
 	}
 
@@ -1701,7 +1701,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 			case LIMIT_LEVEL:
 				if (GetLevel() < limitValue)
 				{
-					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("아이템의 레벨 제한보다 레벨이 낮습니다."));
+					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì•„ì´í…œì˜ ë ˆë²¨ ì œí•œë³´ë‹¤ ë ˆë²¨ì´ ë‚®ìŠµë‹ˆë‹¤."));
 					return false;
 				}
 				break;
@@ -1723,17 +1723,17 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 	if ( CArenaManager::instance().IsLimitedItem( GetMapIndex(), item->GetVnum() ) == true )
 	{
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련 중에는 이용할 수 없는 물품입니다."));
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ëŒ€ë ¨ ì¤‘ì—ëŠ” ì´ìš©í•  ìˆ˜ ì—†ëŠ” ë¬¼í’ˆì…ë‹ˆë‹¤."));
 		return false;
 	}
 
-	// 아이템 최초 사용 이후부터는 사용하지 않아도 시간이 차감되는 방식 처리. 
+	// ì•„ì´í…œ ìµœì´ˆ ì‚¬ìš© ì´í›„ë¶€í„°ëŠ” ì‚¬ìš©í•˜ì§€ ì•Šì•„ë„ ì‹œê°„ì´ ì°¨ê°ë˜ëŠ” ë°©ì‹ ì²˜ë¦¬. 
 	if (-1 != iLimitRealtimeStartFirstUseFlagIndex)
 	{
-		// 한 번이라도 사용한 아이템인지 여부는 Socket1을 보고 판단한다. (Socket1에 사용횟수 기록)
+		// í•œ ë²ˆì´ë¼ë„ ì‚¬ìš©í•œ ì•„ì´í…œì¸ì§€ ì—¬ë¶€ëŠ” Socket1ì„ ë³´ê³  íŒë‹¨í•œë‹¤. (Socket1ì— ì‚¬ìš©íšŸìˆ˜ ê¸°ë¡)
 		if (0 == item->GetSocket(1))
 		{
-			// 사용가능시간은 Default 값으로 Limit Value 값을 사용하되, Socket0에 값이 있으면 그 값을 사용하도록 한다. (단위는 초)
+			// ì‚¬ìš©ê°€ëŠ¥ì‹œê°„ì€ Default ê°’ìœ¼ë¡œ Limit Value ê°’ì„ ì‚¬ìš©í•˜ë˜, Socket0ì— ê°’ì´ ìˆìœ¼ë©´ ê·¸ ê°’ì„ ì‚¬ìš©í•˜ë„ë¡ í•œë‹¤. (ë‹¨ìœ„ëŠ” ì´ˆ)
 			long duration = (0 != item->GetSocket(0)) ? item->GetSocket(0) : item->GetProto()->aLimits[iLimitRealtimeStartFirstUseFlagIndex].lValue;
 
 			if (0 == duration)
@@ -1760,7 +1760,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 			{
 				if (item->GetVnum() == 50051 || item->GetVnum() == 50052 || item->GetVnum() == 50053)
 				{
-					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련 중에는 이용할 수 없는 물품입니다."));
+					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ëŒ€ë ¨ ì¤‘ì—ëŠ” ì´ìš©í•  ìˆ˜ ì—†ëŠ” ë¬¼í’ˆì…ë‹ˆë‹¤."));
 					return false;
 				}
 			}
@@ -1787,13 +1787,13 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 				if (!tree)
 				{
-					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("모닥불을 피울 수 없는 지점입니다."));
+					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ëª¨ë‹¥ë¶ˆì„ í”¼ìš¸ ìˆ˜ ì—†ëŠ” ì§€ì ì…ë‹ˆë‹¤."));
 					return false;
 				}
 
 				if (tree->IsAttr((long)(GetX()+fx), (long)(GetY()+fy), ATTR_WATER))
 				{
-					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("물 속에 모닥불을 피울 수 없습니다."));
+					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë¬¼ ì†ì— ëª¨ë‹¥ë¶ˆì„ í”¼ìš¸ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 					return false;
 				}
 
@@ -1880,7 +1880,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 								switch (item->GetVnum())
 								{
-									case 71049: // 비단보따리
+									case 71049: // ë¹„ë‹¨ë³´ë”°ë¦¬
 										if (LC_IsYMIR() == true || LC_IsKorea() == true)
 										{
 											if (IS_BOTARYABLE_ZONE(GetMapIndex()) == true)
@@ -1889,7 +1889,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 											}
 											else
 											{
-												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("개인 상점을 열 수 없는 지역입니다"));
+												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê°œì¸ ìƒì ì„ ì—´ ìˆ˜ ì—†ëŠ” ì§€ì—­ì…ë‹ˆë‹¤"));
 											}
 										}
 										else
@@ -1916,8 +1916,8 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 		case ITEM_WEAPON:
 		case ITEM_ARMOR:
 		case ITEM_ROD:
-		case ITEM_RING:		// 신규 반지 아이템
-		case ITEM_BELT:		// 신규 벨트 아이템
+		case ITEM_RING:		// ì‹ ê·œ ë°˜ì§€ ì•„ì´í…œ
+		case ITEM_BELT:		// ì‹ ê·œ ë²¨íŠ¸ ì•„ì´í…œ
 			// MINING
 		case ITEM_PICK:
 			// END_OF_MINING
@@ -1926,10 +1926,10 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 			else
 				UnequipItem(item);
 			break;
-			// 착용하지 않은 용혼석은 사용할 수 없다.
-			// 정상적인 클라라면, 용혼석에 관하여 item use 패킷을 보낼 수 없다.
-			// 용혼석 착용은 item move 패킷으로 한다.
-			// 착용한 용혼석은 추출한다.
+			// ì°©ìš©í•˜ì§€ ì•Šì€ ìš©í˜¼ì„ì€ ì‚¬ìš©í•  ìˆ˜ ì—†ë‹¤.
+			// ì •ìƒì ì¸ í´ë¼ë¼ë©´, ìš©í˜¼ì„ì— ê´€í•˜ì—¬ item use íŒ¨í‚·ì„ ë³´ë‚¼ ìˆ˜ ì—†ë‹¤.
+			// ìš©í˜¼ì„ ì°©ìš©ì€ item move íŒ¨í‚·ìœ¼ë¡œ í•œë‹¤.
+			// ì°©ìš©í•œ ìš©í˜¼ì„ì€ ì¶”ì¶œí•œë‹¤.
 		case ITEM_DS:
 			{
 				if (!item->IsEquipped())
@@ -1948,7 +1948,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 			{
 				if (CArenaManager::instance().IsArenaMap(GetMapIndex()) == true)
 				{
-					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련 중에는 이용할 수 없는 물품입니다."));
+					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ëŒ€ë ¨ ì¤‘ì—ëŠ” ì´ìš©í•  ìˆ˜ ì—†ëŠ” ë¬¼í’ˆì…ë‹ˆë‹¤."));
 					return false;
 				}
 
@@ -1960,7 +1960,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 		case ITEM_TREASURE_BOX:
 			{
 				return false;
-				//ChatPacket(CHAT_TYPE_TALKING, LC_TEXT("열쇠로 잠겨 있어서 열리지 않는것 같다. 열쇠를 구해보자."));
+				//ChatPacket(CHAT_TYPE_TALKING, LC_TEXT("ì—´ì‡ ë¡œ ì ê²¨ ìˆì–´ì„œ ì—´ë¦¬ì§€ ì•ŠëŠ”ê²ƒ ê°™ë‹¤. ì—´ì‡ ë¥¼ êµ¬í•´ë³´ì."));
 			}
 			break;
 
@@ -1976,13 +1976,13 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 				if (item2->GetType() != ITEM_TREASURE_BOX)
 				{
-					ChatPacket(CHAT_TYPE_TALKING, LC_TEXT("열쇠로 여는 물건이 아닌것 같다."));
+					ChatPacket(CHAT_TYPE_TALKING, LC_TEXT("ì—´ì‡ ë¡œ ì—¬ëŠ” ë¬¼ê±´ì´ ì•„ë‹Œê²ƒ ê°™ë‹¤."));
 					return false;
 				}
 
 				if (item->GetValue(0) == item2->GetValue(0))
 				{
-					//ChatPacket(CHAT_TYPE_TALKING, LC_TEXT("열쇠는 맞으나 아이템 주는 부분 구현이 안되었습니다."));
+					//ChatPacket(CHAT_TYPE_TALKING, LC_TEXT("ì—´ì‡ ëŠ” ë§ìœ¼ë‚˜ ì•„ì´í…œ ì£¼ëŠ” ë¶€ë¶„ êµ¬í˜„ì´ ì•ˆë˜ì—ˆìŠµë‹ˆë‹¤."));
 					DWORD dwBoxVnum = item2->GetVnum();
 					std::vector <DWORD> dwVnums;
 					std::vector <DWORD> dwCounts;
@@ -1998,34 +1998,34 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							switch (dwVnums[i])
 							{
 								case CSpecialItemGroup::GOLD:
-									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("돈 %d 냥을 획득했습니다."), dwCounts[i]);
+									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ëˆ %d ëƒ¥ì„ íšë“í–ˆìŠµë‹ˆë‹¤."), dwCounts[i]);
 									break;
 								case CSpecialItemGroup::EXP:
-									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상자에서 부터 신비한 빛이 나옵니다."));
-									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%d의 경험치를 획득했습니다."), dwCounts[i]);
+									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒìì—ì„œ ë¶€í„° ì‹ ë¹„í•œ ë¹›ì´ ë‚˜ì˜µë‹ˆë‹¤."));
+									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%dì˜ ê²½í—˜ì¹˜ë¥¼ íšë“í–ˆìŠµë‹ˆë‹¤."), dwCounts[i]);
 									break;
 								case CSpecialItemGroup::MOB:
-									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상자에서 몬스터가 나타났습니다!"));
+									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒìì—ì„œ ëª¬ìŠ¤í„°ê°€ ë‚˜íƒ€ë‚¬ìŠµë‹ˆë‹¤!"));
 									break;
 								case CSpecialItemGroup::SLOW:
-									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상자에서 나온 빨간 연기를 들이마시자 움직이는 속도가 느려졌습니다!"));
+									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒìì—ì„œ ë‚˜ì˜¨ ë¹¨ê°„ ì—°ê¸°ë¥¼ ë“¤ì´ë§ˆì‹œì ì›€ì§ì´ëŠ” ì†ë„ê°€ ëŠë ¤ì¡ŒìŠµë‹ˆë‹¤!"));
 									break;
 								case CSpecialItemGroup::DRAIN_HP:
-									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상자가 갑자기 폭발하였습니다! 생명력이 감소했습니다."));
+									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒìê°€ ê°‘ìê¸° í­ë°œí•˜ì˜€ìŠµë‹ˆë‹¤! ìƒëª…ë ¥ì´ ê°ì†Œí–ˆìŠµë‹ˆë‹¤."));
 									break;
 								case CSpecialItemGroup::POISON:
-									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상자에서 나온 녹색 연기를 들이마시자 독이 온몸으로 퍼집니다!"));
+									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒìì—ì„œ ë‚˜ì˜¨ ë…¹ìƒ‰ ì—°ê¸°ë¥¼ ë“¤ì´ë§ˆì‹œì ë…ì´ ì˜¨ëª¸ìœ¼ë¡œ í¼ì§‘ë‹ˆë‹¤!"));
 									break;
 								case CSpecialItemGroup::MOB_GROUP:
-									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상자에서 몬스터가 나타났습니다!"));
+									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒìì—ì„œ ëª¬ìŠ¤í„°ê°€ ë‚˜íƒ€ë‚¬ìŠµë‹ˆë‹¤!"));
 									break;
 								default:
 									if (item_gets[i])
 									{
 										if (dwCounts[i] > 1)
-											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상자에서 %s 가 %d 개 나왔습니다."), item_gets[i]->GetName(), dwCounts[i]);
+											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒìì—ì„œ %s ê°€ %d ê°œ ë‚˜ì™”ìŠµë‹ˆë‹¤."), item_gets[i]->GetName(), dwCounts[i]);
 										else
-											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상자에서 %s 가 나왔습니다."), item_gets[i]->GetName());
+											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒìì—ì„œ %s ê°€ ë‚˜ì™”ìŠµë‹ˆë‹¤."), item_gets[i]->GetName());
 
 									}
 							}
@@ -2033,13 +2033,13 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 					}
 					else
 					{
-						ChatPacket(CHAT_TYPE_TALKING, LC_TEXT("열쇠가 맞지 않는 것 같다."));
+						ChatPacket(CHAT_TYPE_TALKING, LC_TEXT("ì—´ì‡ ê°€ ë§ì§€ ì•ŠëŠ” ê²ƒ ê°™ë‹¤."));
 						return false;
 					}
 				}
 				else
 				{
-					ChatPacket(CHAT_TYPE_TALKING, LC_TEXT("열쇠가 맞지 않는 것 같다."));
+					ChatPacket(CHAT_TYPE_TALKING, LC_TEXT("ì—´ì‡ ê°€ ë§ì§€ ì•ŠëŠ” ê²ƒ ê°™ë‹¤."));
 					return false;
 				}
 			}
@@ -2053,20 +2053,20 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 				std::vector <LPITEM> item_gets;
 				int count = 0;
 
-				if (dwBoxVnum == 50033 && LC_IsYMIR()) // 알수없는 상자
+				if (dwBoxVnum == 50033 && LC_IsYMIR()) // ì•Œìˆ˜ì—†ëŠ” ìƒì
 				{
 					if (GetLevel() < 15)
 					{
-						ChatPacket(CHAT_TYPE_INFO, LC_TEXT("15레벨 이하에서는 사용할 수 없습니다."));
+						ChatPacket(CHAT_TYPE_INFO, LC_TEXT("15ë ˆë²¨ ì´í•˜ì—ì„œëŠ” ì‚¬ìš©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 						return false;
 					}
 				}
 
-				if( (dwBoxVnum > 51500 && dwBoxVnum < 52000) || (dwBoxVnum >= 50255 && dwBoxVnum <= 50260) )	// 용혼원석들
+				if( (dwBoxVnum > 51500 && dwBoxVnum < 52000) || (dwBoxVnum >= 50255 && dwBoxVnum <= 50260) )	// ìš©í˜¼ì›ì„ë“¤
 				{
 					if( !(this->DragonSoul_IsQualified()) )
 					{
-						ChatPacket(CHAT_TYPE_INFO,LC_TEXT("먼저 용혼석 퀘스트를 완료하셔야 합니다."));
+						ChatPacket(CHAT_TYPE_INFO,LC_TEXT("ë¨¼ì € ìš©í˜¼ì„ í€˜ìŠ¤íŠ¸ë¥¼ ì™„ë£Œí•˜ì…”ì•¼ í•©ë‹ˆë‹¤."));
 						return false;
 					}
 				}
@@ -2079,41 +2079,41 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 						switch (dwVnums[i])
 						{
 						case CSpecialItemGroup::GOLD:
-							ChatPacket(CHAT_TYPE_INFO, LC_TEXT("돈 %d 냥을 획득했습니다."), dwCounts[i]);
+							ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ëˆ %d ëƒ¥ì„ íšë“í–ˆìŠµë‹ˆë‹¤."), dwCounts[i]);
 							break;
 						case CSpecialItemGroup::EXP:
-							ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상자에서 부터 신비한 빛이 나옵니다."));
-							ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%d의 경험치를 획득했습니다."), dwCounts[i]);
+							ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒìì—ì„œ ë¶€í„° ì‹ ë¹„í•œ ë¹›ì´ ë‚˜ì˜µë‹ˆë‹¤."));
+							ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%dì˜ ê²½í—˜ì¹˜ë¥¼ íšë“í–ˆìŠµë‹ˆë‹¤."), dwCounts[i]);
 							break;
 						case CSpecialItemGroup::MOB:
-							ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상자에서 몬스터가 나타났습니다!"));
+							ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒìì—ì„œ ëª¬ìŠ¤í„°ê°€ ë‚˜íƒ€ë‚¬ìŠµë‹ˆë‹¤!"));
 							break;
 						case CSpecialItemGroup::SLOW:
-							ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상자에서 나온 빨간 연기를 들이마시자 움직이는 속도가 느려졌습니다!"));
+							ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒìì—ì„œ ë‚˜ì˜¨ ë¹¨ê°„ ì—°ê¸°ë¥¼ ë“¤ì´ë§ˆì‹œì ì›€ì§ì´ëŠ” ì†ë„ê°€ ëŠë ¤ì¡ŒìŠµë‹ˆë‹¤!"));
 							break;
 						case CSpecialItemGroup::DRAIN_HP:
-							ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상자가 갑자기 폭발하였습니다! 생명력이 감소했습니다."));
+							ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒìê°€ ê°‘ìê¸° í­ë°œí•˜ì˜€ìŠµë‹ˆë‹¤! ìƒëª…ë ¥ì´ ê°ì†Œí–ˆìŠµë‹ˆë‹¤."));
 							break;
 						case CSpecialItemGroup::POISON:
-							ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상자에서 나온 녹색 연기를 들이마시자 독이 온몸으로 퍼집니다!"));
+							ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒìì—ì„œ ë‚˜ì˜¨ ë…¹ìƒ‰ ì—°ê¸°ë¥¼ ë“¤ì´ë§ˆì‹œì ë…ì´ ì˜¨ëª¸ìœ¼ë¡œ í¼ì§‘ë‹ˆë‹¤!"));
 							break;
 						case CSpecialItemGroup::MOB_GROUP:
-							ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상자에서 몬스터가 나타났습니다!"));
+							ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒìì—ì„œ ëª¬ìŠ¤í„°ê°€ ë‚˜íƒ€ë‚¬ìŠµë‹ˆë‹¤!"));
 							break;
 						default:
 							if (item_gets[i])
 							{
 								if (dwCounts[i] > 1)
-									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상자에서 %s 가 %d 개 나왔습니다."), item_gets[i]->GetName(), dwCounts[i]);
+									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒìì—ì„œ %s ê°€ %d ê°œ ë‚˜ì™”ìŠµë‹ˆë‹¤."), item_gets[i]->GetName(), dwCounts[i]);
 								else
-									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상자에서 %s 가 나왔습니다."), item_gets[i]->GetName());
+									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒìì—ì„œ %s ê°€ ë‚˜ì™”ìŠµë‹ˆë‹¤."), item_gets[i]->GetName());
 							}
 						}
 					}
 				}
 				else
 				{
-					ChatPacket(CHAT_TYPE_TALKING, LC_TEXT("아무것도 얻을 수 없었습니다."));
+					ChatPacket(CHAT_TYPE_TALKING, LC_TEXT("ì•„ë¬´ê²ƒë„ ì–»ì„ ìˆ˜ ì—†ì—ˆìŠµë‹ˆë‹¤."));
 					return false;
 				}
 			}
@@ -2132,10 +2132,10 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 				if (SkillLevelDown(dwVnum))
 				{
 					ITEM_MANAGER::instance().RemoveItem(item);
-					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("스킬 레벨을 내리는데 성공하였습니다."));
+					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìŠ¤í‚¬ ë ˆë²¨ì„ ë‚´ë¦¬ëŠ”ë° ì„±ê³µí•˜ì˜€ìŠµë‹ˆë‹¤."));
 				}
 				else
-					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("스킬 레벨을 내릴 수 없습니다."));
+					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìŠ¤í‚¬ ë ˆë²¨ì„ ë‚´ë¦´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 			}
 			break;
 
@@ -2143,7 +2143,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 			{
 				if (IsPolymorphed())
 				{
-					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("변신중에는 책을 읽을수 없습니다."));
+					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë³€ì‹ ì¤‘ì—ëŠ” ì±…ì„ ì½ì„ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 					return false;
 				}
 
@@ -2155,7 +2155,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 				}
 				else
 				{
-					// 새로운 수련서는 value 0 에 스킬 번호가 있으므로 그것을 사용.
+					// ìƒˆë¡œìš´ ìˆ˜ë ¨ì„œëŠ” value 0 ì— ìŠ¤í‚¬ ë²ˆí˜¸ê°€ ìˆìœ¼ë¯€ë¡œ ê·¸ê²ƒì„ ì‚¬ìš©.
 					dwVnum = item->GetValue(0);
 				}
 
@@ -2194,7 +2194,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 						case USE_ABILITY_UP:
 							if (FindAffect(affect_type, apply_type))
 							{
-								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이미 효과가 걸려 있습니다."));
+								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ë¯¸ íš¨ê³¼ê°€ ê±¸ë ¤ ìˆìŠµë‹ˆë‹¤."));
 								return false;
 							}
 
@@ -2237,7 +2237,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 						{
 							if (FindAffect(AFFECT_EXP_BONUS_EURO_FREE, aApplyInfo[item->GetValue(1)].bPointType))
 							{
-								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이미 효과가 걸려 있습니다."));
+								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ë¯¸ íš¨ê³¼ê°€ ê±¸ë ¤ ìˆìŠµë‹ˆë‹¤."));
 							}
 							else
 							{
@@ -2253,7 +2253,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							{
 								if (quest::CQuestManager::instance().GetEventFlag("arena_potion_limit") > 0)
 								{
-									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련장에서 사용하실 수 없습니다."));
+									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ëŒ€ë ¨ì¥ì—ì„œ ì‚¬ìš©í•˜ì‹¤ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 									return false;
 								}
 
@@ -2267,14 +2267,14 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										{
 											if (m_nPotionLimit <= 0)
 											{
-												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("사용 제한량을 초과하였습니다."));
+												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì‚¬ìš© ì œí•œëŸ‰ì„ ì´ˆê³¼í•˜ì˜€ìŠµë‹ˆë‹¤."));
 												return false;
 											}
 										}
 										break;
 
 									default :
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련장에서 사용하실 수 없습니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ëŒ€ë ¨ì¥ì—ì„œ ì‚¬ìš©í•˜ì‹¤ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 										return false;
 										break;
 								}
@@ -2282,7 +2282,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 							bool used = false;
 
-							if (item->GetValue(0) != 0) // HP 절대값 회복
+							if (item->GetValue(0) != 0) // HP ì ˆëŒ€ê°’ íšŒë³µ
 							{
 								if (GetHP() < GetMaxHP())
 								{
@@ -2292,7 +2292,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								}
 							}
 
-							if (item->GetValue(1) != 0)	// SP 절대값 회복
+							if (item->GetValue(1) != 0)	// SP ì ˆëŒ€ê°’ íšŒë³µ
 							{
 								if (GetSP() < GetMaxSP())
 								{
@@ -2302,7 +2302,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								}
 							}
 
-							if (item->GetValue(3) != 0) // HP % 회복
+							if (item->GetValue(3) != 0) // HP % íšŒë³µ
 							{
 								if (GetHP() < GetMaxHP())
 								{
@@ -2312,7 +2312,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								}
 							}
 
-							if (item->GetValue(4) != 0) // SP % 회복
+							if (item->GetValue(4) != 0) // SP % íšŒë³µ
 							{
 								if (GetSP() < GetMaxSP())
 								{
@@ -2327,7 +2327,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								if (item->GetVnum() == 50085 || item->GetVnum() == 50086)
 								{
 									if (test_server)
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("월병 또는 종자 를 사용하였습니다"));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì›”ë³‘ ë˜ëŠ” ì¢…ì ë¥¼ ì‚¬ìš©í•˜ì˜€ìŠµë‹ˆë‹¤"));
 									SetUseSeedOrMoonBottleTime();
 								}
 								if (GetDungeon())
@@ -2354,7 +2354,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 				{
 					if (CArenaManager::instance().IsArenaMap(GetMapIndex()) == true)
 					{
-						ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련 중에는 이용할 수 없는 물품입니다."));
+						ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ëŒ€ë ¨ ì¤‘ì—ëŠ” ì´ìš©í•  ìˆ˜ ì—†ëŠ” ë¬¼í’ˆì…ë‹ˆë‹¤."));
 						return false;
 					}
 				}
@@ -2373,7 +2373,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							{
 								return false;
 							}
-							// 우선 용혼석에 관해서만 하도록 한다.
+							// ìš°ì„  ìš©í˜¼ì„ì— ê´€í•´ì„œë§Œ í•˜ë„ë¡ í•œë‹¤.
 							if (pDestItem->IsDragonSoul())
 							{
 								int ret;
@@ -2397,7 +2397,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										sprintf(buf, "Inc %ds by item{VN:%d VAL%d:%ld}", ret, item->GetVnum(), ITEM_VALUE_CHARGING_AMOUNT_IDX, item->GetValue(ITEM_VALUE_CHARGING_AMOUNT_IDX));
 									}
 
-									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%d초 만큼 충전되었습니다."), ret);
+									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%dì´ˆ ë§Œí¼ ì¶©ì „ë˜ì—ˆìŠµë‹ˆë‹¤."), ret);
 									item->SetCount(item->GetCount() - 1);
 									LogManager::instance().ItemLog(this, item, "DS_CHARGING_SUCCESS", buf);
 									return true;
@@ -2413,7 +2413,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										sprintf(buf, "No change by item{VN:%d VAL%d:%ld}", item->GetVnum(), ITEM_VALUE_CHARGING_AMOUNT_IDX, item->GetValue(ITEM_VALUE_CHARGING_AMOUNT_IDX));
 									}
 
-									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("충전할 수 없습니다."));
+									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì¶©ì „í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 									LogManager::instance().ItemLog(this, item, "DS_CHARGING_FAILED", buf);
 									return false;
 								}
@@ -2429,14 +2429,14 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							{
 								return false;
 							}
-							// 우선 용혼석에 관해서만 하도록 한다.
+							// ìš°ì„  ìš©í˜¼ì„ì— ê´€í•´ì„œë§Œ í•˜ë„ë¡ í•œë‹¤.
 							if (pDestItem->IsDragonSoul())
 							{
 								int ret = pDestItem->GiveMoreTime_Fix(item->GetValue(ITEM_VALUE_CHARGING_AMOUNT_IDX));
 								char buf[128];
 								if (ret)
 								{
-									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%d초 만큼 충전되었습니다."), ret);
+									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%dì´ˆ ë§Œí¼ ì¶©ì „ë˜ì—ˆìŠµë‹ˆë‹¤."), ret);
 									sprintf(buf, "Increase %ds by item{VN:%d VAL%d:%ld}", ret, item->GetVnum(), ITEM_VALUE_CHARGING_AMOUNT_IDX, item->GetValue(ITEM_VALUE_CHARGING_AMOUNT_IDX));
 									LogManager::instance().ItemLog(this, item, "DS_CHARGING_SUCCESS", buf);
 									item->SetCount(item->GetCount() - 1);
@@ -2444,7 +2444,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								}
 								else
 								{
-									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("충전할 수 없습니다."));
+									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì¶©ì „í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 									sprintf(buf, "No change by item{VN:%d VAL%d:%ld}", item->GetVnum(), ITEM_VALUE_CHARGING_AMOUNT_IDX, item->GetValue(ITEM_VALUE_CHARGING_AMOUNT_IDX));
 									LogManager::instance().ItemLog(this, item, "DS_CHARGING_FAILED", buf);
 									return false;
@@ -2458,20 +2458,20 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 						
 						switch (item->GetVnum())
 						{
-							//크리스마스 란주
+							//í¬ë¦¬ìŠ¤ë§ˆìŠ¤ ë€ì£¼
 							case ITEM_NOG_POCKET:
 								{
 									/*
-									란주능력치 : item_proto value 의미
-										이동속도  value 1
-										공격력	  value 2
-										경험치    value 3
-										지속시간  value 0 (단위 초)
+									ë€ì£¼ëŠ¥ë ¥ì¹˜ : item_proto value ì˜ë¯¸
+										ì´ë™ì†ë„  value 1
+										ê³µê²©ë ¥	  value 2
+										ê²½í—˜ì¹˜    value 3
+										ì§€ì†ì‹œê°„  value 0 (ë‹¨ìœ„ ì´ˆ)
 
 									*/
 									if (FindAffect(AFFECT_NOG_ABILITY))
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이미 효과가 걸려 있습니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ë¯¸ íš¨ê³¼ê°€ ê±¸ë ¤ ìˆìŠµë‹ˆë‹¤."));
 										return false;
 									}
 									long time = item->GetValue(0);
@@ -2486,15 +2486,15 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								}
 								break;
 								
-							//라마단용 사탕
+							//ë¼ë§ˆë‹¨ìš© ì‚¬íƒ•
 							case ITEM_RAMADAN_CANDY:
 								{
 									/*
-									사탕능력치 : item_proto value 의미
-										이동속도  value 1
-										공격력	  value 2
-										경험치    value 3
-										지속시간  value 0 (단위 초)
+									ì‚¬íƒ•ëŠ¥ë ¥ì¹˜ : item_proto value ì˜ë¯¸
+										ì´ë™ì†ë„  value 1
+										ê³µê²©ë ¥	  value 2
+										ê²½í—˜ì¹˜    value 3
+										ì§€ì†ì‹œê°„  value 0 (ë‹¨ìœ„ ì´ˆ)
 
 									*/
 									long time = item->GetValue(0);
@@ -2516,7 +2516,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										{
 											if (CArenaManager::instance().IsArenaMap(pMarriage->ch1->GetMapIndex()) == true)
 											{
-												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련 중에는 이용할 수 없는 물품입니다."));
+												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ëŒ€ë ¨ ì¤‘ì—ëŠ” ì´ìš©í•  ìˆ˜ ì—†ëŠ” ë¬¼í’ˆì…ë‹ˆë‹¤."));
 												break;
 											}
 										}
@@ -2525,7 +2525,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										{
 											if (CArenaManager::instance().IsArenaMap(pMarriage->ch2->GetMapIndex()) == true)
 											{
-												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련 중에는 이용할 수 없는 물품입니다."));
+												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ëŒ€ë ¨ ì¤‘ì—ëŠ” ì´ìš©í•  ìˆ˜ ì—†ëŠ” ë¬¼í’ˆì…ë‹ˆë‹¤."));
 												break;
 											}
 										}
@@ -2540,13 +2540,13 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										WarpToPID(pMarriage->GetOther(GetPlayerID()));
 									}
 									else
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("결혼 상태가 아니면 결혼반지를 사용할 수 없습니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê²°í˜¼ ìƒíƒœê°€ ì•„ë‹ˆë©´ ê²°í˜¼ë°˜ì§€ë¥¼ ì‚¬ìš©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 								}
 								break;
 
-								//기존 용기의 망토
+								//ê¸°ì¡´ ìš©ê¸°ì˜ ë§í† 
 							case UNIQUE_ITEM_CAPE_OF_COURAGE:
-								//라마단 보상용 용기의 망토
+								//ë¼ë§ˆë‹¨ ë³´ìƒìš© ìš©ê¸°ì˜ ë§í† 
 							case 70057:
 							case REWARD_BOX_UNIQUE_ITEM_CAPE_OF_COURAGE:
 								AggregateMonster();
@@ -2565,7 +2565,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							case 30094:
 							case 30095:
 							case 30096:
-								// 복주머니
+								// ë³µì£¼ë¨¸ë‹ˆ
 								{
 									const int MAX_BAG_INFO = 26;
 									static struct LuckyBagInfo
@@ -2653,7 +2653,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 									if (bi[i].vnum == 50300)
 									{
-										// 스킬수련서는 특수하게 준다.
+										// ìŠ¤í‚¬ìˆ˜ë ¨ì„œëŠ” íŠ¹ìˆ˜í•˜ê²Œ ì¤€ë‹¤.
 										GiveRandomSkillBook();
 									}
 									else if (bi[i].vnum == 1)
@@ -2668,7 +2668,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								}
 								break;
 
-							case 50004: // 이벤트용 감지기
+							case 50004: // ì´ë²¤íŠ¸ìš© ê°ì§€ê¸°
 								{
 									if (item->GetSocket(0))
 									{
@@ -2676,7 +2676,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									}
 									else
 									{
-										// 처음 사용시
+										// ì²˜ìŒ ì‚¬ìš©ì‹œ
 										int iMapIndex = GetMapIndex();
 
 										PIXEL_POSITION pos;
@@ -2689,7 +2689,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										}
 										else
 										{
-											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이 곳에선 이벤트용 감지기가 동작하지 않는것 같습니다."));
+											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ ê³³ì—ì„  ì´ë²¤íŠ¸ìš© ê°ì§€ê¸°ê°€ ë™ì‘í•˜ì§€ ì•ŠëŠ”ê²ƒ ê°™ìŠµë‹ˆë‹¤."));
 											return false;
 										}
 									}
@@ -2699,10 +2699,10 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 									if (distance < 1000.0f)
 									{
-										// 발견!
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이벤트용 감지기가 신비로운 빛을 내며 사라집니다."));
+										// ë°œê²¬!
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ë²¤íŠ¸ìš© ê°ì§€ê¸°ê°€ ì‹ ë¹„ë¡œìš´ ë¹›ì„ ë‚´ë©° ì‚¬ë¼ì§‘ë‹ˆë‹¤."));
 
-										// 사용횟수에 따라 주는 아이템을 다르게 한다.
+										// ì‚¬ìš©íšŸìˆ˜ì— ë”°ë¼ ì£¼ëŠ” ì•„ì´í…œì„ ë‹¤ë¥´ê²Œ í•œë‹¤.
 										struct TEventStoneInfo
 										{
 											DWORD dwVnum;
@@ -2801,7 +2801,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 														pdw[0] = info[i].dwVnum;
 														pdw[1] = info[i].count;
 
-														// 추첨서는 소켓을 설정한다
+														// ì¶”ì²¨ì„œëŠ” ì†Œì¼“ì„ ì„¤ì •í•œë‹¤
 														DBManager::instance().ReturnQuery(QID_LOTTO, GetPlayerID(), pdw,
 																"INSERT INTO lotto_list VALUES(0, 'server%s', %u, NOW())", 
 																get_table_postfix(), GetPlayerID());
@@ -2821,7 +2821,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										if (len < 0 || len >= (int) sizeof(chatbuf))
 											len = sizeof(chatbuf) - 1;
 
-										++len;  // \0 문자까지 보내기
+										++len;  // \0 ë¬¸ìê¹Œì§€ ë³´ë‚´ê¸°
 
 										TPacketGCChat pack_chat;
 										pack_chat.header	= GC::CHAT;
@@ -2847,11 +2847,11 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									else
 										dist = 3;
 
-									// 많이 사용했으면 사라진다.
+									// ë§ì´ ì‚¬ìš©í–ˆìœ¼ë©´ ì‚¬ë¼ì§„ë‹¤.
 									const int STONE_DETECT_MAX_TRY = 10;
 									if (item->GetSocket(0) >= STONE_DETECT_MAX_TRY)
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이벤트용 감지기가 흔적도 없이 사라집니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ë²¤íŠ¸ìš© ê°ì§€ê¸°ê°€ í”ì ë„ ì—†ì´ ì‚¬ë¼ì§‘ë‹ˆë‹¤."));
 										ITEM_MANAGER::instance().RemoveItem(item, "REMOVE (DETECT_EVENT_STONE) 0");
 										AutoGiveItem(27002);
 										return true;
@@ -2867,7 +2867,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										if (len < 0 || len >= (int) sizeof(chatbuf))
 											len = sizeof(chatbuf) - 1;
 
-										++len;  // \0 문자까지 보내기
+										++len;  // \0 ë¬¸ìê¹Œì§€ ë³´ë‚´ê¸°
 
 										TPacketGCChat pack_chat;
 										pack_chat.header	= GC::CHAT;
@@ -2887,8 +2887,8 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								}
 								break;
 
-							case 27989: // 영석감지기
-							case 76006: // 선물용 영석감지기
+							case 27989: // ì˜ì„ê°ì§€ê¸°
+							case 76006: // ì„ ë¬¼ìš© ì˜ì„ê°ì§€ê¸°
 								{
 									LPSECTREE_MAP pMap = SECTREE_MANAGER::instance().GetMap(GetMapIndex());
 
@@ -2932,12 +2932,12 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 											}
 											else
 											{
-												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("감지기를 작용하였으나 감지되는 영석이 없습니다."));
+												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê°ì§€ê¸°ë¥¼ ì‘ìš©í•˜ì˜€ìœ¼ë‚˜ ê°ì§€ë˜ëŠ” ì˜ì„ì´ ì—†ìŠµë‹ˆë‹¤."));
 											}
 										}
 										else
 										{
-											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("감지기를 작용하였으나 감지되는 영석이 없습니다."));
+											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê°ì§€ê¸°ë¥¼ ì‘ìš©í•˜ì˜€ìœ¼ë‚˜ ê°ì§€ë˜ëŠ” ì˜ì„ì´ ì—†ìŠµë‹ˆë‹¤."));
 										}
 
 										if (item->GetSocket(0) >= 6)
@@ -2950,13 +2950,13 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								}
 								break;
 
-							case 27996: // 독병
+							case 27996: // ë…ë³‘
 								item->SetCount(item->GetCount() - 1);
 								/*if (GetSkillLevel(SKILL_CREATE_POISON))
 								  AddAffect(AFFECT_ATT_GRADE, POINT_ATT_GRADE, 3, AFF_DRINK_POISON, 15*60, 0, true);
 								  else
 								  {
-								// 독다루기가 없으면 50% 즉사 50% 공격력 +2
+								// ë…ë‹¤ë£¨ê¸°ê°€ ì—†ìœ¼ë©´ 50% ì¦‰ì‚¬ 50% ê³µê²©ë ¥ +2
 								if (number(0, 1))
 								{
 								if (GetHP() > 100)
@@ -2969,12 +2969,12 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								}*/
 								break;
 
-							case 27987: // 조개
-								// 50  돌조각 47990
-								// 30  꽝
-								// 10  백진주 47992
-								// 7   청진주 47993
-								// 3   피진주 47994
+							case 27987: // ì¡°ê°œ
+								// 50  ëŒì¡°ê° 47990
+								// 30  ê½
+								// 10  ë°±ì§„ì£¼ 47992
+								// 7   ì²­ì§„ì£¼ 47993
+								// 3   í”¼ì§„ì£¼ 47994
 								{
 									item->SetCount(item->GetCount() - 1);
 
@@ -2982,7 +2982,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 									if (r <= 50)
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("조개에서 돌조각이 나왔습니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì¡°ê°œì—ì„œ ëŒì¡°ê°ì´ ë‚˜ì™”ìŠµë‹ˆë‹¤."));
 										AutoGiveItem(27990);
 									}
 									else
@@ -3001,33 +3001,33 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 										if (r <= prob_table[0])
 										{
-											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("조개가 흔적도 없이 사라집니다."));
+											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì¡°ê°œê°€ í”ì ë„ ì—†ì´ ì‚¬ë¼ì§‘ë‹ˆë‹¤."));
 										}
 										else if (r <= prob_table[1])
 										{
-											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("조개에서 백진주가 나왔습니다."));
+											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì¡°ê°œì—ì„œ ë°±ì§„ì£¼ê°€ ë‚˜ì™”ìŠµë‹ˆë‹¤."));
 											AutoGiveItem(27992);
 										}
 										else if (r <= prob_table[2])
 										{
-											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("조개에서 청진주가 나왔습니다."));
+											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì¡°ê°œì—ì„œ ì²­ì§„ì£¼ê°€ ë‚˜ì™”ìŠµë‹ˆë‹¤."));
 											AutoGiveItem(27993);
 										}
 										else
 										{
-											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("조개에서 피진주가 나왔습니다."));
+											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì¡°ê°œì—ì„œ í”¼ì§„ì£¼ê°€ ë‚˜ì™”ìŠµë‹ˆë‹¤."));
 											AutoGiveItem(27994);
 										}
 									}
 								}
 								break;
 
-							case 71013: // 축제용폭죽
+							case 71013: // ì¶•ì œìš©í­ì£½
 								CreateFly(number(FLY_FIREWORK1, FLY_FIREWORK6), this);
 								item->SetCount(item->GetCount() - 1);
 								break;
 
-							case 50100: // 폭죽
+							case 50100: // í­ì£½
 							case 50101:
 							case 50102:
 							case 50103:
@@ -3038,7 +3038,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								item->SetCount(item->GetCount() - 1);
 								break;
 
-							case 50200: // 보따리
+							case 50200: // ë³´ë”°ë¦¬
 								if (LC_IsYMIR() == true || LC_IsKorea() == true)
 								{
 									if (IS_BOTARYABLE_ZONE(GetMapIndex()) == true)
@@ -3047,7 +3047,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									}
 									else
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("개인 상점을 열 수 없는 지역입니다"));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê°œì¸ ìƒì ì„ ì—´ ìˆ˜ ì—†ëŠ” ì§€ì—­ì…ë‹ˆë‹¤"));
 									}
 								}
 								else
@@ -3061,13 +3061,13 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								item->SetCount(item->GetCount() - 1);
 								break;
 
-							case 50301: // 통솔력 수련서
+							case 50301: // í†µì†”ë ¥ ìˆ˜ë ¨ì„œ
 							case 50302:
 							case 50303:
 								{
 									if (IsPolymorphed() == true)
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("둔갑 중에는 능력을 올릴 수 없습니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë‘”ê°‘ ì¤‘ì—ëŠ” ëŠ¥ë ¥ì„ ì˜¬ë¦´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 										return false;
 									}
 
@@ -3075,13 +3075,13 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 									if (lv < item->GetValue(0))
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이 책은 너무 어려워 이해하기가 힘듭니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ ì±…ì€ ë„ˆë¬´ ì–´ë ¤ì›Œ ì´í•´í•˜ê¸°ê°€ í˜ë“­ë‹ˆë‹¤."));
 										return false;
 									}
 
 									if (lv >= item->GetValue(1))
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이 책은 아무리 봐도 도움이 될 것 같지 않습니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ ì±…ì€ ì•„ë¬´ë¦¬ ë´ë„ ë„ì›€ì´ ë  ê²ƒ ê°™ì§€ ì•ŠìŠµë‹ˆë‹¤."));
 										return false;
 									}
 
@@ -3096,31 +3096,31 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								}
 								break;
 
-							case 50304: // 연계기 수련서
+							case 50304: // ì—°ê³„ê¸° ìˆ˜ë ¨ì„œ
 							case 50305:
 							case 50306:
 								{
 									if (IsPolymorphed())
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("변신중에는 책을 읽을수 없습니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë³€ì‹ ì¤‘ì—ëŠ” ì±…ì„ ì½ì„ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 										return false;
 										
 									}
 									if (GetSkillLevel(SKILL_COMBO) == 0 && GetLevel() < 30)
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("레벨 30이 되기 전에는 습득할 수 있을 것 같지 않습니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë ˆë²¨ 30ì´ ë˜ê¸° ì „ì—ëŠ” ìŠµë“í•  ìˆ˜ ìˆì„ ê²ƒ ê°™ì§€ ì•ŠìŠµë‹ˆë‹¤."));
 										return false;
 									}
 
 									if (GetSkillLevel(SKILL_COMBO) == 1 && GetLevel() < 50)
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("레벨 50이 되기 전에는 습득할 수 있을 것 같지 않습니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë ˆë²¨ 50ì´ ë˜ê¸° ì „ì—ëŠ” ìŠµë“í•  ìˆ˜ ìˆì„ ê²ƒ ê°™ì§€ ì•ŠìŠµë‹ˆë‹¤."));
 										return false;
 									}
 
 									if (GetSkillLevel(SKILL_COMBO) >= 2)
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("연계기는 더이상 수련할 수 없습니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì—°ê³„ê¸°ëŠ” ë”ì´ìƒ ìˆ˜ë ¨í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 										return false;
 									}
 
@@ -3136,13 +3136,13 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									}
 								}
 								break;
-							case 50311: // 언어 수련서
+							case 50311: // ì–¸ì–´ ìˆ˜ë ¨ì„œ
 							case 50312:
 							case 50313:
 								{
 									if (IsPolymorphed())
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("변신중에는 책을 읽을수 없습니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë³€ì‹ ì¤‘ì—ëŠ” ì±…ì„ ì½ì„ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 										return false;
 										
 									}
@@ -3150,7 +3150,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									int iPct = MINMAX(0, item->GetValue(1), 100);
 									if (GetSkillLevel(dwSkillVnum)>=20 || dwSkillVnum-SKILL_LANGUAGE1+1 == GetEmpire())
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이미 완벽하게 알아들을 수 있는 언어이다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ë¯¸ ì™„ë²½í•˜ê²Œ ì•Œì•„ë“¤ì„ ìˆ˜ ìˆëŠ” ì–¸ì–´ì´ë‹¤."));
 										return false;
 									}
 
@@ -3165,11 +3165,11 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								}
 								break;
 
-							case 50061 : // 일본 말 소환 스킬 수련서
+							case 50061 : // ì¼ë³¸ ë§ ì†Œí™˜ ìŠ¤í‚¬ ìˆ˜ë ¨ì„œ
 								{
 									if (IsPolymorphed())
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("변신중에는 책을 읽을수 없습니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë³€ì‹ ì¤‘ì—ëŠ” ì±…ì„ ì½ì„ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 										return false;
 										
 									}
@@ -3178,7 +3178,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 									if (GetSkillLevel(dwSkillVnum) >= 10)
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("더 이상 수련할 수 없습니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë” ì´ìƒ ìˆ˜ë ¨í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 										return false;
 									}
 
@@ -3193,13 +3193,13 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								}
 								break;
 
-							case 50314: case 50315: case 50316: // 변신 수련서
-							case 50323: case 50324: // 증혈 수련서
-							case 50325: case 50326: // 철통 수련서
+							case 50314: case 50315: case 50316: // ë³€ì‹  ìˆ˜ë ¨ì„œ
+							case 50323: case 50324: // ì¦í˜ˆ ìˆ˜ë ¨ì„œ
+							case 50325: case 50326: // ì² í†µ ìˆ˜ë ¨ì„œ
 								{
 									if (IsPolymorphed() == true)
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("둔갑 중에는 능력을 올릴 수 없습니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë‘”ê°‘ ì¤‘ì—ëŠ” ëŠ¥ë ¥ì„ ì˜¬ë¦´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 										return false;
 									}
 									
@@ -3232,25 +3232,25 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 									if (GetLevel() < iLevelLimit)
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이 책을 읽으려면 레벨을 더 올려야 합니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ ì±…ì„ ì½ìœ¼ë ¤ë©´ ë ˆë²¨ì„ ë” ì˜¬ë ¤ì•¼ í•©ë‹ˆë‹¤."));
 										return false;
 									}
 
 									if (GetSkillLevel(dwSkillVnum) >= 40)
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("더 이상 수련할 수 없습니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë” ì´ìƒ ìˆ˜ë ¨í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 										return false;
 									}
 
 									if (GetSkillLevel(dwSkillVnum) < iSkillLevelLowLimit)
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이 책은 너무 어려워 이해하기가 힘듭니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ ì±…ì€ ë„ˆë¬´ ì–´ë ¤ì›Œ ì´í•´í•˜ê¸°ê°€ í˜ë“­ë‹ˆë‹¤."));
 										return false;
 									}
 
 									if (GetSkillLevel(dwSkillVnum) >= iSkillLevelHighLimit)
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이 책으로는 더 이상 수련할 수 없습니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ ì±…ìœ¼ë¡œëŠ” ë” ì´ìƒ ìˆ˜ë ¨í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 										return false;
 									}
 
@@ -3271,7 +3271,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								{
 									if (IsPolymorphed())
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("변신중에는 책을 읽을수 없습니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë³€ì‹ ì¤‘ì—ëŠ” ì±…ì„ ì½ì„ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 										return false;
 										
 									}
@@ -3280,7 +3280,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 									if (GetSkillLevel(dwSkillVnum)>=40)
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("더 이상 수련할 수 없습니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë” ì´ìƒ ìˆ˜ë ¨í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 										return false;
 									}
 
@@ -3312,7 +3312,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								{
 									if (IsPolymorphed())
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("변신중에는 책을 읽을수 없습니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë³€ì‹ ì¤‘ì—ëŠ” ì±…ì„ ì½ì„ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 										return false;
 										
 									}
@@ -3321,7 +3321,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 									if (GetSkillLevel(dwSkillVnum)>=40)
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("더 이상 수련할 수 없습니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë” ì´ìƒ ìˆ˜ë ¨í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 										return false;
 									}
 
@@ -3341,7 +3341,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								{
 									if (IsPolymorphed())
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("변신중에는 책을 읽을수 없습니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë³€ì‹ ì¤‘ì—ëŠ” ì±…ì„ ì½ì„ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 										return false;
 										
 									}
@@ -3350,7 +3350,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 									if (GetLevel() < 50)
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("아직 승마 스킬을 수련할 수 있는 레벨이 아닙니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì•„ì§ ìŠ¹ë§ˆ ìŠ¤í‚¬ì„ ìˆ˜ë ¨í•  ìˆ˜ ìˆëŠ” ë ˆë²¨ì´ ì•„ë‹™ë‹ˆë‹¤."));
 										return false;
 									}
 
@@ -3358,9 +3358,9 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									{
 										if (FindAffect(AFFECT_SKILL_NO_BOOK_DELAY))
 										{
-											// 주안술서 사용중에는 시간 제한 무시
+											// ì£¼ì•ˆìˆ ì„œ ì‚¬ìš©ì¤‘ì—ëŠ” ì‹œê°„ ì œí•œ ë¬´ì‹œ
 											RemoveAffect(AFFECT_SKILL_NO_BOOK_DELAY);
-											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("주안술서를 통해 주화입마에서 빠져나왔습니다."));
+											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì£¼ì•ˆìˆ ì„œë¥¼ í†µí•´ ì£¼í™”ì…ë§ˆì—ì„œ ë¹ ì ¸ë‚˜ì™”ìŠµë‹ˆë‹¤."));
 										}
 										else
 										{
@@ -3373,14 +3373,14 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 											GetSkillLevel(SKILL_HORSE_WILDATTACK) + GetSkillLevel(SKILL_HORSE_CHARGE) + GetSkillLevel(SKILL_HORSE_ESCAPE) >= 60 ||
 											GetSkillLevel(SKILL_HORSE_WILDATTACK_RANGE) + GetSkillLevel(SKILL_HORSE_CHARGE) + GetSkillLevel(SKILL_HORSE_ESCAPE) >= 60)
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("더 이상 승마 수련서를 읽을 수 없습니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë” ì´ìƒ ìŠ¹ë§ˆ ìˆ˜ë ¨ì„œë¥¼ ì½ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 										return false;
 									}
 
 									if (number(1, 100) <= iPct)
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("승마 수련서를 읽어 승마 스킬 포인트를 얻었습니다."));
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("얻은 포인트로는 승마 스킬의 레벨을 올릴 수 있습니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìŠ¹ë§ˆ ìˆ˜ë ¨ì„œë¥¼ ì½ì–´ ìŠ¹ë§ˆ ìŠ¤í‚¬ í¬ì¸íŠ¸ë¥¼ ì–»ì—ˆìŠµë‹ˆë‹¤."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì–»ì€ í¬ì¸íŠ¸ë¡œëŠ” ìŠ¹ë§ˆ ìŠ¤í‚¬ì˜ ë ˆë²¨ì„ ì˜¬ë¦´ ìˆ˜ ìˆìŠµë‹ˆë‹¤."));
 										PointChange(POINT_HORSE_SKILL, 1);
 
 										int iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
@@ -3390,15 +3390,15 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									}
 									else
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("승마 수련서 이해에 실패하였습니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìŠ¹ë§ˆ ìˆ˜ë ¨ì„œ ì´í•´ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤."));
 									}
 
 									ITEM_MANAGER::instance().RemoveItem(item);
 								}
 								break;
 
-							case 70102: // 선두
-							case 70103: // 선두
+							case 70102: // ì„ ë‘
+							case 70103: // ì„ ë‘
 								{
 									if (GetAlignment() >= 0)
 										return false;
@@ -3412,13 +3412,13 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 									if (delta / 10 > 0)
 									{
-										ChatPacket(CHAT_TYPE_TALKING, LC_TEXT("마음이 맑아지는군. 가슴을 짓누르던 무언가가 좀 가벼워진 느낌이야."));
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("선악치가 %d 증가하였습니다."), delta/10);
+										ChatPacket(CHAT_TYPE_TALKING, LC_TEXT("ë§ˆìŒì´ ë§‘ì•„ì§€ëŠ”êµ°. ê°€ìŠ´ì„ ì§“ëˆ„ë¥´ë˜ ë¬´ì–¸ê°€ê°€ ì¢€ ê°€ë²¼ì›Œì§„ ëŠë‚Œì´ì•¼."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì„ ì•…ì¹˜ê°€ %d ì¦ê°€í•˜ì˜€ìŠµë‹ˆë‹¤."), delta/10);
 									}
 								}
 								break;
 
-							case 71107: // 천도복숭아
+							case 71107: // ì²œë„ë³µìˆ­ì•„
 								{
 									int val = item->GetValue(0);
 									int interval = item->GetValue(1);
@@ -3429,18 +3429,18 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									{
 										if (test_server == false)
 										{
-											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("아직 사용할 수 없습니다."));
+											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì•„ì§ ì‚¬ìš©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 											return false;
 										}
 										else
 										{
-											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("테스트 서버 시간제한 통과"));
+											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("í…ŒìŠ¤íŠ¸ ì„œë²„ ì‹œê°„ì œí•œ í†µê³¼"));
 										}
 									}
 									
 									if (GetAlignment() == 200000)
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("선악치를 더 이상 올릴 수 없습니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì„ ì•…ì¹˜ë¥¼ ë” ì´ìƒ ì˜¬ë¦´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 										return false;
 									}
 									
@@ -3456,8 +3456,8 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									item->SetCount(item->GetCount()-1);
 									pPC->SetFlag("mythical_peach.last_use_time", get_global_time());
 
-									ChatPacket(CHAT_TYPE_TALKING, LC_TEXT("마음이 맑아지는군. 가슴을 짓누르던 무언가가 좀 가벼워진 느낌이야."));
-									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("선악치가 %d 증가하였습니다."), val);
+									ChatPacket(CHAT_TYPE_TALKING, LC_TEXT("ë§ˆìŒì´ ë§‘ì•„ì§€ëŠ”êµ°. ê°€ìŠ´ì„ ì§“ëˆ„ë¥´ë˜ ë¬´ì–¸ê°€ê°€ ì¢€ ê°€ë²¼ì›Œì§„ ëŠë‚Œì´ì•¼."));
+									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì„ ì•…ì¹˜ê°€ %d ì¦ê°€í•˜ì˜€ìŠµë‹ˆë‹¤."), val);
 
 									char buf[256 + 1];
 									snprintf(buf, sizeof(buf), "%d %d", old_alignment, GetAlignment() / 10);
@@ -3465,7 +3465,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								}
 								break;
 
-							case 71109: // 탈석서
+							case 71109: // íƒˆì„ì„œ
 							case 72719:
 								{
 									LPITEM item2;
@@ -3489,7 +3489,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 											case ARMOR_EAR:
 											case ARMOR_WRIST:
 											case ARMOR_NECK:
-												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("빼낼 영석이 없습니다"));
+												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë¹¼ë‚¼ ì˜ì„ì´ ì—†ìŠµë‹ˆë‹¤"));
 												return false;
 											}
 											break;
@@ -3516,7 +3516,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 									if (socket.size() == 0)
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("빼낼 영석이 없습니다"));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë¹¼ë‚¼ ì˜ì„ì´ ì—†ìŠµë‹ˆë‹¤"));
 										return false;
 									}
 
@@ -3536,17 +3536,17 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								}
 								break;
 
-							case 70201:   // 탈색제
-							case 70202:   // 염색약(흰색)
-							case 70203:   // 염색약(금색)
-							case 70204:   // 염색약(빨간색)
-							case 70205:   // 염색약(갈색)
-							case 70206:   // 염색약(검은색)
+							case 70201:   // íƒˆìƒ‰ì œ
+							case 70202:   // ì—¼ìƒ‰ì•½(í°ìƒ‰)
+							case 70203:   // ì—¼ìƒ‰ì•½(ê¸ˆìƒ‰)
+							case 70204:   // ì—¼ìƒ‰ì•½(ë¹¨ê°„ìƒ‰)
+							case 70205:   // ì—¼ìƒ‰ì•½(ê°ˆìƒ‰)
+							case 70206:   // ì—¼ìƒ‰ì•½(ê²€ì€ìƒ‰)
 								{
 									// NEW_HAIR_STYLE_ADD
 									if (GetPart(PART_HAIR) >= 1001)
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("현재 헤어스타일에서는 염색과 탈색이 불가능합니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("í˜„ì¬ í—¤ì–´ìŠ¤íƒ€ì¼ì—ì„œëŠ” ì—¼ìƒ‰ê³¼ íƒˆìƒ‰ì´ ë¶ˆê°€ëŠ¥í•©ë‹ˆë‹¤."));
 									}
 									// END_NEW_HAIR_STYLE_ADD
 									else
@@ -3574,7 +3574,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 											}
 											else
 											{
-												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%d 레벨이 되어야 다시 염색하실 수 있습니다."), last_dye_level+3);
+												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%d ë ˆë²¨ì´ ë˜ì–´ì•¼ ë‹¤ì‹œ ì—¼ìƒ‰í•˜ì‹¤ ìˆ˜ ìˆìŠµë‹ˆë‹¤."), last_dye_level+3);
 											}
 										}
 									}
@@ -3594,7 +3594,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										for (int i = 0; i < count; i++)
 										{
 											if (dwVnums[i] == CSpecialItemGroup::GOLD)
-												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("돈 %d 냥을 획득했습니다."), dwCounts[i]);
+												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ëˆ %d ëƒ¥ì„ íšë“í–ˆìŠµë‹ˆë‹¤."), dwCounts[i]);
 										}
 
 										item->SetCount(item->GetCount() - 1);
@@ -3615,8 +3615,8 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									if (item->GetVnum() == ITEM_VALENTINE_ROSE && SEX_MALE==GET_SEX(this) ||
 										item->GetVnum() == ITEM_VALENTINE_CHOCOLATE && SEX_FEMALE==GET_SEX(this))
 									{
-										// 성별이 맞지않아 쓸 수 없다.
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("성별이 맞지않아 이 아이템을 열 수 없습니다."));
+										// ì„±ë³„ì´ ë§ì§€ì•Šì•„ ì“¸ ìˆ˜ ì—†ë‹¤.
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì„±ë³„ì´ ë§ì§€ì•Šì•„ ì´ ì•„ì´í…œì„ ì—´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 										return false;
 									}
 
@@ -3639,8 +3639,8 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									if (item->GetVnum() == ITEM_WHITEDAY_CANDY && SEX_MALE==GET_SEX(this) ||
 										item->GetVnum() == ITEM_WHITEDAY_ROSE && SEX_FEMALE==GET_SEX(this))
 									{
-										// 성별이 맞지않아 쓸 수 없다.
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("성별이 맞지않아 이 아이템을 열 수 없습니다."));
+										// ì„±ë³„ì´ ë§ì§€ì•Šì•„ ì“¸ ìˆ˜ ì—†ë‹¤.
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì„±ë³„ì´ ë§ì§€ì•Šì•„ ì´ ì•„ì´í…œì„ ì—´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 										return false;
 									}
 
@@ -3650,7 +3650,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								}
 								break;
 
-							case 50011: // 월광보합
+							case 50011: // ì›”ê´‘ë³´í•©
 								{
 									DWORD dwBoxVnum = 50011;
 									std::vector <DWORD> dwVnums;
@@ -3672,41 +3672,41 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 											switch (dwVnums[i])
 											{
 											case CSpecialItemGroup::GOLD:
-												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("돈 %d 냥을 획득했습니다."), dwCounts[i]);
+												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ëˆ %d ëƒ¥ì„ íšë“í–ˆìŠµë‹ˆë‹¤."), dwCounts[i]);
 												break;
 
 											case CSpecialItemGroup::EXP:
-												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상자에서 부터 신비한 빛이 나옵니다."));
-												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%d의 경험치를 획득했습니다."), dwCounts[i]);
+												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒìì—ì„œ ë¶€í„° ì‹ ë¹„í•œ ë¹›ì´ ë‚˜ì˜µë‹ˆë‹¤."));
+												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%dì˜ ê²½í—˜ì¹˜ë¥¼ íšë“í–ˆìŠµë‹ˆë‹¤."), dwCounts[i]);
 												break;
 
 											case CSpecialItemGroup::MOB:
-												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상자에서 몬스터가 나타났습니다!"));
+												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒìì—ì„œ ëª¬ìŠ¤í„°ê°€ ë‚˜íƒ€ë‚¬ìŠµë‹ˆë‹¤!"));
 												break;
 
 											case CSpecialItemGroup::SLOW:
-												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상자에서 나온 빨간 연기를 들이마시자 움직이는 속도가 느려졌습니다!"));
+												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒìì—ì„œ ë‚˜ì˜¨ ë¹¨ê°„ ì—°ê¸°ë¥¼ ë“¤ì´ë§ˆì‹œì ì›€ì§ì´ëŠ” ì†ë„ê°€ ëŠë ¤ì¡ŒìŠµë‹ˆë‹¤!"));
 												break;
 
 											case CSpecialItemGroup::DRAIN_HP:
-												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상자가 갑자기 폭발하였습니다! 생명력이 감소했습니다."));
+												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒìê°€ ê°‘ìê¸° í­ë°œí•˜ì˜€ìŠµë‹ˆë‹¤! ìƒëª…ë ¥ì´ ê°ì†Œí–ˆìŠµë‹ˆë‹¤."));
 												break;
 
 											case CSpecialItemGroup::POISON:
-												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상자에서 나온 녹색 연기를 들이마시자 독이 온몸으로 퍼집니다!"));
+												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒìì—ì„œ ë‚˜ì˜¨ ë…¹ìƒ‰ ì—°ê¸°ë¥¼ ë“¤ì´ë§ˆì‹œì ë…ì´ ì˜¨ëª¸ìœ¼ë¡œ í¼ì§‘ë‹ˆë‹¤!"));
 												break;
 
 											case CSpecialItemGroup::MOB_GROUP:
-												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상자에서 몬스터가 나타났습니다!"));
+												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒìì—ì„œ ëª¬ìŠ¤í„°ê°€ ë‚˜íƒ€ë‚¬ìŠµë‹ˆë‹¤!"));
 												break;
 
 											default:
 												if (item_gets[i])
 												{
 													if (dwCounts[i] > 1)
-														ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상자에서 %s 가 %d 개 나왔습니다."), item_gets[i]->GetName(), dwCounts[i]);
+														ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒìì—ì„œ %s ê°€ %d ê°œ ë‚˜ì™”ìŠµë‹ˆë‹¤."), item_gets[i]->GetName(), dwCounts[i]);
 													else
-														ChatPacket(CHAT_TYPE_INFO, LC_TEXT("상자에서 %s 가 나왔습니다."), item_gets[i]->GetName());
+														ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ìƒìì—ì„œ %s ê°€ ë‚˜ì™”ìŠµë‹ˆë‹¤."), item_gets[i]->GetName());
 												}
 												break;
 											}
@@ -3714,7 +3714,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									}
 									else
 									{
-										ChatPacket(CHAT_TYPE_TALKING, LC_TEXT("아무것도 얻을 수 없었습니다."));
+										ChatPacket(CHAT_TYPE_TALKING, LC_TEXT("ì•„ë¬´ê²ƒë„ ì–»ì„ ìˆ˜ ì—†ì—ˆìŠµë‹ˆë‹¤."));
 										return false;
 									}
 								}
@@ -3731,7 +3731,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							case 50107:
 								{
 									EffectPacket(SE_CHINA_FIREWORK);
-									// 스턴 공격을 올려준다
+									// ìŠ¤í„´ ê³µê²©ì„ ì˜¬ë ¤ì¤€ë‹¤
 									AddAffect(AFFECT_CHINA_FIREWORK, POINT_STUN_PCT, 30, AFF_CHINA_FIREWORK, 5*60, 0, true);
 									item->SetCount(item->GetCount()-1);
 								}
@@ -3741,12 +3741,12 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								{
 									if (CArenaManager::instance().IsArenaMap(GetMapIndex()) == true)
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련 중에는 이용할 수 없는 물품입니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ëŒ€ë ¨ ì¤‘ì—ëŠ” ì´ìš©í•  ìˆ˜ ì—†ëŠ” ë¬¼í’ˆì…ë‹ˆë‹¤."));
 										return false;
 									}
 
 									EffectPacket(SE_SPIN_TOP);
-									// 스턴 공격을 올려준다
+									// ìŠ¤í„´ ê³µê²©ì„ ì˜¬ë ¤ì¤€ë‹¤
 									AddAffect(AFFECT_CHINA_FIREWORK, POINT_STUN_PCT, 30, AFF_CHINA_FIREWORK, 5*60, 0, true);
 									item->SetCount(item->GetCount()-1);
 								}
@@ -3767,11 +3767,11 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								item->SetCount(item->GetCount()-1);
 								break;
 
-							case ITEM_ELK_VNUM: // 돈꾸러미
+							case ITEM_ELK_VNUM: // ëˆê¾¸ëŸ¬ë¯¸
 								{
 									int iGold = item->GetSocket(0);
 									ITEM_MANAGER::instance().RemoveItem(item);
-									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("돈 %d 냥을 획득했습니다."), iGold);
+									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ëˆ %d ëƒ¥ì„ íšë“í–ˆìŠµë‹ˆë‹¤."), iGold);
 									PointChange(POINT_GOLD, iGold);
 								}
 								break;
@@ -3784,7 +3784,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								}
 								break;
 
-							case 71092 : // 변신 해체부 임시
+							case 71092 : // ë³€ì‹  í•´ì²´ë¶€ ì„ì‹œ
 								{
 									if (m_pkChrTarget != NULL)
 									{
@@ -3805,9 +3805,9 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								}
 								break;
 
-							case 71051 : // 진재가
+							case 71051 : // ì§„ì¬ê°€
 								{
-									// 유럽, 싱가폴, 베트남 진재가 사용금지
+									// ìœ ëŸ½, ì‹±ê°€í´, ë² íŠ¸ë‚¨ ì§„ì¬ê°€ ì‚¬ìš©ê¸ˆì§€
 									// if (LC_IsEurope() || LC_IsSingapore() || LC_IsVietnam())
 										// return false;
 
@@ -3827,13 +3827,13 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 									if (item2->GetAttributeSetIndex() == -1)
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("속성을 변경할 수 없는 아이템입니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì†ì„±ì„ ë³€ê²½í•  ìˆ˜ ì—†ëŠ” ì•„ì´í…œì…ë‹ˆë‹¤."));
 										return false;
 									}
 
 									if (item2->AddRareAttribute() == true)
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("성공적으로 속성이 추가 되었습니다"));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì„±ê³µì ìœ¼ë¡œ ì†ì„±ì´ ì¶”ê°€ ë˜ì—ˆìŠµë‹ˆë‹¤"));
 
 										int iAddedIdx = item2->GetRareAttrCount() + 4;
 										char buf[21];
@@ -3853,14 +3853,14 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									}
 									else
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("더 이상 이 아이템으로 속성을 추가할 수 없습니다"));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë” ì´ìƒ ì´ ì•„ì´í…œìœ¼ë¡œ ì†ì„±ì„ ì¶”ê°€í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤"));
 									}
 								}
 								break;
 
-							case 71052 : // 진재경
+							case 71052 : // ì§„ì¬ê²½
 								{
-									// 유럽, 싱가폴, 베트남 진재가 사용금지
+									// ìœ ëŸ½, ì‹±ê°€í´, ë² íŠ¸ë‚¨ ì§„ì¬ê°€ ì‚¬ìš©ê¸ˆì§€
 									// if (LC_IsEurope() || LC_IsSingapore() || LC_IsVietnam())
 										// return false;
 
@@ -3880,7 +3880,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 									if (item2->GetAttributeSetIndex() == -1)
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("속성을 변경할 수 없는 아이템입니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì†ì„±ì„ ë³€ê²½í•  ìˆ˜ ì—†ëŠ” ì•„ì´í…œì…ë‹ˆë‹¤."));
 										return false;
 									}
 
@@ -3894,7 +3894,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									}
 									else
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("변경 시킬 속성이 없습니다"));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë³€ê²½ ì‹œí‚¬ ì†ì„±ì´ ì—†ìŠµë‹ˆë‹¤"));
 									}
 								}
 								break;
@@ -3907,8 +3907,8 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							case ITEM_AUTO_SP_RECOVERY_M:
 							case ITEM_AUTO_SP_RECOVERY_L:
 							case ITEM_AUTO_SP_RECOVERY_X:
-							// 무시무시하지만 이전에 하던 걸 고치기는 무섭고...
-							// 그래서 그냥 하드 코딩. 선물 상자용 자동물약 아이템들.
+							// ë¬´ì‹œë¬´ì‹œí•˜ì§€ë§Œ ì´ì „ì— í•˜ë˜ ê±¸ ê³ ì¹˜ê¸°ëŠ” ë¬´ì„­ê³ ...
+							// ê·¸ë˜ì„œ ê·¸ëƒ¥ í•˜ë“œ ì½”ë”©. ì„ ë¬¼ ìƒììš© ìë™ë¬¼ì•½ ì•„ì´í…œë“¤.
 							case REWARD_BOX_ITEM_AUTO_SP_RECOVERY_XS: 
 							case REWARD_BOX_ITEM_AUTO_SP_RECOVERY_S: 
 							case REWARD_BOX_ITEM_AUTO_HP_RECOVERY_XS: 
@@ -3918,7 +3918,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								{
 									if (CArenaManager::instance().IsArenaMap(GetMapIndex()) == true)
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련장에서 사용하실 수 없습니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ëŒ€ë ¨ì¥ì—ì„œ ì‚¬ìš©í•˜ì‹¤ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 										return false;
 									}
 
@@ -3961,7 +3961,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 										if (-1 == pos)
 										{
-											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("소지품에 빈 공간이 없습니다."));
+											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì†Œì§€í’ˆì— ë¹ˆ ê³µê°„ì´ ì—†ìŠµë‹ˆë‹¤."));
 											break;
 										}
 
@@ -4075,7 +4075,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 									if (get_global_time() - last_use_time < 10*60)
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("아직 사용할 수 없습니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì•„ì§ ì‚¬ìš©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 										return false;
 									}
 
@@ -4094,7 +4094,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							{
 								if (quest::CQuestManager::instance().GetEventFlag("arena_potion_limit") > 0)
 								{
-									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련장에서 사용하실 수 없습니다."));
+									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ëŒ€ë ¨ì¥ì—ì„œ ì‚¬ìš©í•˜ì‹¤ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 									return false;
 								}
 
@@ -4108,21 +4108,21 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										{
 											if (m_nPotionLimit <= 0)
 											{
-												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("사용 제한량을 초과하였습니다."));
+												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì‚¬ìš© ì œí•œëŸ‰ì„ ì´ˆê³¼í•˜ì˜€ìŠµë‹ˆë‹¤."));
 												return false;
 											}
 										}
 										break;
 
 									default :
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련장에서 사용하실 수 없습니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ëŒ€ë ¨ì¥ì—ì„œ ì‚¬ìš©í•˜ì‹¤ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 										return false;
 								}
 							}
 
 							bool used = false;
 
-							if (item->GetValue(0) != 0) // HP 절대값 회복
+							if (item->GetValue(0) != 0) // HP ì ˆëŒ€ê°’ íšŒë³µ
 							{
 								if (GetHP() < GetMaxHP())
 								{
@@ -4132,7 +4132,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								}
 							}
 
-							if (item->GetValue(1) != 0)	// SP 절대값 회복
+							if (item->GetValue(1) != 0)	// SP ì ˆëŒ€ê°’ íšŒë³µ
 							{
 								if (GetSP() < GetMaxSP())
 								{
@@ -4142,7 +4142,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								}
 							}
 
-							if (item->GetValue(3) != 0) // HP % 회복
+							if (item->GetValue(3) != 0) // HP % íšŒë³µ
 							{
 								if (GetHP() < GetMaxHP())
 								{
@@ -4152,7 +4152,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								}
 							}
 
-							if (item->GetValue(4) != 0) // SP % 회복
+							if (item->GetValue(4) != 0) // SP % íšŒë³µ
 							{
 								if (GetSP() < GetMaxSP())
 								{
@@ -4167,7 +4167,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								if (item->GetVnum() == 50085 || item->GetVnum() == 50086)
 								{
 									if (test_server)
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("월병 또는 종자 를 사용하였습니다"));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì›”ë³‘ ë˜ëŠ” ì¢…ì ë¥¼ ì‚¬ìš©í•˜ì˜€ìŠµë‹ˆë‹¤"));
 									SetUseSeedOrMoonBottleTime();
 								}
 								if (GetDungeon())
@@ -4190,7 +4190,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 						{
 							if (quest::CQuestManager::instance().GetEventFlag("arena_potion_limit") > 0)
 							{
-								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련장에서 사용하실 수 없습니다."));
+								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ëŒ€ë ¨ì¥ì—ì„œ ì‚¬ìš©í•˜ì‹¤ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 								return false;
 							}
 						
@@ -4206,14 +4206,14 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									{
 										if (m_nPotionLimit <= 0)
 										{
-											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("사용 제한량을 초과하였습니다."));
+											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì‚¬ìš© ì œí•œëŸ‰ì„ ì´ˆê³¼í•˜ì˜€ìŠµë‹ˆë‹¤."));
 											return false;
 										}
 									}
 									break;
 
 								default :
-									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련장에서 사용하실 수 없습니다."));
+									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ëŒ€ë ¨ì¥ì—ì„œ ì‚¬ìš©í•˜ì‹¤ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 									return false;
 							}
 						}
@@ -4336,22 +4336,22 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							const int MEMORY_PORTAL = 2;
 
 
-							// gm_guild_build, oxevent 맵에서 귀환부 귀환기억부 를 사용못하게 막음
+							// gm_guild_build, oxevent ë§µì—ì„œ ê·€í™˜ë¶€ ê·€í™˜ê¸°ì–µë¶€ ë¥¼ ì‚¬ìš©ëª»í•˜ê²Œ ë§‰ìŒ
 							if (GetMapIndex() == 200 || GetMapIndex() == 113)
 							{
-								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("현재 위치에서 사용할 수 없습니다."));
+								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("í˜„ì¬ ìœ„ì¹˜ì—ì„œ ì‚¬ìš©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 								return false;
 							}
 
 							if (CArenaManager::instance().IsArenaMap(GetMapIndex()) == true)
 							{
-								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("대련 중에는 이용할 수 없는 물품입니다."));
+								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ëŒ€ë ¨ ì¤‘ì—ëŠ” ì´ìš©í•  ìˆ˜ ì—†ëŠ” ë¬¼í’ˆì…ë‹ˆë‹¤."));
 								return false;
 							}
 
 							if (m_pkWarpEvent)
 							{
-								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이동할 준비가 되어있음으로 귀환부를 사용할수 없습니다"));
+								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ë™í•  ì¤€ë¹„ê°€ ë˜ì–´ìˆìŒìœ¼ë¡œ ê·€í™˜ë¶€ë¥¼ ì‚¬ìš©í• ìˆ˜ ì—†ìŠµë‹ˆë‹¤"));
 								return false;
 							}
 
@@ -4362,7 +4362,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								return false;
 							// END_OF_CONSUME_LIFE_WHEN_USE_WARP_ITEM
 
-							if (item->GetValue(0) == TOWN_PORTAL) // 귀환부
+							if (item->GetValue(0) == TOWN_PORTAL) // ê·€í™˜ë¶€
 							{
 								if (item->GetSocket(0) == 0)
 								{
@@ -4388,20 +4388,20 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								else
 								{
 									if (test_server)
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("원래 위치로 복귀"));	
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì›ë˜ ìœ„ì¹˜ë¡œ ë³µê·€"));	
 
 									ProcessRecallItem(item);
 								}
 							}
-							else if (item->GetValue(0) == MEMORY_PORTAL) // 귀환기억부
+							else if (item->GetValue(0) == MEMORY_PORTAL) // ê·€í™˜ê¸°ì–µë¶€
 							{
 								if (item->GetSocket(0) == 0)
 								{
 									if (GetDungeon())
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("던전 안에서는 %s%s 사용할 수 없습니다."),
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë˜ì „ ì•ˆì—ì„œëŠ” %s%s ì‚¬ìš©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."),
 												item->GetName(),
-												g_iUseLocale ? "" : (under_han(item->GetName()) ? LC_TEXT("을") : LC_TEXT("를")));
+												g_iUseLocale ? "" : (under_han(item->GetName()) ? LC_TEXT("ì„") : LC_TEXT("ë¥¼")));
 										return false;
 									}
 
@@ -4434,21 +4434,21 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							if (item2->IsEquipped()) // Fix
 								return false;
 	
-							if (item2->GetVnum() >= 28330 && item2->GetVnum() <= 28343) // 영석+3
+							if (item2->GetVnum() >= 28330 && item2->GetVnum() <= 28343) // ì˜ì„+3
 							{
-								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("+3 영석은 이 아이템으로 개량할 수 없습니다"));
+								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("+3 ì˜ì„ì€ ì´ ì•„ì´í…œìœ¼ë¡œ ê°œëŸ‰í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤"));
 								return false;
 							}
 							
-							if (item2->GetVnum() >= 28430 && item2->GetVnum() <= 28443)  // 영석+4
+							if (item2->GetVnum() >= 28430 && item2->GetVnum() <= 28443)  // ì˜ì„+4
 							{
-								if (item->GetVnum() == 71056) // 청룡의숨결
+								if (item->GetVnum() == 71056) // ì²­ë£¡ì˜ìˆ¨ê²°
 								{
 									RefineItem(item, item2);
 								}
 								else
 								{
-									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("영석은 이 아이템으로 개량할 수 없습니다"));
+									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì˜ì„ì€ ì´ ì•„ì´í…œìœ¼ë¡œ ê°œëŸ‰í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤"));
 								}
 							}
 							else
@@ -4478,12 +4478,12 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								BuffOnAttr_RemoveBuffsFromItem(item2);
 							}
 
-							// [NOTE] 코스튬 아이템에는 아이템 최초 생성시 랜덤 속성을 부여하되, 재경재가 등등은 막아달라는 요청이 있었음.
-							// 원래 ANTI_CHANGE_ATTRIBUTE 같은 아이템 Flag를 추가하여 기획 레벨에서 유연하게 컨트롤 할 수 있도록 할 예정이었으나
-							// 그딴거 필요없으니 닥치고 빨리 해달래서 그냥 여기서 막음... -_-
+							// [NOTE] ì½”ìŠ¤íŠ¬ ì•„ì´í…œì—ëŠ” ì•„ì´í…œ ìµœì´ˆ ìƒì„±ì‹œ ëœë¤ ì†ì„±ì„ ë¶€ì—¬í•˜ë˜, ì¬ê²½ì¬ê°€ ë“±ë“±ì€ ë§‰ì•„ë‹¬ë¼ëŠ” ìš”ì²­ì´ ìˆì—ˆìŒ.
+							// ì›ë˜ ANTI_CHANGE_ATTRIBUTE ê°™ì€ ì•„ì´í…œ Flagë¥¼ ì¶”ê°€í•˜ì—¬ ê¸°íš ë ˆë²¨ì—ì„œ ìœ ì—°í•˜ê²Œ ì»¨íŠ¸ë¡¤ í•  ìˆ˜ ìˆë„ë¡ í•  ì˜ˆì •ì´ì—ˆìœ¼ë‚˜
+							// ê·¸ë”´ê±° í•„ìš”ì—†ìœ¼ë‹ˆ ë‹¥ì¹˜ê³  ë¹¨ë¦¬ í•´ë‹¬ë˜ì„œ ê·¸ëƒ¥ ì—¬ê¸°ì„œ ë§‰ìŒ... -_-
 							if (ITEM_COSTUME == item2->GetType())
 							{
-								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("속성을 변경할 수 없는 아이템입니다."));
+								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì†ì„±ì„ ë³€ê²½í•  ìˆ˜ ì—†ëŠ” ì•„ì´í…œì…ë‹ˆë‹¤."));
 								return false;
 							}
 
@@ -4506,7 +4506,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 										if (i == ITEM_SOCKET_MAX_NUM)
 										{
-											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("청소할 석이 박혀있지 않습니다."));
+											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì²­ì†Œí•  ì„ì´ ë°•í˜€ìˆì§€ ì•ŠìŠµë‹ˆë‹¤."));
 											return false;
 										}
 
@@ -4538,21 +4538,21 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								case USE_CHANGE_ATTRIBUTE :
 									if (item2->GetAttributeSetIndex() == -1)
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("속성을 변경할 수 없는 아이템입니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì†ì„±ì„ ë³€ê²½í•  ìˆ˜ ì—†ëŠ” ì•„ì´í…œì…ë‹ˆë‹¤."));
 										return false;
 									}
 
 									if (item2->GetAttributeCount() == 0)
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("변경할 속성이 없습니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë³€ê²½í•  ì†ì„±ì´ ì—†ìŠµë‹ˆë‹¤."));
 										return false;
 									}
 
 									if (GM_PLAYER == GetGMLevel() && false == test_server)
 									{
 										//
-										// Event Flag 를 통해 이전에 아이템 속성 변경을 한 시간으로 부터 충분한 시간이 흘렀는지 검사하고
-										// 시간이 충분히 흘렀다면 현재 속성변경에 대한 시간을 설정해 준다.
+										// Event Flag ë¥¼ í†µí•´ ì´ì „ì— ì•„ì´í…œ ì†ì„± ë³€ê²½ì„ í•œ ì‹œê°„ìœ¼ë¡œ ë¶€í„° ì¶©ë¶„í•œ ì‹œê°„ì´ í˜ë €ëŠ”ì§€ ê²€ì‚¬í•˜ê³ 
+										// ì‹œê°„ì´ ì¶©ë¶„íˆ í˜ë €ë‹¤ë©´ í˜„ì¬ ì†ì„±ë³€ê²½ì— ëŒ€í•œ ì‹œê°„ì„ ì„¤ì •í•´ ì¤€ë‹¤.
 										//
 
 										DWORD dwChangeItemAttrCycle = quest::CQuestManager::instance().GetEventFlag(msc_szChangeItemAttrCycleFlag);
@@ -4569,7 +4569,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 											// if (dwLastChangeItemAttrMin + dwChangeItemAttrCycle > dwNowMin)
 											// {
-												// ChatPacket(CHAT_TYPE_INFO, LC_TEXT("속성을 바꾼지 %d분 이내에는 다시 변경할 수 없습니다.(%d 분 남음)"),
+												// ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì†ì„±ì„ ë°”ê¾¼ì§€ %dë¶„ ì´ë‚´ì—ëŠ” ë‹¤ì‹œ ë³€ê²½í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.(%d ë¶„ ë‚¨ìŒ)"),
 														// dwChangeItemAttrCycle, dwChangeItemAttrCycle - (dwNowMin - dwLastChangeItemAttrMin));
 												// return false;
 											// }
@@ -4599,8 +4599,8 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 									else
 									{
-										// 연재경 특수처리
-										// 절대로 연재가 추가 안될거라 하여 하드 코딩함.
+										// ì—°ì¬ê²½ íŠ¹ìˆ˜ì²˜ë¦¬
+										// ì ˆëŒ€ë¡œ ì—°ì¬ê°€ ì¶”ê°€ ì•ˆë ê±°ë¼ í•˜ì—¬ í•˜ë“œ ì½”ë”©í•¨.
 										if (item->GetVnum() == 71151 || item->GetVnum() == 76023)
 										{
 											if ((item2->GetType() == ITEM_WEAPON)
@@ -4617,20 +4617,20 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 												}
 												if (false == bCanUse)
 												{
-													ChatPacket(CHAT_TYPE_INFO, LC_TEXT("적용 레벨보다 높아 사용이 불가능합니다."));
+													ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì ìš© ë ˆë²¨ë³´ë‹¤ ë†’ì•„ ì‚¬ìš©ì´ ë¶ˆê°€ëŠ¥í•©ë‹ˆë‹¤."));
 													break;
 												}
 											}
 											else
 											{
-												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("무기와 갑옷에만 사용 가능합니다."));
+												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë¬´ê¸°ì™€ ê°‘ì˜·ì—ë§Œ ì‚¬ìš© ê°€ëŠ¥í•©ë‹ˆë‹¤."));
 												break;
 											}
 										}
 										item2->ChangeAttribute();
 									}
 
-									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("속성을 변경하였습니다."));
+									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì†ì„±ì„ ë³€ê²½í•˜ì˜€ìŠµë‹ˆë‹¤."));
 									{
 										char buf[21];
 										snprintf(buf, sizeof(buf), "%u", item2->GetID());
@@ -4643,14 +4643,14 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								case USE_ADD_ATTRIBUTE :
 									if (item2->GetAttributeSetIndex() == -1)
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("속성을 변경할 수 없는 아이템입니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì†ì„±ì„ ë³€ê²½í•  ìˆ˜ ì—†ëŠ” ì•„ì´í…œì…ë‹ˆë‹¤."));
 										return false;
 									}
 
 									if (item2->GetAttributeCount() < 4)
 									{
-										// 연재가 특수처리
-										// 절대로 연재가 추가 안될거라 하여 하드 코딩함.
+										// ì—°ì¬ê°€ íŠ¹ìˆ˜ì²˜ë¦¬
+										// ì ˆëŒ€ë¡œ ì—°ì¬ê°€ ì¶”ê°€ ì•ˆë ê±°ë¼ í•˜ì—¬ í•˜ë“œ ì½”ë”©í•¨.
 										if (item->GetVnum() == 71152 || item->GetVnum() == 76024)
 										{
 											if ((item2->GetType() == ITEM_WEAPON)
@@ -4667,13 +4667,13 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 												}
 												if (false == bCanUse)
 												{
-													ChatPacket(CHAT_TYPE_INFO, LC_TEXT("적용 레벨보다 높아 사용이 불가능합니다."));
+													ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì ìš© ë ˆë²¨ë³´ë‹¤ ë†’ì•„ ì‚¬ìš©ì´ ë¶ˆê°€ëŠ¥í•©ë‹ˆë‹¤."));
 													break;
 												}
 											}
 											else
 											{
-												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("무기와 갑옷에만 사용 가능합니다."));
+												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë¬´ê¸°ì™€ ê°‘ì˜·ì—ë§Œ ì‚¬ìš© ê°€ëŠ¥í•©ë‹ˆë‹¤."));
 												break;
 											}
 										}
@@ -4683,7 +4683,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										if (number(1, 100) <= aiItemAttributeAddPercent[item2->GetAttributeCount()])
 										{
 											item2->AddAttribute();
-											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("속성 추가에 성공하였습니다."));
+											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì†ì„± ì¶”ê°€ì— ì„±ê³µí•˜ì˜€ìŠµë‹ˆë‹¤."));
 
 											int iAddedIdx = item2->GetAttributeCount() - 1;
 											LogManager::instance().ItemLog(
@@ -4698,7 +4698,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										}
 										else
 										{
-											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("속성 추가에 실패하였습니다."));
+											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì†ì„± ì¶”ê°€ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤."));
 											LogManager::instance().ItemLog(this, item, "ADD_ATTRIBUTE_FAIL", buf);
 										}
 
@@ -4706,20 +4706,20 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									}
 									else
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("더이상 이 아이템을 이용하여 속성을 추가할 수 없습니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë”ì´ìƒ ì´ ì•„ì´í…œì„ ì´ìš©í•˜ì—¬ ì†ì„±ì„ ì¶”ê°€í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 									}
 									break;
 
 								case USE_ADD_ATTRIBUTE2 :
-									// 축복의 구슬 
-									// 재가비서를 통해 속성을 4개 추가 시킨 아이템에 대해서 하나의 속성을 더 붙여준다.
+									// ì¶•ë³µì˜ êµ¬ìŠ¬ 
+									// ì¬ê°€ë¹„ì„œë¥¼ í†µí•´ ì†ì„±ì„ 4ê°œ ì¶”ê°€ ì‹œí‚¨ ì•„ì´í…œì— ëŒ€í•´ì„œ í•˜ë‚˜ì˜ ì†ì„±ì„ ë” ë¶™ì—¬ì¤€ë‹¤.
 									if (item2->GetAttributeSetIndex() == -1)
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("속성을 변경할 수 없는 아이템입니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì†ì„±ì„ ë³€ê²½í•  ìˆ˜ ì—†ëŠ” ì•„ì´í…œì…ë‹ˆë‹¤."));
 										return false;
 									}
 
-									// 속성이 이미 4개 추가 되었을 때만 속성을 추가 가능하다.
+									// ì†ì„±ì´ ì´ë¯¸ 4ê°œ ì¶”ê°€ ë˜ì—ˆì„ ë•Œë§Œ ì†ì„±ì„ ì¶”ê°€ ê°€ëŠ¥í•˜ë‹¤.
 									if (item2->GetAttributeCount() == 4)
 									{
 										char buf[21];
@@ -4728,7 +4728,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										if (number(1, 100) <= aiItemAttributeAddPercent[item2->GetAttributeCount()])
 										{
 											item2->AddAttribute();
-											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("속성 추가에 성공하였습니다."));
+											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì†ì„± ì¶”ê°€ì— ì„±ê³µí•˜ì˜€ìŠµë‹ˆë‹¤."));
 
 											int iAddedIdx = item2->GetAttributeCount() - 1;
 											LogManager::instance().ItemLog(
@@ -4743,7 +4743,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										}
 										else
 										{
-											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("속성 추가에 실패하였습니다."));
+											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì†ì„± ì¶”ê°€ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤."));
 											LogManager::instance().ItemLog(this, item, "ADD_ATTRIBUTE2_FAIL", buf);
 										}
 
@@ -4751,11 +4751,11 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									}
 									else if (item2->GetAttributeCount() == 5)
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("더 이상 이 아이템을 이용하여 속성을 추가할 수 없습니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë” ì´ìƒ ì´ ì•„ì´í…œì„ ì´ìš©í•˜ì—¬ ì†ì„±ì„ ì¶”ê°€í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 									}
 									else if (item2->GetAttributeCount() < 4)
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("먼저 재가비서를 이용하여 속성을 추가시켜 주세요."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë¨¼ì € ì¬ê°€ë¹„ì„œë¥¼ ì´ìš©í•˜ì—¬ ì†ì„±ì„ ì¶”ê°€ì‹œì¼œ ì£¼ì„¸ìš”."));
 									}
 									else
 									{
@@ -4776,12 +4776,12 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 												if (number(1, 100) <= 50)
 												{
 													item2->SetAccessorySocketMaxGrade(item2->GetAccessorySocketMaxGrade() + 1);
-													ChatPacket(CHAT_TYPE_INFO, LC_TEXT("소켓이 성공적으로 추가되었습니다."));
+													ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì†Œì¼“ì´ ì„±ê³µì ìœ¼ë¡œ ì¶”ê°€ë˜ì—ˆìŠµë‹ˆë‹¤."));
 													LogManager::instance().ItemLog(this, item, "ADD_SOCKET_SUCCESS", buf);
 												}
 												else
 												{
-													ChatPacket(CHAT_TYPE_INFO, LC_TEXT("소켓 추가에 실패하였습니다."));
+													ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì†Œì¼“ ì¶”ê°€ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤."));
 													LogManager::instance().ItemLog(this, item, "ADD_SOCKET_FAIL", buf);
 												}
 
@@ -4789,12 +4789,12 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 											}
 											else
 											{
-												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이 액세서리에는 더이상 소켓을 추가할 공간이 없습니다."));
+												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ ì•¡ì„¸ì„œë¦¬ì—ëŠ” ë”ì´ìƒ ì†Œì¼“ì„ ì¶”ê°€í•  ê³µê°„ì´ ì—†ìŠµë‹ˆë‹¤."));
 											}
 										}
 										else
 										{
-											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이 아이템으로 소켓을 추가할 수 없는 아이템입니다."));
+											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ ì•„ì´í…œìœ¼ë¡œ ì†Œì¼“ì„ ì¶”ê°€í•  ìˆ˜ ì—†ëŠ” ì•„ì´í…œì…ë‹ˆë‹¤."));
 										}
 									}
 									break;
@@ -4811,12 +4811,12 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 											if (number(1, 100) <= aiAccessorySocketPutPct[item2->GetAccessorySocketGrade()])
 											{
 												item2->SetAccessorySocketGrade(item2->GetAccessorySocketGrade() + 1);
-												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("장착에 성공하였습니다."));
+												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì¥ì°©ì— ì„±ê³µí•˜ì˜€ìŠµë‹ˆë‹¤."));
 												LogManager::instance().ItemLog(this, item, "PUT_SOCKET_SUCCESS", buf);
 											}
 											else
 											{
-												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("장착에 실패하였습니다."));
+												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì¥ì°©ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤."));
 												LogManager::instance().ItemLog(this, item, "PUT_SOCKET_FAIL", buf);
 											}
 
@@ -4825,19 +4825,19 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										else
 										{
 											if (item2->GetAccessorySocketMaxGrade() == 0)
-												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("먼저 다이아몬드로 악세서리에 소켓을 추가해야합니다."));
+												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë¨¼ì € ë‹¤ì´ì•„ëª¬ë“œë¡œ ì•…ì„¸ì„œë¦¬ì— ì†Œì¼“ì„ ì¶”ê°€í•´ì•¼í•©ë‹ˆë‹¤."));
 											else if (item2->GetAccessorySocketMaxGrade() < ITEM_ACCESSORY_SOCKET_MAX_NUM)
 											{
-												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이 액세서리에는 더이상 장착할 소켓이 없습니다."));
-												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("다이아몬드로 소켓을 추가해야합니다."));
+												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ ì•¡ì„¸ì„œë¦¬ì—ëŠ” ë”ì´ìƒ ì¥ì°©í•  ì†Œì¼“ì´ ì—†ìŠµë‹ˆë‹¤."));
+												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë‹¤ì´ì•„ëª¬ë“œë¡œ ì†Œì¼“ì„ ì¶”ê°€í•´ì•¼í•©ë‹ˆë‹¤."));
 											}
 											else
-												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이 액세서리에는 더이상 보석을 장착할 수 없습니다."));
+												ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ ì•¡ì„¸ì„œë¦¬ì—ëŠ” ë”ì´ìƒ ë³´ì„ì„ ì¥ì°©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 										}
 									}
 									else
 									{
-										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이 아이템을 장착할 수 없습니다."));
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ ì•„ì´í…œì„ ì¥ì°©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 									}
 									break;
 							}
@@ -4854,7 +4854,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 							if (m_pkFishingEvent)
 							{
-								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("낚시 중에 미끼를 갈아끼울 수 없습니다."));
+								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë‚šì‹œ ì¤‘ì— ë¯¸ë¼ë¥¼ ê°ˆì•„ë¼ìš¸ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 								return false;
 							}
 
@@ -4865,11 +4865,11 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 							if (weapon->GetSocket(2))
 							{
-								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이미 꽂혀있던 미끼를 빼고 %s를 끼웁니다."), item->GetName());
+								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ë¯¸ ê½‚í˜€ìˆë˜ ë¯¸ë¼ë¥¼ ë¹¼ê³  %së¥¼ ë¼ì›ë‹ˆë‹¤."), item->GetName());
 							}
 							else
 							{
-								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("낚시대에 %s를 미끼로 끼웁니다."), item->GetName());
+								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë‚šì‹œëŒ€ì— %së¥¼ ë¯¸ë¼ë¡œ ë¼ì›ë‹ˆë‹¤."), item->GetName());
 							}
 
 							weapon->SetSocket(2, item->GetValue(0));
@@ -4896,7 +4896,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							{
 								if (applyValue <= existing->lApplyValue)
 								{
-									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이미 효과가 걸려 있습니다."));
+									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ë¯¸ íš¨ê³¼ê°€ ê±¸ë ¤ ìˆìŠµë‹ˆë‹¤."));
 									break;
 								}
 
@@ -4914,7 +4914,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 						item->SetCount(item->GetCount() - 1);
 						break;
 
-					// 물약 제조 스킬용 레시피 처리	
+					// ë¬¼ì•½ ì œì¡° ìŠ¤í‚¬ìš© ë ˆì‹œí”¼ ì²˜ë¦¬	
 					case USE_RECIPE :
 						{
 							LPITEM pSource1 = FindSpecifyItem(item->GetValue(1));
@@ -4927,7 +4927,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							{
 								if (pSource1 == NULL)
 								{
-									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("물약 조합을 위한 재료가 부족합니다."));
+									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë¬¼ì•½ ì¡°í•©ì„ ìœ„í•œ ì¬ë£Œê°€ ë¶€ì¡±í•©ë‹ˆë‹¤."));
 									return false;
 								}
 							}
@@ -4936,7 +4936,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							{
 								if (pSource2 == NULL)
 								{
-									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("물약 조합을 위한 재료가 부족합니다."));
+									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë¬¼ì•½ ì¡°í•©ì„ ìœ„í•œ ì¬ë£Œê°€ ë¶€ì¡±í•©ë‹ˆë‹¤."));
 									return false;
 								}
 							}
@@ -4945,7 +4945,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							{
 								if (pSource1->GetCount() < dwSourceCount1)
 								{
-									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("재료(%s)가 부족합니다."), pSource1->GetName());
+									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì¬ë£Œ(%s)ê°€ ë¶€ì¡±í•©ë‹ˆë‹¤."), pSource1->GetName());
 									return false;
 								}
 
@@ -4956,7 +4956,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							{
 								if (pSource2->GetCount() < dwSourceCount2)
 								{
-									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("재료(%s)가 부족합니다."), pSource2->GetName());
+									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì¬ë£Œ(%s)ê°€ ë¶€ì¡±í•©ë‹ˆë‹¤."), pSource2->GetName());
 									return false;
 								}
 
@@ -4967,7 +4967,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 							if (!pBottle || pBottle->GetCount() < 1)
 							{
-								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("빈 병이 모자릅니다."));
+								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë¹ˆ ë³‘ì´ ëª¨ìë¦…ë‹ˆë‹¤."));
 								return false;
 							}
 
@@ -4975,7 +4975,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 							if (number(1, 100) > item->GetValue(5))
 							{
-								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("물약 제조에 실패했습니다."));
+								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë¬¼ì•½ ì œì¡°ì— ì‹¤íŒ¨í–ˆìŠµë‹ˆë‹¤."));
 								return false;
 							}
 
@@ -5018,7 +5018,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 					if (item->GetValue(5) == p->alValues[5])
 					{
-						ChatPacket(CHAT_TYPE_INFO, LC_TEXT("같은 종류의 메틴석은 여러개 부착할 수 없습니다."));
+						ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê°™ì€ ì¢…ë¥˜ì˜ ë©”í‹´ì„ì€ ì—¬ëŸ¬ê°œ ë¶€ì°©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 						return false;
 					}
 				}
@@ -5027,7 +5027,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 				{
 					if (!IS_SET(item->GetWearFlag(), WEARABLE_BODY) || !IS_SET(item2->GetWearFlag(), WEARABLE_BODY))
 					{
-						ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이 메틴석은 장비에 부착할 수 없습니다."));
+						ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ ë©”í‹´ì„ì€ ì¥ë¹„ì— ë¶€ì°©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 						return false;
 					}
 				}
@@ -5035,28 +5035,28 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 				{
 					if (!IS_SET(item->GetWearFlag(), WEARABLE_WEAPON))
 					{
-						ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이 메틴석은 무기에 부착할 수 없습니다."));
+						ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ ë©”í‹´ì„ì€ ë¬´ê¸°ì— ë¶€ì°©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 						return false;
 					}
 				}
 				else
 				{
-					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("부착할 수 있는 슬롯이 없습니다."));
+					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë¶€ì°©í•  ìˆ˜ ìˆëŠ” ìŠ¬ë¡¯ì´ ì—†ìŠµë‹ˆë‹¤."));
 					return false;
 				}
 
 				for (i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
 					if (item2->GetSocket(i) >= 1 && item2->GetSocket(i) <= 2 && item2->GetSocket(i) >= item->GetValue(2))
 					{
-						// 석 확률
+						// ì„ í™•ë¥ 
 						if (number(1, 100) <= 30)
 						{
-							ChatPacket(CHAT_TYPE_INFO, LC_TEXT("메틴석 부착에 성공하였습니다."));
+							ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë©”í‹´ì„ ë¶€ì°©ì— ì„±ê³µí•˜ì˜€ìŠµë‹ˆë‹¤."));
 							item2->SetSocket(i, item->GetVnum());
 						}
 						else
 						{
-							ChatPacket(CHAT_TYPE_INFO, LC_TEXT("메틴석 부착에 실패하였습니다."));
+							ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë©”í‹´ì„ ë¶€ì°©ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤."));
 							item2->SetSocket(i, ITEM_BROKEN_METIN_VNUM);
 						}
 
@@ -5066,7 +5066,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 					}
 
 				if (i == ITEM_SOCKET_MAX_NUM)
-					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("부착할 수 있는 슬롯이 없습니다."));
+					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë¶€ì°©í•  ìˆ˜ ìˆëŠ” ìŠ¬ë¡¯ì´ ì—†ìŠµë‹ˆë‹¤."));
 			}
 			break;
 
@@ -5085,7 +5085,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 			break;
 
 		case ITEM_BLEND:
-			// 새로운 약초들
+			// ìƒˆë¡œìš´ ì•½ì´ˆë“¤
 			sys_log(0,"ITEM_BLEND!!");
 			if (Blend_Item_find(item->GetVnum()))
 			{
@@ -5101,13 +5101,13 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 				
 				if (FindAffect(affect_type, apply_type))
 				{
-					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이미 효과가 걸려 있습니다."));
+					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ë¯¸ íš¨ê³¼ê°€ ê±¸ë ¤ ìˆìŠµë‹ˆë‹¤."));
 				}
 				else
 				{
 					if (FindAffect(AFFECT_EXP_BONUS_EURO_FREE, POINT_RESIST_MAGIC))
 					{
-						ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이미 효과가 걸려 있습니다."));
+						ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ë¯¸ íš¨ê³¼ê°€ ê±¸ë ¤ ìˆìŠµë‹ˆë‹¤."));
 					}
 					else
 					{
@@ -5179,7 +5179,7 @@ bool CHARACTER::UseItem(TItemPos Cell, TItemPos DestCell)
 
 	if (!item->CanUsedBy(this))
 	{
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("군직이 맞지않아 이 아이템을 사용할 수 없습니다."));
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("êµ°ì§ì´ ë§ì§€ì•Šì•„ ì´ ì•„ì´í…œì„ ì‚¬ìš©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		return false;
 	}
 
@@ -5188,7 +5188,7 @@ bool CHARACTER::UseItem(TItemPos Cell, TItemPos DestCell)
 
 	if (false == FN_check_item_sex(this, item))
 	{
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("성별이 맞지않아 이 아이템을 사용할 수 없습니다."));
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì„±ë³„ì´ ë§ì§€ì•Šì•„ ì´ ì•„ì´í…œì„ ì‚¬ìš©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		return false;
 	}
 
@@ -5197,43 +5197,43 @@ bool CHARACTER::UseItem(TItemPos Cell, TItemPos DestCell)
 	{
 		if (false == IS_SUMMONABLE_ZONE(GetMapIndex()))
 		{
-			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("사용할수 없습니다."));
+			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì‚¬ìš©í• ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 			return false;
 		}
 
-		// 경혼반지 사용지 상대방이 SUMMONABLE_ZONE에 있는가는 WarpToPC()에서 체크
+		// ê²½í˜¼ë°˜ì§€ ì‚¬ìš©ì§€ ìƒëŒ€ë°©ì´ SUMMONABLE_ZONEì— ìˆëŠ”ê°€ëŠ” WarpToPC()ì—ì„œ ì²´í¬
 		
-		//삼거리 관려 맵에서는 귀환부를 막아버린다.
+		//ì‚¼ê±°ë¦¬ ê´€ë ¤ ë§µì—ì„œëŠ” ê·€í™˜ë¶€ë¥¼ ë§‰ì•„ë²„ë¦°ë‹¤.
 		if (CThreeWayWar::instance().IsThreeWayWarMapIndex(GetMapIndex()))
 		{
-			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("삼거리 전투 참가중에는 귀환부,귀환기억부를 사용할수 없습니다."));
+			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì‚¼ê±°ë¦¬ ì „íˆ¬ ì°¸ê°€ì¤‘ì—ëŠ” ê·€í™˜ë¶€,ê·€í™˜ê¸°ì–µë¶€ë¥¼ ì‚¬ìš©í• ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 			return false;
 		}
 		int iPulse = thecore_pulse();
 
-		//창고 연후 체크
+		//ì°½ê³  ì—°í›„ ì²´í¬
 		if (iPulse - GetSafeboxLoadTime() < PASSES_PER_SEC(g_nPortalLimitTime))
 		{
-			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("창고를 연후 %d초 이내에는 귀환부,귀환기억부를 사용할 수 없습니다."), g_nPortalLimitTime);
+			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì°½ê³ ë¥¼ ì—°í›„ %dì´ˆ ì´ë‚´ì—ëŠ” ê·€í™˜ë¶€,ê·€í™˜ê¸°ì–µë¶€ë¥¼ ì‚¬ìš©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."), g_nPortalLimitTime);
 
 			if (test_server)
 				ChatPacket(CHAT_TYPE_INFO, "[TestOnly]Pulse %d LoadTime %d PASS %d", iPulse, GetSafeboxLoadTime(), PASSES_PER_SEC(g_nPortalLimitTime));
 			return false; 
 		}
 
-		//거래관련 창 체크
+		//ê±°ë˜ê´€ë ¨ ì°½ ì²´í¬
 		if (GetExchange() || GetMyShop() || GetShopOwner() || IsOpenSafebox() || IsCubeOpen())
 		{
-			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("거래창,창고 등을 연 상태에서는 귀환부,귀환기억부 를 사용할수 없습니다."));
+			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê±°ë˜ì°½,ì°½ê³  ë“±ì„ ì—° ìƒíƒœì—ì„œëŠ” ê·€í™˜ë¶€,ê·€í™˜ê¸°ì–µë¶€ ë¥¼ ì‚¬ìš©í• ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 			return false;
 		}
 
 		//PREVENT_REFINE_HACK
-		//개량후 시간체크 
+		//ê°œëŸ‰í›„ ì‹œê°„ì²´í¬ 
 		{
 			if (iPulse - GetRefineTime() < PASSES_PER_SEC(g_nPortalLimitTime))
 			{
-				ChatPacket(CHAT_TYPE_INFO, LC_TEXT("아이템 개량후 %d초 이내에는 귀환부,귀환기억부를 사용할 수 없습니다."), g_nPortalLimitTime);
+				ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì•„ì´í…œ ê°œëŸ‰í›„ %dì´ˆ ì´ë‚´ì—ëŠ” ê·€í™˜ë¶€,ê·€í™˜ê¸°ì–µë¶€ë¥¼ ì‚¬ìš©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."), g_nPortalLimitTime);
 				return false;
 			}
 		}
@@ -5244,7 +5244,7 @@ bool CHARACTER::UseItem(TItemPos Cell, TItemPos DestCell)
 		{
 			if (iPulse - GetMyShopTime() < PASSES_PER_SEC(g_nPortalLimitTime))
 			{
-				ChatPacket(CHAT_TYPE_INFO, LC_TEXT("개인상점 사용후 %d초 이내에는 귀환부,귀환기억부를 사용할 수 없습니다."), g_nPortalLimitTime);
+				ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê°œì¸ìƒì  ì‚¬ìš©í›„ %dì´ˆ ì´ë‚´ì—ëŠ” ê·€í™˜ë¶€,ê·€í™˜ê¸°ì–µë¶€ë¥¼ ì‚¬ìš©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."), g_nPortalLimitTime);
 				return false;
 			}
 			
@@ -5252,7 +5252,7 @@ bool CHARACTER::UseItem(TItemPos Cell, TItemPos DestCell)
 		//END_PREVENT_ITEM_COPY
 		
 
-		//귀환부 거리체크
+		//ê·€í™˜ë¶€ ê±°ë¦¬ì²´í¬
 		if (item->GetVnum() != 70302)
 		{
 			PIXEL_POSITION posWarp;
@@ -5262,13 +5262,13 @@ bool CHARACTER::UseItem(TItemPos Cell, TItemPos DestCell)
 
 			double nDist = 0;
 			const double nDistant = 5000.0;
-			//귀환기억부 
+			//ê·€í™˜ê¸°ì–µë¶€ 
 			if (item->GetVnum() == 22010)
 			{
 				x = item->GetSocket(0) - GetX();
 				y = item->GetSocket(1) - GetY();
 			}
-			//귀환부
+			//ê·€í™˜ë¶€
 			else if (item->GetVnum() == 22000) 
 			{
 				SECTREE_MANAGER::instance().GetRecallPositionByEmpire(GetMapIndex(), GetEmpire(), posWarp);
@@ -5289,7 +5289,7 @@ bool CHARACTER::UseItem(TItemPos Cell, TItemPos DestCell)
 
 			if (nDistant > nDist)
 			{
-				ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이동 되어질 위치와 너무 가까워 귀환부를 사용할수 없습니다."));
+				ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ë™ ë˜ì–´ì§ˆ ìœ„ì¹˜ì™€ ë„ˆë¬´ ê°€ê¹Œì›Œ ê·€í™˜ë¶€ë¥¼ ì‚¬ìš©í• ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 
 				if (test_server)
 					ChatPacket(CHAT_TYPE_INFO, "PossibleDistant %f nNowDist %f", nDistant,nDist);
@@ -5299,29 +5299,29 @@ bool CHARACTER::UseItem(TItemPos Cell, TItemPos DestCell)
 		}
 
 		//PREVENT_PORTAL_AFTER_EXCHANGE
-		//교환 후 시간체크
+		//êµí™˜ í›„ ì‹œê°„ì²´í¬
 		if (iPulse - GetExchangeTime()  < PASSES_PER_SEC(g_nPortalLimitTime))
 		{
-			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("거래 후 %d초 이내에는 귀환부,귀환기억부등을 사용할 수 없습니다."), g_nPortalLimitTime);
+			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê±°ë˜ í›„ %dì´ˆ ì´ë‚´ì—ëŠ” ê·€í™˜ë¶€,ê·€í™˜ê¸°ì–µë¶€ë“±ì„ ì‚¬ìš©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."), g_nPortalLimitTime);
 			return false;
 		}
 		//END_PREVENT_PORTAL_AFTER_EXCHANGE
 
 	}
 
-	//보따리 비단 사용시 거래창 제한 체크 
+	//ë³´ë”°ë¦¬ ë¹„ë‹¨ ì‚¬ìš©ì‹œ ê±°ë˜ì°½ ì œí•œ ì²´í¬ 
 	if (item->GetVnum() == 50200 | item->GetVnum() == 71049)
 	{
 		if (GetExchange() || GetMyShop() || GetShopOwner() || IsOpenSafebox() || IsCubeOpen())
 		{
-			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("거래창,창고 등을 연 상태에서는 보따리,비단보따리를 사용할수 없습니다."));
+			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê±°ë˜ì°½,ì°½ê³  ë“±ì„ ì—° ìƒíƒœì—ì„œëŠ” ë³´ë”°ë¦¬,ë¹„ë‹¨ë³´ë”°ë¦¬ë¥¼ ì‚¬ìš©í• ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 			return false;
 		}
 
 	}
 	//END_PREVENT_TRADE_WINDOW
 
-	if (IS_SET(item->GetFlag(), ITEM_FLAG_LOG)) // 사용 로그를 남기는 아이템 처리
+	if (IS_SET(item->GetFlag(), ITEM_FLAG_LOG)) // ì‚¬ìš© ë¡œê·¸ë¥¼ ë‚¨ê¸°ëŠ” ì•„ì´í…œ ì²˜ë¦¬
 	{
 		DWORD vid = item->GetVID();
 		DWORD oldCount = item->GetCount();
@@ -5335,7 +5335,7 @@ bool CHARACTER::UseItem(TItemPos Cell, TItemPos DestCell)
 
 		bool ret = UseItemEx(item, DestCell);
 
-		if (NULL == ITEM_MANAGER::instance().FindByVID(vid)) // UseItemEx에서 아이템이 삭제 되었다. 삭제 로그를 남김
+		if (NULL == ITEM_MANAGER::instance().FindByVID(vid)) // UseItemExì—ì„œ ì•„ì´í…œì´ ì‚­ì œ ë˜ì—ˆë‹¤. ì‚­ì œ ë¡œê·¸ë¥¼ ë‚¨ê¹€
 		{
 			LogManager::instance().ItemLog(this, vid, vnum, "REMOVE", hint);
 		}
@@ -5357,7 +5357,7 @@ bool CHARACTER::DropItem(TItemPos Cell, BYTE bCount)
 	if (!CanHandleItem())
 	{
 		if (NULL != DragonSoul_RefineWindow_GetOpener())
-			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("강화창을 연 상태에서는 아이템을 옮길 수 없습니다."));
+			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê°•í™”ì°½ì„ ì—° ìƒíƒœì—ì„œëŠ” ì•„ì´í…œì„ ì˜®ê¸¸ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		return false;
 	}
 
@@ -5378,14 +5378,14 @@ bool CHARACTER::DropItem(TItemPos Cell, BYTE bCount)
 
 	if (IS_SET(item->GetAntiFlag(), ITEM_ANTIFLAG_DROP | ITEM_ANTIFLAG_GIVE))
 	{
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("버릴 수 없는 아이템입니다."));
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë²„ë¦´ ìˆ˜ ì—†ëŠ” ì•„ì´í…œì…ë‹ˆë‹¤."));
 		return false;
 	}
 
 	if (bCount == 0 || bCount > item->GetCount())
 		bCount = item->GetCount();
 
-	SyncQuickslot(QUICKSLOT_TYPE_ITEM, Cell.cell, 255);	// Quickslot 에서 지움
+	SyncQuickslot(QUICKSLOT_TYPE_ITEM, Cell.cell, 255);	// Quickslot ì—ì„œ ì§€ì›€
 
 	LPITEM pkItemToDrop;
 	
@@ -5459,12 +5459,12 @@ bool CHARACTER::DropItem(TItemPos Cell, BYTE bCount)
 
 	if (pkItemToDrop->AddToGround(GetMapIndex(), pxPos))
 	{
-		// 한국에는 아이템을 버리고 복구해달라는 진상유저들이 많아서
-		// 아이템을 바닥에 버릴 시 속성로그를 남긴다.
+		// í•œêµ­ì—ëŠ” ì•„ì´í…œì„ ë²„ë¦¬ê³  ë³µêµ¬í•´ë‹¬ë¼ëŠ” ì§„ìƒìœ ì €ë“¤ì´ ë§ì•„ì„œ
+		// ì•„ì´í…œì„ ë°”ë‹¥ì— ë²„ë¦´ ì‹œ ì†ì„±ë¡œê·¸ë¥¼ ë‚¨ê¸´ë‹¤.
 		if (LC_IsYMIR())
 			item->AttrLog();
 
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("떨어진 아이템은 3분 후 사라집니다."));
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë–¨ì–´ì§„ ì•„ì´í…œì€ 3ë¶„ í›„ ì‚¬ë¼ì§‘ë‹ˆë‹¤."));
 		pkItemToDrop->StartDestroyEvent();
 
 		ITEM_MANAGER::instance().FlushDelayedSave(pkItemToDrop);
@@ -5494,7 +5494,7 @@ bool CHARACTER::DropGold(int gold)
 	{
 		if (get_dword_time() < m_dwLastGoldDropTime+g_GoldDropTimeLimitValue)
 		{
-			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("아직 골드를 버릴 수 없습니다."));
+			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì•„ì§ ê³¨ë“œë¥¼ ë²„ë¦´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 			return false;
 		}
 	}
@@ -5512,11 +5512,11 @@ bool CHARACTER::DropGold(int gold)
 			//Motion(MOTION_PICKUP);
 			PointChange(POINT_GOLD, -gold, true);
 
-			// 브라질에 돈이 없어진다는 버그가 있는데,
-			// 가능한 시나리오 중에 하나는,
-			// 메크로나, 핵을 써서 1000원 이하의 돈을 계속 버려 골드를 0으로 만들고, 
-			// 돈이 없어졌다고 복구 신청하는 것일 수도 있다.
-			// 따라서 그런 경우를 잡기 위해 낮은 수치의 골드에 대해서도 로그를 남김.
+			// ë¸Œë¼ì§ˆì— ëˆì´ ì—†ì–´ì§„ë‹¤ëŠ” ë²„ê·¸ê°€ ìˆëŠ”ë°,
+			// ê°€ëŠ¥í•œ ì‹œë‚˜ë¦¬ì˜¤ ì¤‘ì— í•˜ë‚˜ëŠ”,
+			// ë©”í¬ë¡œë‚˜, í•µì„ ì¨ì„œ 1000ì› ì´í•˜ì˜ ëˆì„ ê³„ì† ë²„ë ¤ ê³¨ë“œë¥¼ 0ìœ¼ë¡œ ë§Œë“¤ê³ , 
+			// ëˆì´ ì—†ì–´ì¡Œë‹¤ê³  ë³µêµ¬ ì‹ ì²­í•˜ëŠ” ê²ƒì¼ ìˆ˜ë„ ìˆë‹¤.
+			// ë”°ë¼ì„œ ê·¸ëŸ° ê²½ìš°ë¥¼ ì¡ê¸° ìœ„í•´ ë‚®ì€ ìˆ˜ì¹˜ì˜ ê³¨ë“œì— ëŒ€í•´ì„œë„ ë¡œê·¸ë¥¼ ë‚¨ê¹€.
 			if (LC_IsBrazil() == true)
 			{
 				if (gold >= 213)
@@ -5524,19 +5524,19 @@ bool CHARACTER::DropGold(int gold)
 			}
 			else
 			{
-				if (gold > 1000) // 천원 이상만 기록한다.
+				if (gold > 1000) // ì²œì› ì´ìƒë§Œ ê¸°ë¡í•œë‹¤.
 					LogManager::instance().CharLog(this, gold, "DROP_GOLD", "");
 			}
 
 			if (false == LC_IsBrazil())
 			{
 				item->StartDestroyEvent(150);
-				ChatPacket(CHAT_TYPE_INFO, LC_TEXT("떨어진 아이템은 %d분 후 사라집니다."), 150/60);
+				ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë–¨ì–´ì§„ ì•„ì´í…œì€ %dë¶„ í›„ ì‚¬ë¼ì§‘ë‹ˆë‹¤."), 150/60);
 			}
 			else
 			{
 				item->StartDestroyEvent(60);
-				ChatPacket(CHAT_TYPE_INFO, LC_TEXT("떨어진 아이템은 %d분 후 사라집니다."), 1);
+				ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë–¨ì–´ì§„ ì•„ì´í…œì€ %dë¶„ í›„ ì‚¬ë¼ì§‘ë‹ˆë‹¤."), 1);
 			}
 		}
 
@@ -5580,14 +5580,14 @@ bool CHARACTER::MoveItem(TItemPos Cell, TItemPos DestCell, BYTE count)
 	if (!CanHandleItem())
 	{
 		if (NULL != DragonSoul_RefineWindow_GetOpener())
-			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("강화창을 연 상태에서는 아이템을 옮길 수 없습니다."));
+			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê°•í™”ì°½ì„ ì—° ìƒíƒœì—ì„œëŠ” ì•„ì´í…œì„ ì˜®ê¸¸ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		return false;
 	}
 
 	// Only specific types of items can be placed in the belt inventory.
 	if (DestCell.IsBeltInventoryPosition() && false == CBeltInventoryHelper::CanMoveIntoBeltInventory(item))
 	{
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이 아이템은 벨트 인벤토리로 옮길 수 없습니다."));			
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ ì•„ì´í…œì€ ë²¨íŠ¸ ì¸ë²¤í† ë¦¬ë¡œ ì˜®ê¸¸ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));			
 		return false;
 	}
 
@@ -5600,7 +5600,7 @@ bool CHARACTER::MoveItem(TItemPos Cell, TItemPos DestCell, BYTE count)
 	{
 		if (GetItem(DestCell))	// For equipment, checking only this position is sufficient.
 		{
-			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이미 장비를 착용하고 있습니다."));
+			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ë¯¸ ì¥ë¹„ë¥¼ ì°©ìš©í•˜ê³  ìˆìŠµë‹ˆë‹¤."));
 			
 			return false;
 		}
@@ -5636,7 +5636,7 @@ bool CHARACTER::MoveItem(TItemPos Cell, TItemPos DestCell, BYTE count)
 
 		if ((item2 = GetItem(DestCell)) && item != item2 && item2->IsStackable() &&
 				!IS_SET(item2->GetAntiFlag(), ITEM_ANTIFLAG_STACK) &&
-				item2->GetVnum() == item->GetVnum()) // 합칠 수 있는 아이템의 경우
+				item2->GetVnum() == item->GetVnum()) // í•©ì¹  ìˆ˜ ìˆëŠ” ì•„ì´í…œì˜ ê²½ìš°
 		{
 			for (int i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
 				if (item2->GetSocket(i) != item->GetSocket(i))
@@ -5777,7 +5777,7 @@ namespace NPartyPickupDistribute
 				{
 					ch->PointChange(POINT_GOLD, iMoney, true);
 
-					if (iMoney > 1000) // 천원 이상만 기록한다.
+					if (iMoney > 1000) // ì²œì› ì´ìƒë§Œ ê¸°ë¡í•œë‹¤.
 						LogManager::instance().CharLog(ch, iMoney, "GET_GOLD", "");
 				}
 		}
@@ -5795,7 +5795,7 @@ void CHARACTER::GiveGold(int iAmount)
 	{
 		LPPARTY pParty = GetParty();
 
-		// 파티가 있는 경우 나누어 가진다.
+		// íŒŒí‹°ê°€ ìˆëŠ” ê²½ìš° ë‚˜ëˆ„ì–´ ê°€ì§„ë‹¤.
 		DWORD dwTotal = iAmount;
 		DWORD dwMyAmount = dwTotal;
 
@@ -5814,18 +5814,18 @@ void CHARACTER::GiveGold(int iAmount)
 
 		PointChange(POINT_GOLD, dwMyAmount, true);
 
-		if (dwMyAmount > 1000) // 천원 이상만 기록한다.
+		if (dwMyAmount > 1000) // ì²œì› ì´ìƒë§Œ ê¸°ë¡í•œë‹¤.
 			LogManager::instance().CharLog(this, dwMyAmount, "GET_GOLD", "");
 	}
 	else
 	{
 		PointChange(POINT_GOLD, iAmount, true);
 
-		// 브라질에 돈이 없어진다는 버그가 있는데,
-		// 가능한 시나리오 중에 하나는,
-		// 메크로나, 핵을 써서 1000원 이하의 돈을 계속 버려 골드를 0으로 만들고, 
-		// 돈이 없어졌다고 복구 신청하는 것일 수도 있다.
-		// 따라서 그런 경우를 잡기 위해 낮은 수치의 골드에 대해서도 로그를 남김.
+		// ë¸Œë¼ì§ˆì— ëˆì´ ì—†ì–´ì§„ë‹¤ëŠ” ë²„ê·¸ê°€ ìˆëŠ”ë°,
+		// ê°€ëŠ¥í•œ ì‹œë‚˜ë¦¬ì˜¤ ì¤‘ì— í•˜ë‚˜ëŠ”,
+		// ë©”í¬ë¡œë‚˜, í•µì„ ì¨ì„œ 1000ì› ì´í•˜ì˜ ëˆì„ ê³„ì† ë²„ë ¤ ê³¨ë“œë¥¼ 0ìœ¼ë¡œ ë§Œë“¤ê³ , 
+		// ëˆì´ ì—†ì–´ì¡Œë‹¤ê³  ë³µêµ¬ ì‹ ì²­í•˜ëŠ” ê²ƒì¼ ìˆ˜ë„ ìˆë‹¤.
+		// ë”°ë¼ì„œ ê·¸ëŸ° ê²½ìš°ë¥¼ ì¡ê¸° ìœ„í•´ ë‚®ì€ ìˆ˜ì¹˜ì˜ ê³¨ë“œì— ëŒ€í•´ì„œë„ ë¡œê·¸ë¥¼ ë‚¨ê¹€.
 		if (LC_IsBrazil() == true)
 		{
 			if (iAmount >= 213)
@@ -5833,7 +5833,7 @@ void CHARACTER::GiveGold(int iAmount)
 		}
 		else
 		{
-			if (iAmount > 1000) // 천원 이상만 기록한다.
+			if (iAmount > 1000) // ì²œì› ì´ìƒë§Œ ê¸°ë¡í•œë‹¤.
 				LogManager::instance().CharLog(this, iAmount, "GET_GOLD", "");
 		}
 	}
@@ -5853,7 +5853,7 @@ bool CHARACTER::PickupItem(DWORD dwVID)
 	{
 		if (item->IsOwnership(this))
 		{
-			// 만약 주으려 하는 아이템이 엘크라면
+			// ë§Œì•½ ì£¼ìœ¼ë ¤ í•˜ëŠ” ì•„ì´í…œì´ ì—˜í¬ë¼ë©´
 			if (item->GetType() == ITEM_ELK)
 			{
 				GiveGold(item->GetCount());
@@ -5863,7 +5863,7 @@ bool CHARACTER::PickupItem(DWORD dwVID)
 
 				Save();
 			}
-			// 평범한 아이템이라면
+			// í‰ë²”í•œ ì•„ì´í…œì´ë¼ë©´
 			else
 			{
 				if (item->IsStackable() && !IS_SET(item->GetAntiFlag(), ITEM_ANTIFLAG_STACK))
@@ -5913,7 +5913,7 @@ bool CHARACTER::PickupItem(DWORD dwVID)
 					if ((iEmptyCell = GetEmptyDragonSoulInventory(item)) == -1)
 					{
 						sys_log(0, "No empty ds inventory pid %u size %ud itemid %u", GetPlayerID(), item->GetSize(), item->GetID());
-						ChatPacket(CHAT_TYPE_INFO, LC_TEXT("소지하고 있는 아이템이 너무 많습니다."));
+						ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì†Œì§€í•˜ê³  ìˆëŠ” ì•„ì´í…œì´ ë„ˆë¬´ ë§ìŠµë‹ˆë‹¤."));
 						return false;
 					}
 				}
@@ -5922,7 +5922,7 @@ bool CHARACTER::PickupItem(DWORD dwVID)
 					if ((iEmptyCell = GetEmptyInventory(item->GetSize())) == -1)
 					{
 						sys_log(0, "No empty inventory pid %u size %ud itemid %u", GetPlayerID(), item->GetSize(), item->GetID());
-						ChatPacket(CHAT_TYPE_INFO, LC_TEXT("소지하고 있는 아이템이 너무 많습니다."));
+						ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì†Œì§€í•˜ê³  ìˆëŠ” ì•„ì´í…œì´ ë„ˆë¬´ ë§ìŠµë‹ˆë‹¤."));
 						return false;
 					}
 				}
@@ -5948,7 +5948,7 @@ bool CHARACTER::PickupItem(DWORD dwVID)
 		}
 		else if (!IS_SET(item->GetAntiFlag(), ITEM_ANTIFLAG_GIVE | ITEM_ANTIFLAG_DROP) && GetParty())
 		{
-			// 다른 파티원 소유권 아이템을 주으려고 한다면
+			// ë‹¤ë¥¸ íŒŒí‹°ì› ì†Œìœ ê¶Œ ì•„ì´í…œì„ ì£¼ìœ¼ë ¤ê³  í•œë‹¤ë©´
 			NPartyPickupDistribute::FFindOwnership funcFindOwnership(item);
 
 			GetParty()->ForEachOnlineMember(funcFindOwnership);
@@ -5965,7 +5965,7 @@ bool CHARACTER::PickupItem(DWORD dwVID)
 
 					if ((iEmptyCell = GetEmptyDragonSoulInventory(item)) == -1)
 					{
-						owner->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("소지하고 있는 아이템이 너무 많습니다."));
+						owner->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì†Œì§€í•˜ê³  ìˆëŠ” ì•„ì´í…œì´ ë„ˆë¬´ ë§ìŠµë‹ˆë‹¤."));
 						return false;
 					}
 				}
@@ -5978,7 +5978,7 @@ bool CHARACTER::PickupItem(DWORD dwVID)
 
 					if ((iEmptyCell = GetEmptyInventory(item->GetSize())) == -1)
 					{
-						owner->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("소지하고 있는 아이템이 너무 많습니다."));
+						owner->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì†Œì§€í•˜ê³  ìˆëŠ” ì•„ì´í…œì´ ë„ˆë¬´ ë§ìŠµë‹ˆë‹¤."));
 						return false;
 					}
 				}
@@ -6020,23 +6020,23 @@ bool CHARACTER::SwapItem(BYTE bCell, BYTE bDestCell)
 
 	TItemPos srcCell(INVENTORY, bCell), destCell(INVENTORY, bDestCell);
 
-	// 올바른 Cell 인지 검사
-	// 용혼석은 Swap할 수 없으므로, 여기서 걸림.
+	// ì˜¬ë°”ë¥¸ Cell ì¸ì§€ ê²€ì‚¬
+	// ìš©í˜¼ì„ì€ Swapí•  ìˆ˜ ì—†ìœ¼ë¯€ë¡œ, ì—¬ê¸°ì„œ ê±¸ë¦¼.
 	//if (bCell >= INVENTORY_MAX_NUM + WEAR_MAX_NUM || bDestCell >= INVENTORY_MAX_NUM + WEAR_MAX_NUM)
 	if (srcCell.IsDragonSoulEquipPosition() || destCell.IsDragonSoulEquipPosition())
 		return false;
 
-	// 같은 CELL 인지 검사
+	// ê°™ì€ CELL ì¸ì§€ ê²€ì‚¬
 	if (bCell == bDestCell)
 		return false;
 
-	// 둘 다 장비창 위치면 Swap 할 수 없다.
+	// ë‘˜ ë‹¤ ì¥ë¹„ì°½ ìœ„ì¹˜ë©´ Swap í•  ìˆ˜ ì—†ë‹¤.
 	if (srcCell.IsEquipPosition() && destCell.IsEquipPosition())
 		return false;
 
 	LPITEM item1, item2;
 
-	// item2가 장비창에 있는 것이 되도록.
+	// item2ê°€ ì¥ë¹„ì°½ì— ìˆëŠ” ê²ƒì´ ë˜ë„ë¡.
 	if (srcCell.IsEquipPosition())
 	{
 		item1 = GetInventoryItem(bDestCell);
@@ -6057,11 +6057,11 @@ bool CHARACTER::SwapItem(BYTE bCell, BYTE bDestCell)
 	    return false;
 	}
 
-	// item2가 bCell위치에 들어갈 수 있는지 확인한다.
+	// item2ê°€ bCellìœ„ì¹˜ì— ë“¤ì–´ê°ˆ ìˆ˜ ìˆëŠ”ì§€ í™•ì¸í•œë‹¤.
 	if (!IsEmptyItemGrid(TItemPos (INVENTORY, item1->GetCell()), item2->GetSize(), item1->GetCell()))
 		return false;
 
-	// 바꿀 아이템이 장비창에 있으면
+	// ë°”ê¿€ ì•„ì´í…œì´ ì¥ë¹„ì°½ì— ìˆìœ¼ë©´
 	if (TItemPos(EQUIPMENT, item2->GetCell()).IsEquipPosition())
 	{
 		BYTE bEquipCell = item2->GetCell() - INVENTORY_MAX_NUM;
@@ -6074,7 +6074,7 @@ bool CHARACTER::SwapItem(BYTE bCell, BYTE bDestCell)
 		if (false == canUnequip || false == canEquip)
 			return false;
 
-		if (bEquipCell != item1->FindEquipCell(this)) // 같은 위치일때만 허용
+		if (bEquipCell != item1->FindEquipCell(this)) // ê°™ì€ ìœ„ì¹˜ì¼ë•Œë§Œ í—ˆìš©
 			return false;
 
 		item2->RemoveFromCharacter();
@@ -6129,7 +6129,7 @@ bool CHARACTER::UnequipItem(LPITEM item)
 }
 
 //
-// @version	05/07/05 Bang2ni - Skill 사용후 1.5 초 이내에 장비 착용 금지
+// @version	05/07/05 Bang2ni - Skill ì‚¬ìš©í›„ 1.5 ì´ˆ ì´ë‚´ì— ì¥ë¹„ ì°©ìš© ê¸ˆì§€
 //
 bool CHARACTER::EquipItem(LPITEM item, int iCandidateCell)
 {
@@ -6147,50 +6147,50 @@ bool CHARACTER::EquipItem(LPITEM item, int iCandidateCell)
 	if (iWearCell < 0)
 		return false;
 
-	// 무언가를 탄 상태에서 턱시도 입기 금지
+	// ë¬´ì–¸ê°€ë¥¼ íƒ„ ìƒíƒœì—ì„œ í„±ì‹œë„ ì…ê¸° ê¸ˆì§€
 	if (iWearCell == WEAR_BODY && IsRiding() && (item->GetVnum() >= 11901 && item->GetVnum() <= 11904))
 	{
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("말을 탄 상태에서 예복을 입을 수 없습니다."));
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë§ì„ íƒ„ ìƒíƒœì—ì„œ ì˜ˆë³µì„ ì…ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		return false;
 	}
 
 	if (iWearCell != WEAR_ARROW && IsPolymorphed())
 	{
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("둔갑 중에는 착용중인 장비를 변경할 수 없습니다."));
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë‘”ê°‘ ì¤‘ì—ëŠ” ì°©ìš©ì¤‘ì¸ ì¥ë¹„ë¥¼ ë³€ê²½í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		return false;
 	}
 
 	if (FN_check_item_sex(this, item) == false)
 	{
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("성별이 맞지않아 이 아이템을 사용할 수 없습니다."));
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì„±ë³„ì´ ë§ì§€ì•Šì•„ ì´ ì•„ì´í…œì„ ì‚¬ìš©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		return false;
 	}
 
-	//신규 탈것 사용시 기존 말 사용여부 체크
+	//ì‹ ê·œ íƒˆê²ƒ ì‚¬ìš©ì‹œ ê¸°ì¡´ ë§ ì‚¬ìš©ì—¬ë¶€ ì²´í¬
 	if(item->IsRideItem() && IsRiding())
 	{
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이미 탈것을 이용중입니다."));
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ë¯¸ íƒˆê²ƒì„ ì´ìš©ì¤‘ì…ë‹ˆë‹¤."));
 		return false;
 	}
 
-	// 화살 이외에는 마지막 공격 시간 또는 스킬 사용 1.5 후에 장비 교체가 가능
+	// í™”ì‚´ ì´ì™¸ì—ëŠ” ë§ˆì§€ë§‰ ê³µê²© ì‹œê°„ ë˜ëŠ” ìŠ¤í‚¬ ì‚¬ìš© 1.5 í›„ì— ì¥ë¹„ êµì²´ê°€ ê°€ëŠ¥
 	DWORD dwCurTime = get_dword_time();
 
 	if (iWearCell != WEAR_ARROW 
 		&& (dwCurTime - GetLastAttackTime() <= 1500 || dwCurTime - m_dwLastSkillTime <= 1500))
 	{
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("가만히 있을 때만 착용할 수 있습니다."));
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê°€ë§Œíˆ ìˆì„ ë•Œë§Œ ì°©ìš©í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤."));
 		return false;
 	}
 
-	// 용혼석 특수 처리
+	// ìš©í˜¼ì„ íŠ¹ìˆ˜ ì²˜ë¦¬
 	if (item->IsDragonSoul())
 	{
-		// 같은 타입의 용혼석이 이미 들어가 있다면 착용할 수 없다.
-		// 용혼석은 swap을 지원하면 안됨.
+		// ê°™ì€ íƒ€ì…ì˜ ìš©í˜¼ì„ì´ ì´ë¯¸ ë“¤ì–´ê°€ ìˆë‹¤ë©´ ì°©ìš©í•  ìˆ˜ ì—†ë‹¤.
+		// ìš©í˜¼ì„ì€ swapì„ ì§€ì›í•˜ë©´ ì•ˆë¨.
 		if(GetInventoryItem(INVENTORY_MAX_NUM + iWearCell))
 		{
-			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이미 같은 종류의 용혼석을 착용하고 있습니다."));
+			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ë¯¸ ê°™ì€ ì¢…ë¥˜ì˜ ìš©í˜¼ì„ì„ ì°©ìš©í•˜ê³  ìˆìŠµë‹ˆë‹¤."));
 			return false;
 		}
 		
@@ -6199,13 +6199,13 @@ bool CHARACTER::EquipItem(LPITEM item, int iCandidateCell)
 			return false;
 		}
 	}
-	// 용혼석이 아님.
+	// ìš©í˜¼ì„ì´ ì•„ë‹˜.
 	else
 	{
-		// 착용할 곳에 아이템이 있다면,
+		// ì°©ìš©í•  ê³³ì— ì•„ì´í…œì´ ìˆë‹¤ë©´,
 		if (GetWear(iWearCell) && !IS_SET(GetWear(iWearCell)->GetFlag(), ITEM_FLAG_IRREMOVABLE))
 		{
-			// 이 아이템은 한번 박히면 변경 불가. swap 역시 완전 불가
+			// ì´ ì•„ì´í…œì€ í•œë²ˆ ë°•íˆë©´ ë³€ê²½ ë¶ˆê°€. swap ì—­ì‹œ ì™„ì „ ë¶ˆê°€
 			if (item->GetWearFlag() == WEARABLE_ABILITY) 
 				return false;
 
@@ -6227,13 +6227,13 @@ bool CHARACTER::EquipItem(LPITEM item, int iCandidateCell)
 
 	if (true == item->IsEquipped())
 	{
-		// 아이템 최초 사용 이후부터는 사용하지 않아도 시간이 차감되는 방식 처리. 
+		// ì•„ì´í…œ ìµœì´ˆ ì‚¬ìš© ì´í›„ë¶€í„°ëŠ” ì‚¬ìš©í•˜ì§€ ì•Šì•„ë„ ì‹œê°„ì´ ì°¨ê°ë˜ëŠ” ë°©ì‹ ì²˜ë¦¬. 
 		if (-1 != item->GetProto()->cLimitRealTimeFirstUseIndex)
 		{
-			// 한 번이라도 사용한 아이템인지 여부는 Socket1을 보고 판단한다. (Socket1에 사용횟수 기록)
+			// í•œ ë²ˆì´ë¼ë„ ì‚¬ìš©í•œ ì•„ì´í…œì¸ì§€ ì—¬ë¶€ëŠ” Socket1ì„ ë³´ê³  íŒë‹¨í•œë‹¤. (Socket1ì— ì‚¬ìš©íšŸìˆ˜ ê¸°ë¡)
 			if (0 == item->GetSocket(1))
 			{
-				// 사용가능시간은 Default 값으로 Limit Value 값을 사용하되, Socket0에 값이 있으면 그 값을 사용하도록 한다. (단위는 초)
+				// ì‚¬ìš©ê°€ëŠ¥ì‹œê°„ì€ Default ê°’ìœ¼ë¡œ Limit Value ê°’ì„ ì‚¬ìš©í•˜ë˜, Socket0ì— ê°’ì´ ìˆìœ¼ë©´ ê·¸ ê°’ì„ ì‚¬ìš©í•˜ë„ë¡ í•œë‹¤. (ë‹¨ìœ„ëŠ” ì´ˆ)
 				long duration = (0 != item->GetSocket(0)) ? item->GetSocket(0) : item->GetProto()->aLimits[item->GetProto()->cLimitRealTimeFirstUseIndex].lValue;
 
 				if (0 == duration)
@@ -6251,27 +6251,27 @@ bool CHARACTER::EquipItem(LPITEM item, int iCandidateCell)
 
 		const DWORD& dwVnum = item->GetVnum();
 
-		// 라마단 이벤트 초승달의 반지(71135) 착용시 이펙트 발동
+		// ë¼ë§ˆë‹¨ ì´ë²¤íŠ¸ ì´ˆìŠ¹ë‹¬ì˜ ë°˜ì§€(71135) ì°©ìš©ì‹œ ì´í™íŠ¸ ë°œë™
 		if (true == CItemVnumHelper::IsRamadanMoonRing(dwVnum))
 		{
 			this->EffectPacket(SE_EQUIP_RAMADAN_RING);
 		}
-		// 할로윈 사탕(71136) 착용시 이펙트 발동
+		// í• ë¡œìœˆ ì‚¬íƒ•(71136) ì°©ìš©ì‹œ ì´í™íŠ¸ ë°œë™
 		else if (true == CItemVnumHelper::IsHalloweenCandy(dwVnum))
 		{
 			this->EffectPacket(SE_EQUIP_HALLOWEEN_CANDY);
 		}
-		// 행복의 반지(71143) 착용시 이펙트 발동
+		// í–‰ë³µì˜ ë°˜ì§€(71143) ì°©ìš©ì‹œ ì´í™íŠ¸ ë°œë™
 		else if (true == CItemVnumHelper::IsHappinessRing(dwVnum))
 		{
 			this->EffectPacket(SE_EQUIP_HAPPINESS_RING);
 		}
-		// 사랑의 팬던트(71145) 착용시 이펙트 발동
+		// ì‚¬ë‘ì˜ íŒ¬ë˜íŠ¸(71145) ì°©ìš©ì‹œ ì´í™íŠ¸ ë°œë™
 		else if (true == CItemVnumHelper::IsLovePendant(dwVnum))
 		{
 			this->EffectPacket(SE_EQUIP_LOVE_PENDANT);
 		}
-		// ITEM_UNIQUE의 경우, SpecialItemGroup에 정의되어 있고, (item->GetSIGVnum() != NULL)
+		// ITEM_UNIQUEì˜ ê²½ìš°, SpecialItemGroupì— ì •ì˜ë˜ì–´ ìˆê³ , (item->GetSIGVnum() != NULL)
 		// 
 		else if (ITEM_UNIQUE == item->GetType() && 0 != item->GetSIGVnum())
 		{
@@ -6443,7 +6443,7 @@ bool CHARACTER::RemoveSpecifyItem(DWORD vnum, DWORD count)
 		if (item->GetVnum() != vnum)
 			continue;
 
-		//개인 상점에 등록된 물건이면 넘어간다. (개인 상점에서 판매될때 이 부분으로 들어올 경우 문제!)
+		//ê°œì¸ ìƒì ì— ë“±ë¡ëœ ë¬¼ê±´ì´ë©´ ë„˜ì–´ê°„ë‹¤. (ê°œì¸ ìƒì ì—ì„œ íŒë§¤ë ë•Œ ì´ ë¶€ë¶„ìœ¼ë¡œ ë“¤ì–´ì˜¬ ê²½ìš° ë¬¸ì œ!)
 		if (m_pkMyShop && m_pkMyShop->IsSellingItem(item->GetID()))
 			continue;
 
@@ -6459,7 +6459,7 @@ bool CHARACTER::RemoveSpecifyItem(DWORD vnum, DWORD count)
 
 	if (0 == count) return true;
 
-	// 예외처리가 약하다.
+	// ì˜ˆì™¸ì²˜ë¦¬ê°€ ì•½í•˜ë‹¤.
 	sys_log(0, "CHARACTER::RemoveSpecifyItem cannot remove enough item vnum %u, still remain %d", vnum, count);
 	return false;
 }
@@ -6493,7 +6493,7 @@ void CHARACTER::RemoveSpecifyTypeItem(BYTE type, DWORD count)
 		if (GetInventoryItem(i)->GetType() != type)
 			continue;
 
-		//개인 상점에 등록된 물건이면 넘어간다. (개인 상점에서 판매될때 이 부분으로 들어올 경우 문제!)
+		//ê°œì¸ ìƒì ì— ë“±ë¡ëœ ë¬¼ê±´ì´ë©´ ë„˜ì–´ê°„ë‹¤. (ê°œì¸ ìƒì ì—ì„œ íŒë§¤ë ë•Œ ì´ ë¶€ë¶„ìœ¼ë¡œ ë“¤ì–´ì˜¬ ê²½ìš° ë¬¸ì œ!)
 		if(m_pkMyShop)
 		{
 			bool isItemSelling = m_pkMyShop->IsSellingItem(GetInventoryItem(i)->GetID());
@@ -6686,9 +6686,9 @@ LPITEM CHARACTER::AutoGiveItem(DWORD dwItemVnum, BYTE bCount, int iRarePct, bool
 	{
 		item->AddToGround(GetMapIndex(), GetXYZ());
 		item->StartDestroyEvent();
-		// 안티 드랍 flag가 걸려있는 아이템의 경우, 
-		// 인벤에 빈 공간이 없어서 어쩔 수 없이 떨어트리게 되면,
-		// ownership을 아이템이 사라질 때까지(300초) 유지한다.
+		// ì•ˆí‹° ë“œë flagê°€ ê±¸ë ¤ìˆëŠ” ì•„ì´í…œì˜ ê²½ìš°, 
+		// ì¸ë²¤ì— ë¹ˆ ê³µê°„ì´ ì—†ì–´ì„œ ì–´ì©” ìˆ˜ ì—†ì´ ë–¨ì–´íŠ¸ë¦¬ê²Œ ë˜ë©´,
+		// ownershipì„ ì•„ì´í…œì´ ì‚¬ë¼ì§ˆ ë•Œê¹Œì§€(300ì´ˆ) ìœ ì§€í•œë‹¤.
 		if (IS_SET(item->GetAntiFlag(), ITEM_ANTIFLAG_DROP))
 			item->SetOwnership(this, 300);
 		else
@@ -6822,12 +6822,12 @@ bool CHARACTER::CanReceiveItem(LPCHARACTER from, LPITEM item) const
 		case 20101:
 		case 20102:
 		case 20103:
-			// 초급 말
+			// ì´ˆê¸‰ ë§
 			if (item->GetVnum() == ITEM_REVIVE_HORSE_1)
 			{
 				if (!IsDead())
 				{
-					from->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("죽지 않은 말에게 선초를 먹일 수 없습니다."));
+					from->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì£½ì§€ ì•Šì€ ë§ì—ê²Œ ì„ ì´ˆë¥¼ ë¨¹ì¼ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 					return false;
 				}
 				return true;
@@ -6836,7 +6836,7 @@ bool CHARACTER::CanReceiveItem(LPCHARACTER from, LPITEM item) const
 			{
 				if (IsDead())
 				{
-					from->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("죽은 말에게 사료를 먹일 수 없습니다."));
+					from->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì£½ì€ ë§ì—ê²Œ ì‚¬ë£Œë¥¼ ë¨¹ì¼ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 					return false;
 				}
 				return true;
@@ -6849,12 +6849,12 @@ bool CHARACTER::CanReceiveItem(LPCHARACTER from, LPITEM item) const
 		case 20104:
 		case 20105:
 		case 20106:
-			// 중급 말
+			// ì¤‘ê¸‰ ë§
 			if (item->GetVnum() == ITEM_REVIVE_HORSE_2)
 			{
 				if (!IsDead())
 				{
-					from->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("죽지 않은 말에게 선초를 먹일 수 없습니다."));
+					from->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì£½ì§€ ì•Šì€ ë§ì—ê²Œ ì„ ì´ˆë¥¼ ë¨¹ì¼ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 					return false;
 				}
 				return true;
@@ -6863,7 +6863,7 @@ bool CHARACTER::CanReceiveItem(LPCHARACTER from, LPITEM item) const
 			{
 				if (IsDead())
 				{
-					from->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("죽은 말에게 사료를 먹일 수 없습니다."));
+					from->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì£½ì€ ë§ì—ê²Œ ì‚¬ë£Œë¥¼ ë¨¹ì¼ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 					return false;
 				}
 				return true;
@@ -6876,12 +6876,12 @@ bool CHARACTER::CanReceiveItem(LPCHARACTER from, LPITEM item) const
 		case 20107:
 		case 20108:
 		case 20109:
-			// 고급 말
+			// ê³ ê¸‰ ë§
 			if (item->GetVnum() == ITEM_REVIVE_HORSE_3)
 			{
 				if (!IsDead())
 				{
-					from->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("죽지 않은 말에게 선초를 먹일 수 없습니다."));
+					from->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì£½ì§€ ì•Šì€ ë§ì—ê²Œ ì„ ì´ˆë¥¼ ë¨¹ì¼ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 					return false;
 				}
 				return true;
@@ -6890,7 +6890,7 @@ bool CHARACTER::CanReceiveItem(LPCHARACTER from, LPITEM item) const
 			{
 				if (IsDead())
 				{
-					from->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("죽은 말에게 사료를 먹일 수 없습니다."));
+					from->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì£½ì€ ë§ì—ê²Œ ì‚¬ë£Œë¥¼ ë¨¹ì¼ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 					return false;
 				}
 				return true;
@@ -6940,7 +6940,7 @@ void CHARACTER::ReceiveItem(LPCHARACTER from, LPITEM item)
 			}
 			else
 			{
-				from->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이 아이템은 개량할 수 없습니다."));
+				from->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ ì•„ì´í…œì€ ê°œëŸ‰í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 			}
 			break;
 			// END_OF_DEVILTOWER_NPC
@@ -6957,7 +6957,7 @@ void CHARACTER::ReceiveItem(LPCHARACTER from, LPITEM item)
 			}
 			else
 			{
-				from->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이 아이템은 개량할 수 없습니다."));
+				from->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ ì•„ì´í…œì€ ê°œëŸ‰í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 			}
 			break;
 
@@ -6976,14 +6976,14 @@ void CHARACTER::ReceiveItem(LPCHARACTER from, LPITEM item)
 			{
 				from->ReviveHorse();
 				item->SetCount(item->GetCount()-1);
-				from->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("말에게 선초를 주었습니다."));
+				from->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë§ì—ê²Œ ì„ ì´ˆë¥¼ ì£¼ì—ˆìŠµë‹ˆë‹¤."));
 			}
 			else if (item->GetVnum() == ITEM_HORSE_FOOD_1 ||
 					item->GetVnum() == ITEM_HORSE_FOOD_2 ||
 					item->GetVnum() == ITEM_HORSE_FOOD_3)
 			{
 				from->FeedHorse();
-				from->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("말에게 사료를 주었습니다."));
+				from->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë§ì—ê²Œ ì‚¬ë£Œë¥¼ ì£¼ì—ˆìŠµë‹ˆë‹¤."));
 				item->SetCount(item->GetCount()-1);
 				EffectPacket(SE_HPUP_RED);
 			}
@@ -7013,7 +7013,7 @@ bool CHARACTER::IsEquipUniqueItem(DWORD dwItemVnum) const
 			return true;
 	}
 
-	// 언어반지인 경우 언어반지(견본) 인지도 체크한다.
+	// ì–¸ì–´ë°˜ì§€ì¸ ê²½ìš° ì–¸ì–´ë°˜ì§€(ê²¬ë³¸) ì¸ì§€ë„ ì²´í¬í•œë‹¤.
 	if (dwItemVnum == UNIQUE_ITEM_RING_OF_LANGUAGE)
 		return IsEquipUniqueItem(UNIQUE_ITEM_RING_OF_LANGUAGE_SAMPLE);
 
@@ -7174,8 +7174,8 @@ bool CHARACTER::ItemProcess_Hair(LPITEM item, int iDestCell)
 {
 	if (item->CheckItemUseLevel(GetLevel()) == false)
 	{
-		// 레벨 제한에 걸림
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("아직 이 머리를 사용할 수 없는 레벨입니다."));
+		// ë ˆë²¨ ì œí•œì— ê±¸ë¦¼
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì•„ì§ ì´ ë¨¸ë¦¬ë¥¼ ì‚¬ìš©í•  ìˆ˜ ì—†ëŠ” ë ˆë²¨ì…ë‹ˆë‹¤."));
 		return false;
 	}
 
@@ -7184,7 +7184,7 @@ bool CHARACTER::ItemProcess_Hair(LPITEM item, int iDestCell)
 	switch (GetJob())
 	{
 		case JOB_WARRIOR :
-			hair -= 72000; // 73001 - 72000 = 1001 부터 헤어 번호 시작
+			hair -= 72000; // 73001 - 72000 = 1001 ë¶€í„° í—¤ì–´ ë²ˆí˜¸ ì‹œì‘
 			break;
 
 		case JOB_ASSASSIN :
@@ -7206,7 +7206,7 @@ bool CHARACTER::ItemProcess_Hair(LPITEM item, int iDestCell)
 
 	if (hair == GetPart(PART_HAIR))
 	{
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("동일한 머리 스타일로는 교체할 수 없습니다."));
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë™ì¼í•œ ë¨¸ë¦¬ ìŠ¤íƒ€ì¼ë¡œëŠ” êµì²´í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 		return true;
 	}
 
@@ -7223,13 +7223,13 @@ bool CHARACTER::ItemProcess_Polymorph(LPITEM item)
 {
 	if (IsPolymorphed())
 	{
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("이미 둔갑중인 상태입니다."));
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì´ë¯¸ ë‘”ê°‘ì¤‘ì¸ ìƒíƒœì…ë‹ˆë‹¤."));
 		return false;
 	}
 
 	if (true == IsRiding())
 	{
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("둔갑할 수 없는 상태입니다."));
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë‘”ê°‘í•  ìˆ˜ ì—†ëŠ” ìƒíƒœì…ë‹ˆë‹¤."));
 		return false;
 	}
 
@@ -7237,7 +7237,7 @@ bool CHARACTER::ItemProcess_Polymorph(LPITEM item)
 
 	if (dwVnum == 0)
 	{
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("잘못된 둔갑 아이템입니다."));
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì˜ëª»ëœ ë‘”ê°‘ ì•„ì´í…œì…ë‹ˆë‹¤."));
 		item->SetCount(item->GetCount()-1);
 		return false;
 	}
@@ -7246,7 +7246,7 @@ bool CHARACTER::ItemProcess_Polymorph(LPITEM item)
 
 	if (pMob == NULL)
 	{
-		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("잘못된 둔갑 아이템입니다."));
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì˜ëª»ëœ ë‘”ê°‘ ì•„ì´í…œì…ë‹ˆë‹¤."));
 		item->SetCount(item->GetCount()-1);
 		return false;
 	}
@@ -7259,14 +7259,14 @@ bool CHARACTER::ItemProcess_Polymorph(LPITEM item)
 		case 70107 :
 		case 71093 :
 			{
-				// 둔갑구 처리
+				// ë‘”ê°‘êµ¬ ì²˜ë¦¬
 				sys_log(0, "USE_POLYMORPH_BALL PID(%d) vnum(%d)", GetPlayerID(), dwVnum);
 
-				// 레벨 제한 체크
+				// ë ˆë²¨ ì œí•œ ì²´í¬
 				int iPolymorphLevelLimit = MAX(0, 20 - GetLevel() * 3 / 10);
 				if (pMob->m_table.bLevel >= GetLevel() + iPolymorphLevelLimit)
 				{
-					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("나보다 너무 높은 레벨의 몬스터로는 변신 할 수 없습니다."));
+					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë‚˜ë³´ë‹¤ ë„ˆë¬´ ë†’ì€ ë ˆë²¨ì˜ ëª¬ìŠ¤í„°ë¡œëŠ” ë³€ì‹  í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 					return false;
 				}
 
@@ -7293,11 +7293,11 @@ bool CHARACTER::ItemProcess_Polymorph(LPITEM item)
 
 		case 50322:
 			{
-				// 보류
+				// ë³´ë¥˜
 
-				// 둔갑서 처리
-				// 소켓0                소켓1           소켓2   
-				// 둔갑할 몬스터 번호   수련정도        둔갑서 레벨
+				// ë‘”ê°‘ì„œ ì²˜ë¦¬
+				// ì†Œì¼“0                ì†Œì¼“1           ì†Œì¼“2   
+				// ë‘”ê°‘í•  ëª¬ìŠ¤í„° ë²ˆí˜¸   ìˆ˜ë ¨ì •ë„        ë‘”ê°‘ì„œ ë ˆë²¨
 				sys_log(0, "USE_POLYMORPH_BOOK: %s(%u) vnum(%u)", GetName(), GetPlayerID(), dwVnum);
 
 				if (CPolymorphUtils::instance().PolymorphCharacter(this, item, pMob) == true)
@@ -7415,8 +7415,8 @@ void CHARACTER::AutoRecoveryItemProcess(const EAffectTypes type)
 						const int pct_of_will_used = (amount_of_used + amount) * 100 / amount_of_full;
 
 						bool bLog = false;
-						// 사용량의 10% 단위로 로그를 남김
-						// (사용량의 %에서, 십의 자리가 바뀔 때마다 로그를 남김.)
+						// ì‚¬ìš©ëŸ‰ì˜ 10% ë‹¨ìœ„ë¡œ ë¡œê·¸ë¥¼ ë‚¨ê¹€
+						// (ì‚¬ìš©ëŸ‰ì˜ %ì—ì„œ, ì‹­ì˜ ìë¦¬ê°€ ë°”ë€” ë•Œë§ˆë‹¤ ë¡œê·¸ë¥¼ ë‚¨ê¹€.)
 						if ((pct_of_will_used / 10) - (pct_of_used / 10) >= 1)
 							bLog = true;
 						pItem->SetSocket(idx_of_amount_of_used, amount_of_used + amount, bLog);
@@ -7488,7 +7488,7 @@ bool CHARACTER::IsValidItemPosition(TItemPos Pos) const
 }
 
 
-// 귀찮아서 만든 매크로.. exp가 true면 msg를 출력하고 return false 하는 매크로 (일반적인 verify 용도랑은 return 때문에 약간 반대라 이름때문에 헷갈릴 수도 있겠다..)
+// ê·€ì°®ì•„ì„œ ë§Œë“  ë§¤í¬ë¡œ.. expê°€ trueë©´ msgë¥¼ ì¶œë ¥í•˜ê³  return false í•˜ëŠ” ë§¤í¬ë¡œ (ì¼ë°˜ì ì¸ verify ìš©ë„ë‘ì€ return ë•Œë¬¸ì— ì•½ê°„ ë°˜ëŒ€ë¼ ì´ë¦„ë•Œë¬¸ì— í—·ê°ˆë¦´ ìˆ˜ë„ ìˆê² ë‹¤..)
 #define VERIFY_MSG(exp, msg)  \
 	if (true == (exp)) { \
 			ChatPacket(CHAT_TYPE_INFO, LC_TEXT(msg)); \
@@ -7496,7 +7496,7 @@ bool CHARACTER::IsValidItemPosition(TItemPos Pos) const
 	}
 
 		
-/// 현재 캐릭터의 상태를 바탕으로 주어진 item을 착용할 수 있는 지 확인하고, 불가능 하다면 캐릭터에게 이유를 알려주는 함수
+/// í˜„ì¬ ìºë¦­í„°ì˜ ìƒíƒœë¥¼ ë°”íƒ•ìœ¼ë¡œ ì£¼ì–´ì§„ itemì„ ì°©ìš©í•  ìˆ˜ ìˆëŠ” ì§€ í™•ì¸í•˜ê³ , ë¶ˆê°€ëŠ¥ í•˜ë‹¤ë©´ ìºë¦­í„°ì—ê²Œ ì´ìœ ë¥¼ ì•Œë ¤ì£¼ëŠ” í•¨ìˆ˜
 bool CHARACTER::CanEquipNow(const LPITEM item, const TItemPos& srcCell, const TItemPos& destCell) /*const*/
 {
 	const TItemTable* itemTable = item->GetProto();
@@ -7534,7 +7534,7 @@ bool CHARACTER::CanEquipNow(const LPITEM item, const TItemPos& srcCell, const TI
 			case LIMIT_LEVEL:
 				if (GetLevel() < limit)
 				{
-					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("레벨이 낮아 착용할 수 없습니다."));
+					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë ˆë²¨ì´ ë‚®ì•„ ì°©ìš©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 					return false;
 				}
 				break;
@@ -7542,7 +7542,7 @@ bool CHARACTER::CanEquipNow(const LPITEM item, const TItemPos& srcCell, const TI
 			case LIMIT_STR:
 				if (GetPoint(POINT_ST) < limit)
 				{
-					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("근력이 낮아 착용할 수 없습니다."));
+					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê·¼ë ¥ì´ ë‚®ì•„ ì°©ìš©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 					return false;
 				}
 				break;
@@ -7550,7 +7550,7 @@ bool CHARACTER::CanEquipNow(const LPITEM item, const TItemPos& srcCell, const TI
 			case LIMIT_INT:
 				if (GetPoint(POINT_IQ) < limit)
 				{
-					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("지능이 낮아 착용할 수 없습니다."));
+					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì§€ëŠ¥ì´ ë‚®ì•„ ì°©ìš©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 					return false;
 				}
 				break;
@@ -7558,7 +7558,7 @@ bool CHARACTER::CanEquipNow(const LPITEM item, const TItemPos& srcCell, const TI
 			case LIMIT_DEX:
 				if (GetPoint(POINT_DX) < limit)
 				{
-					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("민첩이 낮아 착용할 수 없습니다."));
+					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ë¯¼ì²©ì´ ë‚®ì•„ ì°©ìš©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 					return false;
 				}
 				break;
@@ -7566,7 +7566,7 @@ bool CHARACTER::CanEquipNow(const LPITEM item, const TItemPos& srcCell, const TI
 			case LIMIT_CON:
 				if (GetPoint(POINT_HT) < limit)
 				{
-					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("체력이 낮아 착용할 수 없습니다."));
+					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ì²´ë ¥ì´ ë‚®ì•„ ì°©ìš©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 					return false;
 				}
 				break;
@@ -7578,14 +7578,14 @@ bool CHARACTER::CanEquipNow(const LPITEM item, const TItemPos& srcCell, const TI
 		if ((GetWear(WEAR_UNIQUE1) && GetWear(WEAR_UNIQUE1)->IsSameSpecialGroup(item)) ||
 			(GetWear(WEAR_UNIQUE2) && GetWear(WEAR_UNIQUE2)->IsSameSpecialGroup(item)))
 		{
-			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("같은 종류의 유니크 아이템 두 개를 동시에 장착할 수 없습니다."));
+			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê°™ì€ ì¢…ë¥˜ì˜ ìœ ë‹ˆí¬ ì•„ì´í…œ ë‘ ê°œë¥¼ ë™ì‹œì— ì¥ì°©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 			return false;
 		}
 
 		if (marriage::CManager::instance().IsMarriageUniqueItem(item->GetVnum()) && 
 			!marriage::CManager::instance().IsMarried(GetPlayerID()))
 		{
-			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("결혼하지 않은 상태에서 예물을 착용할 수 없습니다."));
+			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("ê²°í˜¼í•˜ì§€ ì•Šì€ ìƒíƒœì—ì„œ ì˜ˆë¬¼ì„ ì°©ìš©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤."));
 			return false;
 		}
 
@@ -7612,7 +7612,7 @@ bool CHARACTER::CanUnequipNow(const LPITEM item, const TItemPos& srcCell, const 
 {	
 
 	if (ITEM_BELT == item->GetType())
-		VERIFY_MSG(CBeltInventoryHelper::IsExistItemInBeltInventory(this), "벨트 인벤토리에 아이템이 존재하면 해제할 수 없습니다.");
+		VERIFY_MSG(CBeltInventoryHelper::IsExistItemInBeltInventory(this), "ë²¨íŠ¸ ì¸ë²¤í† ë¦¬ì— ì•„ì´í…œì´ ì¡´ì¬í•˜ë©´ í•´ì œí•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
 
 	// Items that can never be unequipped
 	if (IS_SET(item->GetFlag(), ITEM_FLAG_IRREMOVABLE))
@@ -7629,9 +7629,10 @@ bool CHARACTER::CanUnequipNow(const LPITEM item, const TItemPos& srcCell, const 
 		else
 			pos = GetEmptyInventory(item->GetSize());
 
-		VERIFY_MSG( -1 == pos, "소지품에 빈 공간이 없습니다." );
+		VERIFY_MSG( -1 == pos, "ì†Œì§€í’ˆì— ë¹ˆ ê³µê°„ì´ ì—†ìŠµë‹ˆë‹¤." );
 	}
 
 
 	return true;
 }
+

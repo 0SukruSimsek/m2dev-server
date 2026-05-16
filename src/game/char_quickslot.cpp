@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "constants.h"
 #include "char.h"
 #include "desc.h"
@@ -9,7 +9,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // QUICKSLOT HANDLING
 /////////////////////////////////////////////////////////////////////////////
-void CHARACTER::SyncQuickslot(BYTE bType, BYTE bOldPos, BYTE bNewPos) // bNewPos == 255 면 DELETE
+void CHARACTER::SyncQuickslot(BYTE bType, BYTE bOldPos, BYTE bNewPos) // bNewPos == 255 ë©´ DELETE
 {
 	if (bOldPos == bNewPos)
 		return;
@@ -92,7 +92,7 @@ bool CHARACTER::SetQuickslot(BYTE pos, TQuickslot & rSlot)
 		pack_quickslot_add.pos		= pos;
 		pack_quickslot_add.slot		= m_quickslot[pos];
 
-		GetDesc()->Packet(&pack_quickslot_add, sizeof(pack_quickslot_add));
+		SafeSendPacket(&pack_quickslot_add, sizeof(pack_quickslot_add));
 	}
 
 	return true;
@@ -111,7 +111,7 @@ bool CHARACTER::DelQuickslot(BYTE pos)
 	pack_quickslot_del.length = sizeof(pack_quickslot_del);
 	pack_quickslot_del.pos	= pos;
 
-	GetDesc()->Packet(&pack_quickslot_del, sizeof(pack_quickslot_del));
+	SafeSendPacket(&pack_quickslot_del, sizeof(pack_quickslot_del));
 	return true;
 }
 
@@ -123,7 +123,7 @@ bool CHARACTER::SwapQuickslot(BYTE a, BYTE b)
 	if (a >= QUICKSLOT_MAX_NUM || b >= QUICKSLOT_MAX_NUM)
 		return false;
 
-	// 퀵 슬롯 자리를 서로 바꾼다.
+	// í€µ ìŠ¬ë¡¯ ìë¦¬ë¥¼ ì„œë¡œ ë°”ê¾¼ë‹¤.
 	quickslot = m_quickslot[a];
 
 	m_quickslot[a] = m_quickslot[b];
@@ -134,7 +134,7 @@ bool CHARACTER::SwapQuickslot(BYTE a, BYTE b)
 	pack_quickslot_swap.pos	= a;
 	pack_quickslot_swap.pos_to	= b;
 
-	GetDesc()->Packet(&pack_quickslot_swap, sizeof(pack_quickslot_swap));
+	SafeSendPacket(&pack_quickslot_swap, sizeof(pack_quickslot_swap));
 	return true;
 }
 
@@ -156,4 +156,5 @@ void CHARACTER::ChainQuickslotItem(LPITEM pItem, BYTE bType, BYTE bOldPos)
 		}
 	}
 }
+
 

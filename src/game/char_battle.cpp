@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "utils.h"
 #include "config.h"
+#include "bot_logger.h"  // v30 — Master CSV log
 #include "desc.h"
 #include "desc_manager.h"
 #include "char_manager.h"
@@ -1624,7 +1625,11 @@ void CHARACTER::SetLastAttacked(DWORD dwTime)
 
 void CHARACTER::SendDamagePacket(LPCHARACTER pAttacker, int Damage, BYTE DamageFlag)
 {
-	if (IsPC() == true || (pAttacker->IsPC() == true && pAttacker->GetTarget() == this))
+	// v29.2 — Bot attacker icin PacketAround broadcast (SetTarget bypass, DESC=null safe).
+	// Eski kosul: pAttacker->IsPC() && pAttacker->GetTarget() == this. Bot SetTarget yapamiyor
+	// (DESC=null crash). Bot attacker durumunda damage info'yu civarda PacketAround ile yay.
+	bool bot_attacker = pAttacker && pAttacker->IsPC() && pAttacker->IsServerSideBot();
+	if (IsPC() == true || (pAttacker->IsPC() == true && pAttacker->GetTarget() == this) || bot_attacker)
 	{
 		TPacketGCDamageInfo damageInfo;
 		memset(&damageInfo, 0, sizeof(TPacketGCDamageInfo));
@@ -1635,14 +1640,16 @@ void CHARACTER::SendDamagePacket(LPCHARACTER pAttacker, int Damage, BYTE DamageF
 		damageInfo.flag = DamageFlag;
 		damageInfo.damage = Damage;
 
-		if (GetDesc() != NULL)
-		{
-			GetDesc()->Packet(&damageInfo, sizeof(TPacketGCDamageInfo));
-		}
+		SafeSendPacket(&damageInfo, sizeof(TPacketGCDamageInfo));
 
-		if (pAttacker->GetDesc() != NULL)
+		// v29.2 — Bot attacker icin civar PC'lere damage info yay (m_map_view bypass).
+		if (bot_attacker)
 		{
-			pAttacker->GetDesc()->Packet(&damageInfo, sizeof(TPacketGCDamageInfo));
+			pAttacker->PacketAround(&damageInfo, sizeof(TPacketGCDamageInfo));
+		}
+		else
+		{
+			CHARACTER::SafeSendPacketTo(pAttacker, &damageInfo, sizeof(TPacketGCDamageInfo));
 		}
 		/*
 		   if (GetArenaObserverMode() == false && GetArena() != NULL)
@@ -1691,6 +1698,50 @@ void CHARACTER::EnterCombat()
 
 bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // returns true if dead
 {
+	// Faz 3 — Bot PvP-immune
+	// Server-side AutoBot'lar baska bir oyuncudan veya PC olmayan saldiriganlardan
+	// hasar yemez; bu sayede sürekli öldürülerek kick/relog döngüsüne düşmezler.
+	// Mob saldirilari (pAttacker->IsPC() == false) ve quest/system damage (pAttacker == nullptr)
+	// normal akar — bot kendi mob'larina karsi savasmaya devam eder.
+	if (IsPC() && IsAutoBot() && pAttacker && pAttacker->IsPC() && !pAttacker->IsAutoBot())
+	{
+		// PC -> bot saldirisinda DODGE paketi gönder (görsel kaçınma, hasar 0)
+		TPacketGCDamageInfo damageInfo;
+		memset(&damageInfo, 0, sizeof(TPacketGCDamageInfo));
+		damageInfo.header = GC::DAMAGE_INFO;
+		damageInfo.length = sizeof(damageInfo);
+		damageInfo.dwVID = (DWORD)GetVID();
+		damageInfo.flag   = 0x04;  // DAMAGE_DODGE
+		damageInfo.damage = 0;
+		CHARACTER::SafeSendPacketTo(pAttacker, &damageInfo, sizeof(TPacketGCDamageInfo));
+		return false;
+	}
+
+	// Keyf.Online v11 — Server-side bot DESC=null safety
+	// Mob veya quest/system damage -> bot DESC yok -> SendDamageInfo / SendHPSP gibi paket cagrilari crash.
+	// Cozum: HP'yi internal sec, paket gondermeden return. BotTick IsDead() handle eder.
+	if (IsPC() && IsAutoBot() && !GetDesc())
+	{
+		int hp_before = GetHP();
+		PointChange(POINT_HP, -dam);
+		// v30 — Master log: bot victim damage
+		BotLog_Combat(pAttacker, this, dam, hp_before, GetHP(),
+			(type == DAMAGE_TYPE_MELEE) ? "MELEE_RECV" :
+			(type == DAMAGE_TYPE_MAGIC) ? "MAGIC_RECV" : "OTHER_RECV",
+			0, 0);
+		if (GetHP() <= 0)
+		{
+			sys_log(0, "Damage: bot %s died (no DESC, dam=%d type=%d attacker=%s)",
+				GetName(), dam, (int)type, pAttacker ? pAttacker->GetName() : "system");
+			// v30 — Master log: DEATH event
+			BotLog_Lifecycle(this, "DEATH",
+				pAttacker ? pAttacker->GetName() : "system", dam);
+			// BotTick auto-respawn yapacak (IsDead() detection + village teleport)
+			return true;  // dead
+		}
+		return false;
+	}
+
 	if (DAMAGE_TYPE_MAGIC == type)
 	{
 		dam = (int)((float)dam * (100 + (pAttacker->GetPoint(POINT_MAGIC_ATT_BONUS_PER) + pAttacker->GetPoint(POINT_MELEE_MAGIC_ATT_BONUS_PER))) / 100.f + 0.5f);
@@ -1810,10 +1861,7 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 				damageInfo.flag = DAMAGE_DODGE;
 				damageInfo.damage = 0;
 				
-				if (pAttacker->GetDesc() != NULL)
-				{
-					pAttacker->GetDesc()->Packet(&damageInfo, sizeof(TPacketGCDamageInfo));
-				}
+				CHARACTER::SafeSendPacketTo(pAttacker, &damageInfo, sizeof(TPacketGCDamageInfo));
 			}
 
 			return false;
