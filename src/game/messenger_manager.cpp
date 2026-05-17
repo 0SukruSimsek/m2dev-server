@@ -48,6 +48,10 @@ void MessengerManager::Login(MessengerManager::keyA account)
 
 	DBManager::instance().EscapeString(__account, sizeof(__account), account.c_str(), account.size());
 
+	// M7.5 Fragile pattern: escape yapildi ama Query'de account.c_str() (orijinal)
+	// kullaniliyor, __account (escaped) degil. Simdilik sanity check olarak kaliyor
+	// (SQL metachars iceren account'i reddediyor), ancak bu yapi brittle.
+	// TODO Phase 2: PreparedStatement'a migrate et — __account'i Query'de kullan.
 	if (account.compare(__account))
 		return;
 
