@@ -108,9 +108,15 @@ void LogManager::MoneyLog(BYTE type, DWORD vnum, int gold)
 
 void LogManager::HackLog(const char * c_pszHackName, const char * c_pszLogin, const char * c_pszName, const char * c_pszIP)
 {
-	m_sql.EscapeString(__escape_hint, sizeof(__escape_hint), c_pszHackName, strlen(c_pszHackName));
+	// M7.2 SQL escape — login/name/ip kullanici girisinden gelebilir
+	char __escape_hack[1024], __escape_login[256], __escape_name[256], __escape_ip[64];
+	m_sql.EscapeString(__escape_hack,  sizeof(__escape_hack),  c_pszHackName, strlen(c_pszHackName));
+	m_sql.EscapeString(__escape_login, sizeof(__escape_login), c_pszLogin,    strlen(c_pszLogin));
+	m_sql.EscapeString(__escape_name,  sizeof(__escape_name),  c_pszName,     strlen(c_pszName));
+	m_sql.EscapeString(__escape_ip,    sizeof(__escape_ip),    c_pszIP,       strlen(c_pszIP));
 
-	Query("INSERT INTO hack_log (time, login, name, ip, server, why) VALUES(NOW(), '%s', '%s', '%s', '%s', '%s')", c_pszLogin, c_pszName, c_pszIP, g_stHostname.c_str(), __escape_hint);
+	Query("INSERT INTO hack_log (time, login, name, ip, server, why) VALUES(NOW(), '%s', '%s', '%s', '%s', '%s')",
+		  __escape_login, __escape_name, __escape_ip, g_stHostname.c_str(), __escape_hack);
 }
 
 void LogManager::HackLog(const char * c_pszHackName, LPCHARACTER ch)
@@ -126,7 +132,15 @@ void LogManager::HackLog(const char * c_pszHackName, LPCHARACTER ch)
 
 void LogManager::HackCRCLog(const char * c_pszHackName, const char * c_pszLogin, const char * c_pszName, const char * c_pszIP, DWORD dwCRC)
 {
-	Query("INSERT INTO hack_crc_log (time, login, name, ip, server, why, crc) VALUES(NOW(), '%s', '%s', '%s', '%s', '%s', %u)", c_pszLogin, c_pszName, c_pszIP, g_stHostname.c_str(), c_pszHackName, dwCRC);
+	// M7.2 SQL escape — tum string parametreleri escape edilmemisti
+	char __escape_hack[1024], __escape_login[256], __escape_name[256], __escape_ip[64];
+	m_sql.EscapeString(__escape_hack,  sizeof(__escape_hack),  c_pszHackName, strlen(c_pszHackName));
+	m_sql.EscapeString(__escape_login, sizeof(__escape_login), c_pszLogin,    strlen(c_pszLogin));
+	m_sql.EscapeString(__escape_name,  sizeof(__escape_name),  c_pszName,     strlen(c_pszName));
+	m_sql.EscapeString(__escape_ip,    sizeof(__escape_ip),    c_pszIP,       strlen(c_pszIP));
+
+	Query("INSERT INTO hack_crc_log (time, login, name, ip, server, why, crc) VALUES(NOW(), '%s', '%s', '%s', '%s', '%s', %u)",
+		  __escape_login, __escape_name, __escape_ip, g_stHostname.c_str(), __escape_hack, dwCRC);
 }
 
 void LogManager::GoldBarLog(DWORD dwPID, DWORD dwItemID, GOLDBAR_HOW eHow, const char* c_pszHint)
