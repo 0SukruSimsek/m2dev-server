@@ -202,9 +202,15 @@ void LogManager::SpeedHackLog(DWORD pid, DWORD x, DWORD y, int hack_count)
 
 void LogManager::ChangeNameLog(DWORD pid, const char *old_name, const char *new_name, const char *ip)
 {
+	// M7.3 SQL escape — old_name/new_name/ip kullanici girisinden gelebilir
+	char __escape_old_name[256], __escape_new_name[256], __escape_ip[64];
+	m_sql.EscapeString(__escape_old_name, sizeof(__escape_old_name), old_name, strlen(old_name));
+	m_sql.EscapeString(__escape_new_name, sizeof(__escape_new_name), new_name, strlen(new_name));
+	m_sql.EscapeString(__escape_ip,       sizeof(__escape_ip),       ip,       strlen(ip));
+
 	Query("INSERT DELAYED INTO change_name%s (pid, old_name, new_name, time, ip) "
 			"VALUES(%u, '%s', '%s', NOW(), '%s') ",
-			get_table_postfix(), pid, old_name, new_name, ip);
+			get_table_postfix(), pid, __escape_old_name, __escape_new_name, __escape_ip);
 }
 
 void LogManager::GMCommandLog(DWORD dwPID, const char* szName, const char* szIP, BYTE byChannel, const char* szCommand)
