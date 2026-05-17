@@ -44,6 +44,7 @@
 #include "OXEvent.h"
 #include "locale_service.h"
 #include "DragonSoul.h"
+#include "keyf_train_log.h"  // [KEYF_TRAIN] training log macro
 
 extern void SendShout(const char * szText, BYTE bEmpire);
 extern int g_nPortalLimitTime;
@@ -906,31 +907,58 @@ void CInputMain::ItemMove(LPCHARACTER ch, const char * data)
 	struct command_item_move * pinfo = (struct command_item_move *) data;
 
 	if (ch)
+	{
+		// [KEYF_TRAIN] patch start — INV_MOVE event
+		KEYF_LOG(ch, "INV_MOVE",
+			"from_window=%d from_cell=%d to_window=%d to_cell=%d count=%d",
+			pinfo->Cell.window_type, pinfo->Cell.cell,
+			pinfo->CellTo.window_type, pinfo->CellTo.cell,
+			pinfo->count);
+		// [KEYF_TRAIN] patch end
 		ch->MoveItem(pinfo->Cell, pinfo->CellTo, pinfo->count);
+	}
 }
 
 void CInputMain::ItemPickup(LPCHARACTER ch, const char * data)
 {
 	struct command_item_pickup * pinfo = (struct command_item_pickup*) data;
 	if (ch)
+	{
+		// [KEYF_TRAIN] patch start — ITEM_PICKUP event
+		KEYF_LOG(ch, "ITEM_PICKUP", "vid=%u", pinfo->vid);
+		// [KEYF_TRAIN] patch end
 		ch->PickupItem(pinfo->vid);
+	}
 }
 
 void CInputMain::QuickslotAdd(LPCHARACTER ch, const char * data)
 {
 	struct command_quickslot_add * pinfo = (struct command_quickslot_add *) data;
+	// [KEYF_TRAIN] patch start — QUICKSLOT_ADD event
+	KEYF_LOG(ch, "QUICKSLOT_ADD",
+		"pos=%d slot_type=%d slot_num=%d",
+		pinfo->pos, pinfo->slot.Type, pinfo->slot.Position);
+	// [KEYF_TRAIN] patch end
 	ch->SetQuickslot(pinfo->pos, pinfo->slot);
 }
 
 void CInputMain::QuickslotDelete(LPCHARACTER ch, const char * data)
 {
 	struct command_quickslot_del * pinfo = (struct command_quickslot_del *) data;
+	// [KEYF_TRAIN] patch start — QUICKSLOT_DEL event
+	KEYF_LOG(ch, "QUICKSLOT_DEL", "pos=%d", pinfo->pos);
+	// [KEYF_TRAIN] patch end
 	ch->DelQuickslot(pinfo->pos);
 }
 
 void CInputMain::QuickslotSwap(LPCHARACTER ch, const char * data)
 {
 	struct command_quickslot_swap * pinfo = (struct command_quickslot_swap *) data;
+	// [KEYF_TRAIN] patch start — QUICKSLOT_SWAP event
+	KEYF_LOG(ch, "QUICKSLOT_SWAP",
+		"pos=%d to_pos=%d",
+		pinfo->pos, pinfo->change_pos);
+	// [KEYF_TRAIN] patch end
 	ch->SwapQuickslot(pinfo->pos, pinfo->change_pos);
 }
 
@@ -1570,6 +1598,13 @@ void CInputMain::Move(LPCHARACTER ch, const char * data)
 		return;
 	}
 
+	// [KEYF_TRAIN] patch start — MOVE_START event
+	KEYF_LOG(ch, "MOVE_START",
+		"from=(%d,%d) to=(%d,%d) rot=%d func=%d dwTime=%u",
+		ch->GetX(), ch->GetY(), pinfo->lX, pinfo->lY,
+		pinfo->bRot * 5, pinfo->bFunc, pinfo->dwTime);
+	// [KEYF_TRAIN] patch end
+
 	//enum EMoveFuncType
 	//{   
 	//	FUNC_WAIT,
@@ -2098,6 +2133,9 @@ void CInputMain::Target(LPCHARACTER ch, const char * pcData)
 
 	if (pkObj)
 	{
+		// [KEYF_TRAIN] patch start — TARGET_SELECT (building)
+		KEYF_LOG(ch, "TARGET_SELECT", "vid=%u type=BUILDING", p->dwVID);
+		// [KEYF_TRAIN] patch end
 		TPacketGCTarget pckTarget;
 		pckTarget.header = GC::TARGET;
 		pckTarget.length = sizeof(pckTarget);
@@ -2105,7 +2143,26 @@ void CInputMain::Target(LPCHARACTER ch, const char * pcData)
 		CHARACTER::SafeSendPacketTo(ch, &pckTarget, sizeof(TPacketGCTarget));
 	}
 	else
-		ch->SetTarget(CHARACTER_MANAGER::instance().Find(p->dwVID));
+	{
+		// [KEYF_TRAIN] patch start — TARGET_SELECT (char/mob)
+		LPCHARACTER pkTarget = CHARACTER_MANAGER::instance().Find(p->dwVID);
+		if (pkTarget)
+		{
+			KEYF_LOG(ch, "TARGET_SELECT",
+				"vid=%u type=%s vnum=%u name=%s hp=%d/%d",
+				p->dwVID,
+				pkTarget->IsPC() ? "PC" : "MOB",
+				pkTarget->GetRaceNum(),
+				pkTarget->GetName(),
+				pkTarget->GetHP(), pkTarget->GetMaxHP());
+		}
+		else
+		{
+			KEYF_LOG(ch, "TARGET_CLEAR", "vid=%u", p->dwVID);
+		}
+		ch->SetTarget(pkTarget);
+		// [KEYF_TRAIN] patch end
+	}
 }
 
 void CInputMain::Warp(LPCHARACTER ch, const char * pcData)

@@ -48,6 +48,7 @@
 #include "mining.h"
 #include "castle.h"
 #include "arena.h"
+#include "keyf_train_log.h"  // [KEYF_TRAIN] training log macro
 #include "horsename_manager.h"
 #include "gm.h"
 #include "map_location.h"
@@ -2781,6 +2782,9 @@ void CHARACTER::Sitdown(int is_ground)
 
 void CHARACTER::SetRotation(float fRot)
 {
+	// [KEYF_TRAIN] patch start — ROTATE event
+	KEYF_LOG(this, "ROTATE", "new_rot=%.1f old_rot=%.1f", fRot, m_pointsInstant.fRot);
+	// [KEYF_TRAIN] patch end
 	m_pointsInstant.fRot = fRot;
 }
 
@@ -2906,6 +2910,12 @@ void CHARACTER::Stop()
 
 bool CHARACTER::Goto(long x, long y)
 {
+	// [KEYF_TRAIN] patch start — GOTO_STEP event
+	KEYF_LOG(this, "GOTO_STEP",
+		"to=(%ld,%ld) cur=(%d,%d)",
+		x, y, GetX(), GetY());
+	// [KEYF_TRAIN] patch end
+
 	// TODO: Distance check required
 	// If the location is the same, no need to move (automatic success)
 	if (GetX() == x && GetY() == y)
@@ -8014,7 +8024,7 @@ bool CHARACTER::BotMoveStep(long target_x, long target_y, double step_size, cons
 	return true;
 }
 
-// v37 � M6 SafeSendPacket helper implementation (non-inline, desc.h forward declare problemi yok)
+// v37 � M6 SafeSendPacket helper implementation (non-inline, desc.h forward declare problemi yok)
 void CHARACTER::SafeSendPacket(const void* buf, int size)
 {
 	LPDESC d = GetDesc();
