@@ -74,21 +74,30 @@ CGuild::CGuild(TGuildCreateParameter & cp)
 		m_data.grade_array[i].auth_flag = 0;
 	}
 
+	// M7.1 SQL escape — guild name ve grade_name kullanici girisinden gelebilir
+	char __escape_guild_name[256];
+	DBManager::instance().EscapeString(__escape_guild_name, sizeof(__escape_guild_name),
+			m_data.name, strlen(m_data.name));
+
 	auto pmsg = DBManager::instance().DirectQuery(
 				"INSERT INTO guild%s(name, master, sp, level, exp, skill_point, skill) "
-				"VALUES('%s', %u, 1000, 1, 0, 0, '\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0')", 
-				get_table_postfix(), m_data.name, m_data.master_pid);
+				"VALUES('%s', %u, 1000, 1, 0, 0, '\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0')",
+				get_table_postfix(), __escape_guild_name, m_data.master_pid);
 
 	// TODO if error occur?
 	m_data.guild_id = pmsg->Get()->uiInsertID;
 
 	for (int i = 0; i < GUILD_GRADE_COUNT; ++i)
 	{
-		DBManager::instance().Query("INSERT INTO guild_grade%s VALUES(%u, %d, '%s', %d)", 
+		char __escape_grade_name[256];
+		DBManager::instance().EscapeString(__escape_grade_name, sizeof(__escape_grade_name),
+				m_data.grade_array[i].grade_name, strlen(m_data.grade_array[i].grade_name));
+
+		DBManager::instance().Query("INSERT INTO guild_grade%s VALUES(%u, %d, '%s', %d)",
 				get_table_postfix(),
-				m_data.guild_id, 
-				i + 1, 
-				m_data.grade_array[i].grade_name, 
+				m_data.guild_id,
+				i + 1,
+				__escape_grade_name,
 				m_data.grade_array[i].auth_flag);
 	}
 
