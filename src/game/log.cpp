@@ -48,10 +48,14 @@ bool LogManager::IsConnected()
 
 void LogManager::ItemLog(DWORD dwPID, DWORD x, DWORD y, DWORD dwItemID, const char * c_pszText, const char * c_pszHint, const char * c_pszIP, DWORD dwVnum)
 {
-	m_sql.EscapeString(__escape_hint, sizeof(__escape_hint), c_pszHint, strlen(c_pszHint));
+	// M7.4 SQL escape — c_pszText ve c_pszIP escape edilmemisti
+	char __escape_text[256], __escape_item_ip[64];
+	m_sql.EscapeString(__escape_hint,    sizeof(__escape_hint),    c_pszHint, strlen(c_pszHint));
+	m_sql.EscapeString(__escape_text,    sizeof(__escape_text),    c_pszText, strlen(c_pszText));
+	m_sql.EscapeString(__escape_item_ip, sizeof(__escape_item_ip), c_pszIP,   strlen(c_pszIP));
 
 	Query("INSERT DELAYED INTO log%s (type, time, who, x, y, what, how, hint, ip, vnum) VALUES('ITEM', NOW(), %u, %u, %u, %u, '%s', '%s', '%s', %u)",
-			get_table_postfix(), dwPID, x, y, dwItemID, c_pszText, __escape_hint, c_pszIP, dwVnum);
+			get_table_postfix(), dwPID, x, y, dwItemID, __escape_text, __escape_hint, __escape_item_ip, dwVnum);
 }
 
 void LogManager::ItemLog(LPCHARACTER ch, LPITEM item, const char * c_pszText, const char * c_pszHint)
@@ -215,19 +219,26 @@ void LogManager::ChangeNameLog(DWORD pid, const char *old_name, const char *new_
 
 void LogManager::GMCommandLog(DWORD dwPID, const char* szName, const char* szIP, BYTE byChannel, const char* szCommand)
 {
-	m_sql.EscapeString(__escape_hint, sizeof(__escape_hint), szCommand, strlen(szCommand));
+	// M7.4 SQL escape — szName ve szIP escape edilmemisti
+	char __escape_gm_name[256], __escape_gm_ip[64];
+	m_sql.EscapeString(__escape_hint,    sizeof(__escape_hint),    szCommand, strlen(szCommand));
+	m_sql.EscapeString(__escape_gm_name, sizeof(__escape_gm_name), szName,    strlen(szName));
+	m_sql.EscapeString(__escape_gm_ip,   sizeof(__escape_gm_ip),   szIP,      strlen(szIP));
 
 	Query("INSERT DELAYED INTO command_log%s (userid, server, ip, port, username, command, date ) "
 			"VALUES(%u, 999, '%s', %u, '%s', '%s', NOW()) ",
-			get_table_postfix(), dwPID, szIP, byChannel, szName, __escape_hint);
+			get_table_postfix(), dwPID, __escape_gm_ip, byChannel, __escape_gm_name, __escape_hint);
 }
 
 void LogManager::RefineLog(DWORD pid, const char* item_name, DWORD item_id, int item_refine_level, int is_success, const char* how)
 {
-	m_sql.EscapeString(__escape_hint, sizeof(__escape_hint), item_name, strlen(item_name));
+	// M7.4 SQL escape — item_name escape vardi ama how (setType) escape edilmemisti
+	char __escape_refine_how[128];
+	m_sql.EscapeString(__escape_hint,       sizeof(__escape_hint),       item_name, strlen(item_name));
+	m_sql.EscapeString(__escape_refine_how, sizeof(__escape_refine_how), how,       strlen(how));
 
 	Query("INSERT INTO refinelog%s (pid, item_name, item_id, step, time, is_success, setType) VALUES(%u, '%s', %u, %d, NOW(), %d, '%s')",
-			get_table_postfix(), pid, __escape_hint, item_id, item_refine_level, is_success, how);
+			get_table_postfix(), pid, __escape_hint, item_id, item_refine_level, is_success, __escape_refine_how);
 }
 
 
