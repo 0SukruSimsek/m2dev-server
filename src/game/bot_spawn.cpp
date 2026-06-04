@@ -47,10 +47,15 @@ namespace
         }
 
         sys_log(0, "SpawnAIBot[%s]: STEP_3 DB query", botName);
+        // SQL inject fix: botName config'den gelir ama defensive escape uygulayalim
+        char __escape_bot_name[256];
+        DBManager::instance().EscapeString(__escape_bot_name, sizeof(__escape_bot_name),
+            botName, strlen(botName));
         char query[640];
         snprintf(query, sizeof(query),
             "SELECT id, name, job, level, st, ht, dx, iq, hp, mp, x, y, z, map_index, "
-            "gold, exp, dir, part_main, part_base, part_hair FROM player.player WHERE name='%s' LIMIT 1", botName);
+            "gold, exp, dir, part_main, part_base, part_hair FROM player.player WHERE name='%s' LIMIT 1",
+            __escape_bot_name);
         auto pmsg = DBManager::instance().DirectQuery(query);
         if (!pmsg || pmsg->Get()->uiNumRows == 0)
         {

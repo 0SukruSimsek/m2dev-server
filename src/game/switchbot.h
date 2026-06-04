@@ -44,6 +44,9 @@ public:
     CSwitchbotManager();
     ~CSwitchbotManager();
 
+    // Must be called after thecore_init (start() has run) to start the pulse event.
+    void Initialize();
+
     // Enable / disable bot mode for a character.
     // Writes to GMCommandLog, sets quest-flag "switchbot.enabled".
     void Toggle(LPCHARACTER ch, bool enable);
