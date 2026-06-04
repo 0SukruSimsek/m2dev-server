@@ -79,10 +79,15 @@ void LogManager::ItemLog(LPCHARACTER ch, int itemID, int itemVnum, const char * 
 
 void LogManager::CharLog(DWORD dwPID, DWORD x, DWORD y, DWORD dwValue, const char * c_pszText, const char * c_pszHint, const char * c_pszIP)
 {
-	m_sql.EscapeString(__escape_hint, sizeof(__escape_hint), c_pszHint, strlen(c_pszHint));
+	// M7.6 SQL escape — c_pszText (kullanici-kontrollü chat/aksiyon) ve c_pszIP ham concat ediliyordu
+	char __escape_char_text[CHAT_MAX_LEN * 2 + 1];
+	char __escape_char_ip[64];
+	m_sql.EscapeString(__escape_hint,      sizeof(__escape_hint),      c_pszHint, strlen(c_pszHint));
+	m_sql.EscapeString(__escape_char_text, sizeof(__escape_char_text), c_pszText, strlen(c_pszText));
+	m_sql.EscapeString(__escape_char_ip,   sizeof(__escape_char_ip),   c_pszIP,   strlen(c_pszIP));
 
 	Query("INSERT DELAYED INTO log%s (type, time, who, x, y, what, how, hint, ip) VALUES('CHARACTER', NOW(), %u, %u, %u, %u, '%s', '%s', '%s')",
-			get_table_postfix(), dwPID, x, y, dwValue, c_pszText, __escape_hint, c_pszIP);
+			get_table_postfix(), dwPID, x, y, dwValue, __escape_char_text, __escape_hint, __escape_char_ip);
 }
 
 void LogManager::CharLog(LPCHARACTER ch, DWORD dw, const char * c_pszText, const char * c_pszHint)
