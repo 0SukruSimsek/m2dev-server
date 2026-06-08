@@ -312,6 +312,15 @@ void LogManager::DetailLoginLog(bool isLogin, LPCHARACTER ch)
 
 	if (true == isLogin)
 	{
+		// M7.7 SQL escape — GetClientVersion() client-kontrollü (input.cpp:181 SetClientVersion <- ham paket timestamp[32+1]),
+		// ham '%s' icine giriyordu. Buffer = 32*2+1 (escaped max), srcLen 32'ye clamp (timestamp[32+1] over-read korumasi).
+		const char * c_pszClientVer = ch->GetDesc()->GetClientVersion();
+		size_t client_ver_len = strlen(c_pszClientVer);
+		if (client_ver_len > 32)
+			client_ver_len = 32;
+		char __escape_client_ver[32 * 2 + 1];
+		m_sql.EscapeString(__escape_client_ver, sizeof(__escape_client_ver), c_pszClientVer, client_ver_len);
+
 		Query("INSERT INTO loginlog2(type, is_gm, login_time, channel, account_id, pid, ip, client_version) "
 				"VALUES('INVALID', %s, NOW(), %d, %u, %u, inet_aton('%s'), '%s')",
 				ch->IsGM() ? "'Y'" : "'N'",
@@ -319,7 +328,7 @@ void LogManager::DetailLoginLog(bool isLogin, LPCHARACTER ch)
 				ch->GetDesc()->GetAccountTable().id,
 				ch->GetPlayerID(),
 				ch->GetDesc()->GetHostName(),
-				ch->GetDesc()->GetClientVersion());
+				__escape_client_ver);
 	}
 	else
 	{
