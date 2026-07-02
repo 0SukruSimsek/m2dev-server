@@ -221,6 +221,9 @@ enum EUseSubTypes
 #ifdef ENABLE_TITLE_SYSTEM
 	USE_TITLE,							// 31 Title System (ybeststudio) — Wave 2.1
 #endif
+#ifdef ENABLE_NPC_LOCATION_HELPER
+	USE_MAP,							// 32 NPC Location Helper map unlock item
+#endif
 };
 
 enum EExtractSubTypes

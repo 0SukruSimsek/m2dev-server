@@ -137,6 +137,10 @@ namespace CG
     constexpr uint16_t MARK_CRCLIST       = 0x0C02;
     constexpr uint16_t MARK_UPLOAD        = 0x0C03;
     constexpr uint16_t MARK_IDXLIST       = 0x0C04;
+
+#ifdef ENABLE_NPC_LOCATION_HELPER
+    constexpr uint16_t NPC_LOCATION_HELPER = 0x0D01;
+#endif
 }
 
 // ============================================================================
@@ -284,6 +288,10 @@ namespace GC
     constexpr uint16_t MARK_BLOCK         = 0x0C10;
     constexpr uint16_t MARK_IDXLIST       = 0x0C11;
     constexpr uint16_t MARK_DIFF_DATA     = 0x0C12;
+
+#ifdef ENABLE_NPC_LOCATION_HELPER
+    constexpr uint16_t NPC_LOCATION_HELPER = 0x0D01;
+#endif
 }
 
 // ============================================================================
@@ -716,3 +724,19 @@ namespace DragonSoulSub { enum : uint8_t {
     REFINE_FAIL_TOO_MUCH_MATERIAL,
     REFINE_SUCCEED,
 }; }
+
+#ifdef ENABLE_NPC_LOCATION_HELPER
+namespace NPCLocationHelperSub {
+    namespace CG { enum : uint8_t {
+        REQUEST_STATUS,
+        WARP_TO_NPC,
+        USE_TICKET,
+        REQUEST_GUILD_LAND,
+    }; }
+    namespace GC { enum : uint8_t {
+        STATUS,
+        WARP_RESULT,
+        GUILD_LAND,
+    }; }
+}
+#endif // ENABLE_NPC_LOCATION_HELPER

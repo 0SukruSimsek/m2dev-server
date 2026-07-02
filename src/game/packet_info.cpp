@@ -189,6 +189,9 @@ CPacketInfoCG::CPacketInfoCG()
 #ifdef ENABLE_ANTI_MULTIPLE_FARM
 	Set(CG::ANTI_FARM, sizeof(TSendAntiFarmInfo), "AntiFarmUpdateStatus");
 #endif
+#ifdef ENABLE_NPC_LOCATION_HELPER
+	Set(CG::NPC_LOCATION_HELPER, sizeof(TPacketCGNPCLocationHelper), "NPCLocationHelper");
+#endif
 }
 
 CPacketInfoCG::~CPacketInfoCG()

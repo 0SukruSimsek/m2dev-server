@@ -45,6 +45,9 @@
 #include "locale_service.h"
 #include "DragonSoul.h"
 #include "keyf_train_log.h"  // [KEYF_TRAIN] training log macro
+#ifdef ENABLE_NPC_LOCATION_HELPER
+#include "npc_location_helper.h"
+#endif
 
 extern void SendShout(const char * szText, BYTE bEmpire);
 extern int g_nPortalLimitTime;
@@ -937,7 +940,7 @@ void CInputMain::QuickslotAdd(LPCHARACTER ch, const char * data)
 	// [KEYF_TRAIN] patch start — QUICKSLOT_ADD event
 	KEYF_LOG(ch, "QUICKSLOT_ADD",
 		"pos=%d slot_type=%d slot_num=%d",
-		pinfo->pos, pinfo->slot.Type, pinfo->slot.Position);
+		pinfo->pos, pinfo->slot.type, pinfo->slot.pos);
 	// [KEYF_TRAIN] patch end
 	ch->SetQuickslot(pinfo->pos, pinfo->slot);
 }
@@ -3513,6 +3516,9 @@ void CInputMain::RegisterHandlers()
 #ifdef ENABLE_ANTI_MULTIPLE_FARM
 	reg(CG::ANTI_FARM,          &CInputMain::HandleAntiFarm);
 #endif
+#ifdef ENABLE_NPC_LOCATION_HELPER
+	reg(CG::NPC_LOCATION_HELPER, &CInputMain::HandleNPCLocationHelper);
+#endif
 }
 
 // ---------------------------------------------------------------------------
@@ -3632,4 +3638,20 @@ int CInputMain::RecvAntiFarmUpdateStatus(LPCHARACTER ch, const char* data, size_
 }
 #endif
 
+// ---------------------------------------------------------------------------
+// NPC Location Helper handler
+// ---------------------------------------------------------------------------
+#ifdef ENABLE_NPC_LOCATION_HELPER
+int CInputMain::HandleNPCLocationHelper(LPDESC d, const char* p)
+{
+	LPCHARACTER ch = d->GetCharacter();
+	if (!ch) return 0;
+
+	const TPacketCGNPCLocationHelper* pkt = reinterpret_cast<const TPacketCGNPCLocationHelper*>(p);
+	if (!pkt) return 0;
+
+	CNpcLocationHelperManager::instance().HandlePacket(ch, *pkt);
+	return 0;
+}
+#endif // ENABLE_NPC_LOCATION_HELPER
 

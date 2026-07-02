@@ -1897,6 +1897,37 @@ typedef struct SPacketGCSwitchbotStatus
 	uint32_t uptime_sec;
 } TPacketGCSwitchbotStatus;
 
+#ifdef ENABLE_NPC_LOCATION_HELPER
+// CG packet (client -> server): NPC Location Helper request
+typedef struct SPacketCGNPCLocationHelper
+{
+	uint16_t header;
+	uint16_t length;
+	uint8_t  subheader;
+	uint8_t  pad[3];
+	int32_t  mapIndex;
+	uint32_t vnum;
+	int32_t  x;
+	int32_t  y;
+} TPacketCGNPCLocationHelper;
+
+// GC packet (server -> client): NPC Location Helper response
+typedef struct SPacketGCNPCLocationHelper
+{
+	uint16_t header;
+	uint16_t length;
+	uint8_t  subheader;
+	uint8_t  result;
+	uint8_t  active;
+	uint8_t  pad;
+	uint32_t cooldownRemain;
+	int32_t  mapIndex;
+	uint32_t vnum;
+	int32_t  x;
+	int32_t  y;
+} TPacketGCNPCLocationHelper;
+#endif // ENABLE_NPC_LOCATION_HELPER
+
 #ifdef ENABLE_ANTI_MULTIPLE_FARM
 // Subheader enum for CG/GC ANTI_FARM packets
 enum EAntiFarmSubHeader

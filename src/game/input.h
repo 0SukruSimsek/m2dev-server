@@ -237,6 +237,9 @@ class CInputMain : public CInputProcessor
 		int			RecvAntiFarmUpdateStatus(LPCHARACTER ch, const char* data, size_t uiBytes);
 		int			HandleAntiFarm(LPDESC d, const char* p);
 #endif
+#ifdef ENABLE_NPC_LOCATION_HELPER
+		int			HandleNPCLocationHelper(LPDESC d, const char* p);
+#endif
 };
 
 class CInputDead : public CInputMain
