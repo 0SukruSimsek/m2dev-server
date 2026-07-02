@@ -55,6 +55,7 @@
 #include "BlueDragon_Binder.h"
 #include "skill_power.h"
 #include "buff_on_attributes.h"
+#include "bot_chat.h"
 
 #ifdef __PET_SYSTEM__
 #include "PetSystem.h"
@@ -7962,7 +7963,6 @@ int CHARACTER::BotInternalHeal(BYTE stat)
 // Chat locale picker — Adim 6.1: bot_chat.cpp BotChat_PickLine'a delege.
 const char* BotChatPick(BYTE persona, DWORD seed)
 {
-	extern const char* BotChat_PickLine(BYTE, DWORD);
 	return BotChat_PickLine(persona, seed);
 }
 

@@ -244,6 +244,10 @@ ACMD (do_dragon_soul);
 ACMD (do_ds_list);
 ACMD (do_clear_affect);
 
+#ifdef ENABLE_TITLE_SYSTEM
+ACMD(do_title);
+#endif
+
 struct command_info cmd_info[] =
 {
 	{ "!RESERVED!",	NULL,			0,			POS_DEAD,	GM_IMPLEMENTOR	}, /* 반드시 이 것이 처음이어야 한다. */
@@ -531,6 +535,10 @@ struct command_info cmd_info[] =
 
 	// switchbot dev framework
 	{ "switchbot",		do_switchbot,		0,	POS_DEAD,	GM_LOW_WIZARD	},
+
+#ifdef ENABLE_TITLE_SYSTEM
+	{ "title",			do_title,			0,	POS_DEAD,	GM_PLAYER	},
+#endif
 
 	{ "\n",		NULL,			0,			POS_DEAD,	GM_IMPLEMENTOR	}  /* 반드시 이 것이 마지막이어야 한다. */
 };

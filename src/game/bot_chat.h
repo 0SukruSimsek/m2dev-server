@@ -27,3 +27,14 @@ inline bool BotChat_NearbyPC(CHARACTER* /*bot*/)
 {
     return false;
 }
+
+// No-op: scan for player mentions (stub — chat system reverted).
+inline void BotChat_ScanForMentions(CHARACTER* /*sender*/, const char* /*msg*/)
+{
+}
+
+// Returns nullptr always (chat system reverted).
+inline const char* BotChat_PickLine(BYTE /*persona*/, DWORD /*seed*/)
+{
+    return nullptr;
+}

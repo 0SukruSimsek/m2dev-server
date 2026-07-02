@@ -42,6 +42,9 @@
 #include "DragonSoul.h"
 #include "buff_on_attributes.h"
 #include "belt_inventory_helper.h"
+#ifdef ENABLE_NPC_LOCATION_HELPER
+#include "npc_location_helper.h"
+#endif
 
 const int ITEM_BROKEN_METIN_VNUM = 28960;
 
@@ -2179,6 +2182,15 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 		case ITEM_USE:
 			{
+#ifdef ENABLE_NPC_LOCATION_HELPER
+				if (item->GetVnum() == 79667) // NPC_LOCATION_HELPER_ACTIVATOR
+				{
+					if (!CNpcLocationHelperManager::instance().IsActive(this))
+						item->SetCount(item->GetCount() - 1);
+					CNpcLocationHelperManager::instance().Activate(this);
+					return true;
+				}
+#endif // ENABLE_NPC_LOCATION_HELPER
 				if (item->GetVnum() > 50800 && item->GetVnum() <= 50820)
 				{
 					if (test_server)
@@ -4882,6 +4894,106 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 					case USE_MONEYBAG:
 						break;
 
+#ifdef ENABLE_TITLE_SYSTEM
+					case USE_TITLE:
+					{
+						int iDuration = item->GetValue(1);
+						if (iDuration <= 0)
+							iDuration = item->GetValue(2);
+
+						const DWORD dwVnum = item->GetVnum();
+						const int iBundle0[5] = { 1000, 1001, 1002, 1003, 1004 };
+						const int iBundle1[5] = { 1005, 2000, 2001, 2002, 2003 };
+						const int iBundle2[5] = { 3000, 3001, 3002, 3003, 3004 };
+
+						const int* pBundle = NULL;
+						int iBundleCount = 0;
+						switch (dwVnum)
+						{
+							case 57000: pBundle = iBundle0; iBundleCount = 5; break;
+							case 57001: pBundle = iBundle1; iBundleCount = 5; break;
+							case 57002: pBundle = iBundle2; iBundleCount = 5; break;
+						}
+
+						if (pBundle && iBundleCount > 0)
+						{
+							int iUnlockedCount = 0;
+							for (int i = 0; i < iBundleCount; ++i)
+							{
+								const int iTitleID = pBundle[i];
+								char szOwned[64];
+								char szExpire[64];
+								snprintf(szOwned, sizeof(szOwned), "title_system.owned.%d", iTitleID);
+								snprintf(szExpire, sizeof(szExpire), "title_system.expire.%d", iTitleID);
+
+								if (GetQuestFlag(szOwned) > 0)
+									continue;
+
+								SetQuestFlag(szOwned, 1);
+								if (iDuration > 0)
+									SetQuestFlag(szExpire, get_global_time() + iDuration);
+								else
+									SetQuestFlag(szExpire, 0);
+								ChatPacket(CHAT_TYPE_COMMAND, "TitleSyncAdd %d", iTitleID);
+								++iUnlockedCount;
+							}
+
+							if (iUnlockedCount <= 0)
+							{
+								ChatPacket(CHAT_TYPE_INFO, "You already own all titles in this package.");
+								break;
+							}
+
+							item->SetCount(item->GetCount() - 1);
+							ChatPacket(CHAT_TYPE_INFO, "Title package unlocked: %d new titles.", iUnlockedCount);
+							break;
+						}
+
+						// Tek unvan sertifikasi
+						int iTitleID = item->GetValue(0);
+						if (iTitleID <= 0)
+						{
+							ChatPacket(CHAT_TYPE_INFO, "Invalid title certificate.");
+							break;
+						}
+
+						char szOwned[64];
+						char szExpire[64];
+						snprintf(szOwned, sizeof(szOwned), "title_system.owned.%d", iTitleID);
+						snprintf(szExpire, sizeof(szExpire), "title_system.expire.%d", iTitleID);
+
+						if (GetQuestFlag(szOwned) > 0)
+						{
+							ChatPacket(CHAT_TYPE_INFO, "You already own this title.");
+							break;
+						}
+
+						// FIX-2: active-unvan guard — do_title equip ile tutarli davranis
+						const int iActiveTitle = GetQuestFlag("title_system.active");
+						if (iActiveTitle > 0 && iActiveTitle != iTitleID)
+						{
+							ChatPacket(CHAT_TYPE_INFO, "Remove your current title first.");
+							break;
+						}
+
+						SetQuestFlag(szOwned, 1);
+						if (iDuration > 0)
+							SetQuestFlag(szExpire, get_global_time() + iDuration);
+						else
+							SetQuestFlag(szExpire, 0);
+
+						SetQuestFlag("title_system.active", iTitleID);
+
+						// FIX-1b: sertifika kullaniminda client UI aninda guncelle
+						ChatPacket(CHAT_TYPE_COMMAND, "TitleSyncAdd %d", iTitleID);
+						ChatPacket(CHAT_TYPE_COMMAND, "TitleSyncActive %d", iTitleID);
+
+						ChatPacket(CHAT_TYPE_INFO, "Title unlocked and equipped (ID: %d)", iTitleID);
+						item->SetCount(item->GetCount() - 1);
+					}
+					break;
+#endif // ENABLE_TITLE_SYSTEM
+
 					// MR-12: Overwrite lower value affects
 					case USE_AFFECT :
 						{
@@ -4982,6 +5094,18 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							AutoGiveItem(item->GetValue(0));
 						}
 						break;
+#ifdef ENABLE_NPC_LOCATION_HELPER
+				case USE_MAP:
+					{
+						if (item->GetVnum() >= 79800 && item->GetVnum() <= 79822)
+						{
+							if (CNpcLocationHelperManager::instance().UnlockMapByItem(this, item->GetVnum(), item->GetValue(0)))
+								item->SetCount(item->GetCount() - 1);
+							return true;
+						}
+					}
+					break;
+#endif // ENABLE_NPC_LOCATION_HELPER
 				}
 			}
 			break;

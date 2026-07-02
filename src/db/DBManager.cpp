@@ -162,13 +162,22 @@ unsigned long CDBManager::EscapeString(void *to, const void *from, unsigned long
 
 void CDBManager::SetLocale(const char * szLocale)
 {
+	// GUARD: szLocale must not be NULL, and SQL slots may not be
+	// initialised yet if MariaDB was temporarily unreachable during
+	// startup (rapid-restart race: 4988 watchdog restarts, 62 SIGSEGV).
+	if (!szLocale)
+	{
+		sys_err("CDBManager::SetLocale called with NULL locale, skipping");
+		return;
+	}
+
 	const std::string stLocale(szLocale);
 	sys_log(0, "SetLocale start" );
 	for (int n = 0; n < SQL_MAX_NUM; ++n)
 	{
-		m_mainSQL[n]->SetLocale(stLocale);
-		m_directSQL[n]->SetLocale(stLocale);
-		m_asyncSQL[n]->SetLocale(stLocale);
+		if (m_mainSQL[n])   m_mainSQL[n]->SetLocale(stLocale);
+		if (m_directSQL[n]) m_directSQL[n]->SetLocale(stLocale);
+		if (m_asyncSQL[n])  m_asyncSQL[n]->SetLocale(stLocale);
 	}
 	sys_log(0, "End setlocale %s", szLocale);
 }

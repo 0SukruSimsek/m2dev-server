@@ -61,7 +61,16 @@ EVENTFUNC(switchbot_pulse_event)
 CSwitchbotManager::CSwitchbotManager()
     : m_pPulseEvent(nullptr)
 {
-    // Start the recurring pulse event immediately.
+    // NOTE: event_create MUST NOT be called here — thecore_heart is NULL
+    // until thecore_init() runs inside start().  Call Initialize() after
+    // start() returns successfully (see main.cpp).
+}
+
+void CSwitchbotManager::Initialize()
+{
+    if (m_pPulseEvent)
+        return; // already initialized
+
     TSwitchbotPulseInfo* info = AllocEventInfo<TSwitchbotPulseInfo>();
     info->mgr = this;
     m_pPulseEvent = event_create(switchbot_pulse_event, info, SWITCHBOT_PULSE_TICKS);

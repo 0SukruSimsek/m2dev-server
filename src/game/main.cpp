@@ -61,6 +61,9 @@
 #ifdef __WORLDBOSS__
 #include "worldboss_event.h"
 #endif
+#ifdef ENABLE_NPC_LOCATION_HELPER
+#include "npc_location_helper.h"
+#endif
 
 // #ifndef OS_WINDOWS
 // #include <gtest/gtest.h>
@@ -361,6 +364,9 @@ int main(int argc, char **argv)
 	CDragonLairManager	dl_manager;
 	DSManager dsManager;
 	CSwitchbotManager switchbot_manager; // switchbot dev framework
+#ifdef ENABLE_NPC_LOCATION_HELPER
+	CNpcLocationHelperManager npc_location_helper_manager; // singleton: MUST be declared before instance() call
+#endif
 
 	if (!start(argc, argv)) {
 		CleanUpForEarlyExit();
@@ -376,6 +382,10 @@ int main(int argc, char **argv)
 
 	MessengerManager::instance().Initialize();
 	CGuildManager::instance().Initialize();
+	CSwitchbotManager::instance().Initialize(); // must be after thecore_init (start() ran)
+#ifdef ENABLE_NPC_LOCATION_HELPER
+	CNpcLocationHelperManager::instance().Initialize();
+#endif
 	fishing::Initialize();
 	OXEvent_manager.Initialize();
 

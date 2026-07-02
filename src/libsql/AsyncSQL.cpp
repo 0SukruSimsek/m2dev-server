@@ -46,6 +46,20 @@ bool CAsyncSQL::QueryLocaleSet()
 		return true;
 	}
 
+	// GUARD: m_hDB.host is set by mysql_init() inside Connect().
+	// If Connect() has not been called yet (e.g. SetLocale called before
+	// the worker thread connects, or during rapid restart race), m_hDB is
+	// still zeroed from the constructor's memset — calling
+	// mysql_set_character_set() on an uninitialised handle causes SIGSEGV.
+	// Return true (deferred) so the locale stored in m_stLocale will be
+	// applied later when Connect() calls mysql_options(MYSQL_SET_CHARSET_NAME).
+	if (!m_hDB.host)
+	{
+		sys_log(0, "QueryLocaleSet: m_hDB not ready, locale '%s' deferred until Connect()",
+			m_stLocale.c_str());
+		return true;
+	}
+
 	if (mysql_set_character_set(&m_hDB, m_stLocale.c_str()))
 	{
 		sys_err("cannot set locale %s by 'mysql_set_character_set', errno %u %s",

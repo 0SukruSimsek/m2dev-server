@@ -32,20 +32,17 @@ void log_init()
 	syslog_sink->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v");
 
 	g_syslog = std::make_shared<spdlog::async_logger>(
-		"syslog",
-		syslog_sink,
+		"syslog", syslog_sink,
 		spdlog::thread_pool(),
 		spdlog::async_overflow_policy::block);
 
 	spdlog::register_logger(g_syslog);
 
-
 	auto syserr_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("syserr.log", true);
 	syserr_sink->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] [%!()] %v");
 
 	g_syserr = std::make_shared<spdlog::async_logger>(
-		"syserr",
-		syserr_sink,
+		"syserr", syserr_sink,
 		spdlog::thread_pool(),
 		spdlog::async_overflow_policy::block);
 
