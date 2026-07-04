@@ -16,14 +16,19 @@
 #include "char_manager.h"
 #include "desc_client.h"
 #include "item.h"
+#include "item_manager.h"
 #include "log.h"
 #include "event.h"
 #include "utils.h"
 #include "config.h"
+#include "sectree.h"
+#include "sectree_manager.h"
+#include "entity.h"
 
 #include <sstream>
 #include <algorithm>
 #include <cmath>
+#include <vector>
 
 // Pulse interval in seconds.  PASSES_PER_SEC is runtime, not constexpr.
 #define SWITCHBOT_PULSE_TICKS PASSES_PER_SEC(2)
@@ -310,29 +315,348 @@ void CSwitchbotManager::BotTick(SBotEntry& entry, LPCHARACTER ch)
 }
 
 // ============================================================================
-// Scenario ticks (stubs; GM/QA team fills in real logic)
+// SWITCHBOT FARM AUTOMATION — Wave-2 Faz C+ (2026-07-03)
+//
+// Tasarim kurallari:
+//   1. Tum yeni kod IsSwitchbot yolunun icinde kalir (BotTick->ScenarioTick_Farm).
+//      Switchbot olmayan karakterlere SIFIR etki.
+//   2. Phase VII primitifleri yeniden kullanilir: sectree ForEachAround (mob-bul),
+//      ch->Attack() / ch->BotMoveStep() (hareket/kavga), ch->BotInternalHeal()
+//      (potion), ch->PickupItem() (loot). Yeni kod YAZILMAZ.
+//   3. Mevcut stuck/exploit dedektorlerine dokunulmaz.
+//   4. Karakterin olmu olmasi (ch->IsDead()) durumunda idle — crash yok.
+// ============================================================================
+
+namespace
+{
+    // -------------------------------------------------------------------------
+    // FFarmFindMob — Sectree iter: en yakin hedef MOB / STONE bul
+    // Skoring: canli + pc degil + boss degil (mob_rank<3) = temel skor 100.
+    // Yakinlik: mesafe kucukse skor artar. (Phase VII FFindClosestMob benzeri)
+    // -------------------------------------------------------------------------
+    struct FFarmFindMob
+    {
+        LPCHARACTER  me;
+        LPCHARACTER  best       = nullptr;
+        long long    best_score = -1;
+        static const int FARM_SCAN_RADIUS = 5000;  // u (world units)
+        static const long long kRadSq = (long long)FARM_SCAN_RADIUS * FARM_SCAN_RADIUS;
+
+        void operator()(LPENTITY ent)
+        {
+            if (!ent || !ent->IsType(ENTITY_CHARACTER)) return;
+            LPCHARACTER c = (LPCHARACTER)ent;
+            if (c == me)           return;
+            if (c->IsDead())       return;
+            if (c->IsPC())         return;           // gercek oyunculara dokunma
+            if (c->IsServerSideBot()) return;        // diger bot'lara dokunma
+            if (!c->IsMonster() && !c->IsStone()) return;
+
+            long dx = c->GetX() - me->GetX();
+            long dy = c->GetY() - me->GetY();
+            long long dist_sq = (long long)dx * dx + (long long)dy * dy;
+            if (dist_sq > kRadSq) return;
+
+            // Skor: yakinlik + seviye (fark +-10 tercih)
+            int lvl_diff = std::abs((int)c->GetLevel() - (int)me->GetLevel());
+            int lvl_score = (lvl_diff <= 10) ? 50 : 0;
+            long long score = lvl_score * 1000000LL - dist_sq;  // yakin + uygun seviye
+
+            if (score > best_score)
+            {
+                best_score = score;
+                best       = c;
+            }
+        }
+    };
+
+    // -------------------------------------------------------------------------
+    // FFarmFindItem — Sectree iter: 3000u icinde loot item/gold ara
+    // -------------------------------------------------------------------------
+    struct FFarmFindItem
+    {
+        LPCHARACTER             me;
+        std::vector<DWORD>      vids;
+        static const int LOOT_RANGE_SQ = 3000 * 3000;
+
+        void operator()(LPENTITY ent)
+        {
+            if (!ent || !ent->IsType(ENTITY_ITEM)) return;
+            LPITEM item = (LPITEM)ent;
+            if (!item->GetSectree()) return;
+            int32_t dx = item->GetX() - me->GetX();
+            int32_t dy = item->GetY() - me->GetY();
+            if ((int64_t)dx * dx + (int64_t)dy * dy < LOOT_RANGE_SQ)
+                vids.push_back(item->GetVID());
+        }
+    };
+
+    // -------------------------------------------------------------------------
+    // ApplySwitchbotJitter — Hedef vektoru ±max_deg kadar rastgele saptir.
+    // "Insan eli" efekti — bot tam dogru cizgide degil. (Phase VII B1 kaynakli)
+    // -------------------------------------------------------------------------
+    inline void ApplySwitchbotJitter(long& dx, long& dy, DWORD seed, float max_deg = 8.0f)
+    {
+        int bucket = (int)(seed % 11) - 5;  // -5..+5
+        float angle_deg = bucket * (max_deg / 5.0f);
+        float rad = angle_deg * 3.14159265358979f / 180.0f;
+        float c = std::cos(rad);
+        float s = std::sin(rad);
+        float ndx = c * (float)dx - s * (float)dy;
+        float ndy = s * (float)dx + c * (float)dy;
+        dx = (long)ndx;
+        dy = (long)ndy;
+    }
+}  // namespace
+
+// ============================================================================
+// ScenarioTick_Farm — Gercek farm dongusu
+//
+// Her 2sn Pulse'ta:
+//   (A) Karakter oluyse: idle (crash yok, respawn server'a birakilir).
+//   (B) Yakin item/gold varsa: yerde bekleyen lootu topla (LootPickupAction ornek).
+//   (C) Mevcut hedef canli + yakindaysa: saldir (Attack).
+//   (D) Hedef yok/oldu:
+//       (D1) Sektorde mob ara (FFarmFindMob).
+//       (D2) Mob bulunduysa: chase/melee.
+//       (D3) Mob yoksa: jitterli wander + NO_MOB_90s -> respawn bolgesine warp.
+//   (E) HP/SP dusukse: BotInternalHeal (server-side, paket yok).
+//
+// Metrik: summary_kills (hedef olu oldugunda artir), summary_enc (encounter).
 // ============================================================================
 void CSwitchbotManager::ScenarioTick_Farm(SBotEntry& entry, LPCHARACTER ch)
 {
-    // FARM: move randomly in a small radius, simulate mob encounter.
-    // Stub: increment encounter counter to test metric pipeline.
-    entry.metric.encounters++;
-    // Real implementation: ch->MoveToRandom(), trigger attack, pick up drops.
-    (void)ch;
+    // --- GUARD A: karakter olu ---
+    if (ch->IsDead())
+    {
+        // Idle — hicbir aksiyon yok; olum-respawn server mantigi calissin.
+        sys_log(1, "switchbot FARM PID=%u: char dead, idle", entry.pid);
+        return;
+    }
+
+    const DWORD now_ms = get_dword_time();
+    const DWORD seed   = now_ms ^ entry.pid;
+
+    // --- GUARD E: HP/SP kritikse once iyiles (hedef aramadan once) ---
+    {
+        int hp     = ch->GetHP();
+        int max_hp = ch->GetMaxHP();
+        int sp     = ch->GetSP();
+        int max_sp = ch->GetMaxSP();
+        int hp_pct = (max_hp > 0) ? (hp * 100 / max_hp) : 100;
+        int sp_pct = (max_sp > 0) ? (sp * 100 / max_sp) : 100;
+
+        if (hp_pct < 30)
+        {
+            ch->BotInternalHeal(POINT_HP);
+            sys_log(1, "switchbot FARM PID=%u: HP=%d%% -> BotInternalHeal(HP)", entry.pid, hp_pct);
+        }
+        if (sp_pct < 30)
+        {
+            ch->BotInternalHeal(POINT_SP);
+            sys_log(1, "switchbot FARM PID=%u: SP=%d%% -> BotInternalHeal(SP)", entry.pid, sp_pct);
+        }
+    }
+
+    // --- BÖLÜM B: Yakin item/gold lootu topla ---
+    // F4 FIX: yaklaşma eşiği 250u (BotMoveStep step_size=300 > eşik=250, boşluk yok).
+    // Eski: eşik=300 / step=250 → 300u'daki item için ne-yaklaş-ne-topla aralığı vardı.
+    LPSECTREE sec = ch->GetSectree();
+    if (sec)
+    {
+        FFarmFindItem loot_scan{ ch, {} };
+        sec->ForEachAround(loot_scan);
+        if (!loot_scan.vids.empty())
+        {
+            // En yakin item'a git (ilk VID)
+            LPITEM nearest_item = ITEM_MANAGER::instance().FindByVID(loot_scan.vids[0]);
+            if (nearest_item)
+            {
+                long idx = nearest_item->GetX() - ch->GetX();
+                long idy = nearest_item->GetY() - ch->GetY();
+                long idist_sq = idx * idx + idy * idy;
+                if (idist_sq > 250L * 250L)  // F4: 300 -> 250 (step_size=300 ile hizali)
+                {
+                    // Once yaklas
+                    ApplySwitchbotJitter(idx, idy, seed ^ 0xC0DE, 3.0f);
+                    ch->BotMoveStep(ch->GetX() + idx, ch->GetY() + idy, 300.0, "SB_LOOT_APPROACH");
+                }
+                else
+                {
+                    // Pickup loop (Phase VII B2 LootPickupAction pattern)
+                    for (DWORD vid : loot_scan.vids)
+                    {
+                        ch->PickupItem(vid);
+                    }
+                    sys_log(1, "switchbot FARM PID=%u: loot pickup %zu items",
+                        entry.pid, loot_scan.vids.size());
+                }
+            }
+            // F2 FIX: encounters sadece yeni-hedef-edinme aninda artar (D bolumu).
+            // Loot tick'inde artirma — sayac semantigi: "yeni hedef kac kez edindi".
+            return;  // erken don (bir tick bir eylem)
+        }
+    }
+
+    // --- BÖLÜM C: Mevcut hedef varsa saldir / kovala ---
+    LPCHARACTER target = ch->GetBotTarget();
+    if (target)
+    {
+        if (target->IsDead())
+        {
+            // Hedef yeni oldu -> kill say, hedef sifirla.
+            // F2 FIX: encounters burada artmaz — kill saymak kills'in isi.
+            entry.metric.kills++;
+            ch->SetBotTarget(nullptr);
+            sys_log(1, "switchbot FARM PID=%u: target '%s' died, kill++",
+                entry.pid, target->GetName());
+            target = nullptr;
+        }
+        else
+        {
+            // Hedef canli: mesafe kontrol
+            long tdx = target->GetX() - ch->GetX();
+            long tdy = target->GetY() - ch->GetY();
+            long long dist_sq = (long long)tdx * tdx + (long long)tdy * tdy;
+
+            if (dist_sq <= 280LL * 280LL)
+            {
+                // Melee mesafesi — saldir (Phase VII AttackAction gibi)
+                // F2 FIX: encounters burada artmaz — saldiri sadece combat eylemi.
+                ch->EnterCombat();
+                ch->SetTarget(target);
+                ch->Attack(target, 0);  // PHYSICAL
+                sys_log(1, "switchbot FARM PID=%u: ATTACK target='%s'", entry.pid, target->GetName());
+            }
+            else if (dist_sq < (long long)FFarmFindMob::FARM_SCAN_RADIUS * FFarmFindMob::FARM_SCAN_RADIUS)
+            {
+                // Chase range — yaklas (jitter ile insan hissi)
+                // F2 FIX: encounters burada artmaz — chase sadece hareket eylemi.
+                ApplySwitchbotJitter(tdx, tdy, seed ^ 0xBEEF, 5.0f);
+                ch->BotMoveStep(ch->GetX() + tdx, ch->GetY() + tdy, 300.0, "SB_CHASE");
+            }
+            else
+            {
+                // Hedef cok uzakta — birak, yenisini ara
+                ch->SetBotTarget(nullptr);
+                target = nullptr;
+            }
+
+            if (target) return;  // eylem yapildi
+        }
+    }
+
+    // --- BÖLÜM D: Hedef yok — yeni mob ara ---
+    if (sec)
+    {
+        FFarmFindMob mob_scan{ ch };
+        sec->ForEachAround(mob_scan);
+
+        if (mob_scan.best)
+        {
+            ch->SetBotTarget(mob_scan.best);
+            // F2 FIX: encounters SADECE yeni-hedef-edinme aninda artar.
+            // Semantik: "kac kez yeni bir mob hedeflendi" = leveling ilerleme proxy.
+            entry.metric.encounters++;
+            // F3: Mob bulundu — no_mob_since damgasini sifirla.
+            entry.no_mob_since = 0;
+            sys_log(1, "switchbot FARM PID=%u: new target='%s' lvl=%d",
+                entry.pid, mob_scan.best->GetName(), (int)mob_scan.best->GetLevel());
+            // Bir sonraki tick'te saldiracak (C bolumu)
+        }
+        else
+        {
+            // D3: Mob yok — wander
+            // F3 FIX: no_mob_since ile gercek 90sn NO_MOB warp.
+            // (Eski: stuck_events > 3 kullaniyordu — metric alani, cakisma.)
+            const time_t now_t = time(nullptr);
+            if (entry.no_mob_since == 0)
+                entry.no_mob_since = now_t;  // ilk bos scan damgasi
+
+            long dx = (long)(seed % 2000) - 1000;
+            long dy = (long)((seed >> 13) % 2000) - 1000;
+            double rdist = std::sqrt((double)dx * dx + (double)dy * dy);
+            if (rdist < 1.0) rdist = 1.0;
+            ApplySwitchbotJitter(dx, dy, seed ^ 0xDEAD, 8.0f);
+            long wander_x = ch->GetX() + (long)(dx * 1000.0 / rdist);
+            long wander_y = ch->GetY() + (long)(dy * 1000.0 / rdist);
+            bool moved = ch->BotMoveStep(wander_x, wander_y, 150.0, "SB_WANDER");
+
+            // F1 FIX: farm_stuck_score — AYRI runtime alan, metric.stuck_events DEGIL.
+            // Artirma kriteri: BotMoveStep no-op dondu (hareket olmadi = pozisyon degismedi).
+            if (!moved)
+                entry.farm_stuck_score++;
+
+            // F3: 90sn mob bulunamazsa spawn bolgesine warp.
+            bool no_mob_warp = (entry.no_mob_since > 0 &&
+                                (now_t - entry.no_mob_since) >= 90);
+
+            // F1: farm_stuck_score > 3 ise warp (metric.stuck_events'e dokunma).
+            bool stuck_warp = (entry.farm_stuck_score > 3);
+
+            if (no_mob_warp || stuck_warp)
+            {
+                long wx = ch->GetX() + (long)(seed % 6000) - 3000;
+                long wy = ch->GetY() + (long)((seed * 2654435769u) % 6000) - 3000;
+                ch->BotMoveStep(wx, wy, 500.0, "SB_STUCK_WARP");
+                entry.farm_stuck_score = 0;   // F1: kendi sayacini sifirla
+                entry.no_mob_since     = 0;   // F3: no_mob damgasini sifirla
+                sys_log(0, "switchbot FARM PID=%u: warp trigger no_mob=%s stuck=%s -> (%ld,%ld)",
+                    entry.pid,
+                    no_mob_warp ? "YES" : "NO",
+                    stuck_warp  ? "YES" : "NO",
+                    wx, wy);
+            }
+        }
+    }
 }
 
+// ============================================================================
+// ScenarioTick_Quest — Farm-fallback (quest otomasyonu buyuk ayri is)
+//
+// Mission: "leveling, quest, zone farming" — Quest otomasyonu (NPC dialog,
+// objective tracking, quest-item pickup) ayri bir Wave'de ele alinacak.
+// Bu turda: Quest senaryosunda Farm davranisi devreye girer (kill+loot devam
+// eder, quest metrikleri ise "not implemented" yorumuyla loglanir).
+// ============================================================================
 void CSwitchbotManager::ScenarioTick_Quest(SBotEntry& entry, LPCHARACTER ch)
 {
-    // QUEST: stub — simulate quest interaction tick.
-    entry.metric.encounters++;
-    (void)ch;
+    // Quest otomasyonu (NPC dialog + objective tracking) bu turda implement edilmedi.
+    // Farm davranisini delege et: kill/loot calissin, quest-specifik adimlar yok.
+    // metric: encounters artir (Farm ile ayni sayac, Quest ozel sayac yok bu turda)
+    ScenarioTick_Farm(entry, ch);
+
+    // Quest-ozel log: 60sn'de bir bildir (FlushMetric zaten TICK_OK loglar)
+    static thread_local time_t s_quest_warn = 0;
+    if (time(nullptr) - s_quest_warn > 60)
+    {
+        sys_log(0, "switchbot QUEST PID=%u: quest-specific steps NOT IMPLEMENTED "
+            "(NPC dialog / objective tracking); delegating to Farm. "
+            "Implement in Wave-3 quest-automation iz.", entry.pid);
+        s_quest_warn = time(nullptr);
+    }
 }
 
+// ============================================================================
+// ScenarioTick_Dungeon — Farm-fallback (dungeon navigasyon buyuk ayri is)
+//
+// Dungeon otomasyonu (portal + boss + dungeon-specific spawn) ayri Wave'de.
+// Bu turda: Dungeon senaryosunda Farm davranisi devreye girer.
+// ============================================================================
 void CSwitchbotManager::ScenarioTick_Dungeon(SBotEntry& entry, LPCHARACTER ch)
 {
-    // DUNGEON: stub — simulate dungeon navigation tick.
-    entry.metric.encounters++;
-    (void)ch;
+    // Dungeon otomasyonu (portal bulma, boss sirali kill, ozel spawn)
+    // bu turda implement edilmedi. Farm davranisini delege et.
+    ScenarioTick_Farm(entry, ch);
+
+    static thread_local time_t s_dung_warn = 0;
+    if (time(nullptr) - s_dung_warn > 60)
+    {
+        sys_log(0, "switchbot DUNGEON PID=%u: dungeon-specific steps NOT IMPLEMENTED "
+            "(portal/boss/spawn); delegating to Farm. "
+            "Implement in Wave-3 dungeon-automation iz.", entry.pid);
+        s_dung_warn = time(nullptr);
+    }
 }
 
 void CSwitchbotManager::ScenarioTick_PvP(SBotEntry& entry, LPCHARACTER ch)

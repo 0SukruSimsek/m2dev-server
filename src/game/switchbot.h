@@ -30,6 +30,17 @@ struct SBotEntry
     // Scenario rotation timer.
     time_t           next_rotate = 0;
 
+    // --- Farm-only runtime state (NOT part of metric — metric is Flush/StuckCheck owned) ---
+
+    // F1: Farm warp counter — incremented by FarmWander when BotMoveStep returns
+    // no-op (position unchanged). NOT metric.stuck_events (which belongs to
+    // StuckCheck + FlushMetric.Reset()). Reset to 0 after warp fires.
+    int              farm_stuck_score = 0;
+
+    // F3: Time when the farm last saw zero mobs in scan radius.
+    // Set on first empty scan, cleared on mob found, warp fires at 90s elapsed.
+    time_t           no_mob_since = 0;
+
     SBotEntry() = default;
     explicit SBotEntry(DWORD p) : pid(p) { metric.pid = p; }
 };
